@@ -25,12 +25,13 @@ import (
 
 var (
 	// main operation modes
-	list        = flag.Bool("l", false, "list files whose formatting differs from gofmt's")
-	write       = flag.Bool("w", false, "write result to (source) file instead of stdout")
-	rewriteRule = flag.String("r", "", "rewrite rule (e.g., 'a[b:len(a)] -> a[b:]')")
-	simplifyAST = flag.Bool("s", false, "simplify code")
-	doDiff      = flag.Bool("d", false, "display diffs instead of rewriting files")
-	allErrors   = flag.Bool("e", false, "report all errors (not just the first 10 on different lines)")
+	list          = flag.Bool("l", false, "list files whose formatting differs from gofmt's")
+	write         = flag.Bool("w", false, "write result to (source) file instead of stdout")
+	rewriteRule   = flag.String("r", "", "rewrite rule (e.g., 'a[b:len(a)] -> a[b:]')")
+	simplifyAST   = flag.Bool("s", false, "simplify code")
+	doDiff        = flag.Bool("d", false, "display diffs instead of rewriting files")
+	allErrors     = flag.Bool("e", false, "report all errors (not just the first 10 on different lines)")
+	shortFuncLits = flag.Bool("short_func_lits", false, "short function literals")
 
 	// debugging
 	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to this file")
@@ -112,7 +113,7 @@ func processFile(filename string, in io.Reader, out io.Writer, stdin bool) error
 		simplify(file)
 	}
 
-	res, err := format(fileSet, file, sourceAdj, indentAdj, src, printer.Config{Mode: printerMode, Tabwidth: tabWidth})
+	res, err := format(fileSet, file, sourceAdj, indentAdj, src, printer.Config{Mode: printerMode, Tabwidth: tabWidth, ShortFuncLits: *shortFuncLits})
 	if err != nil {
 		return err
 	}

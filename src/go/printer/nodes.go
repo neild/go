@@ -743,7 +743,32 @@ func (p *printer) expr1(expr ast.Expr, prec1, depth int) {
 		p.print(x)
 
 	case *ast.FuncLit:
-		p.expr(x.Type)
+		namedResults := false
+		if x.Type.Results != nil {
+			for _, result := range x.Type.Results.List {
+				if len(result.Names) > 0 {
+					namedResults = true
+					break
+				}
+			}
+		}
+		if namedResults || !p.Config.ShortFuncLits {
+			p.expr(x.Type)
+			p.funcBody(p.distanceFrom(x.Type.Pos()), blank, x.Body)
+			return
+		}
+		p.print(token.FUNC)
+		i := 0
+		for _, param := range x.Type.Params.List {
+			for _, name := range param.Names {
+				if i != 0 {
+					p.print(token.COMMA)
+				}
+				p.print(blank)
+				p.print(name)
+				i++
+			}
+		}
 		p.funcBody(p.distanceFrom(x.Type.Pos()), blank, x.Body)
 
 	case *ast.ParenExpr:
