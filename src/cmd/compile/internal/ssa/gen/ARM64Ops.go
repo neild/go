@@ -109,7 +109,7 @@ func init() {
 	for i, name := range regNamesARM64 {
 		num[name] = i
 	}
-	buildReg := func(s string) regMask {
+	buildReg := func s {
 		m := regMask(0)
 		for _, r := range strings.Split(s, " ") {
 			if n, ok := num[r]; ok {

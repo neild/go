@@ -28,7 +28,7 @@ const (
 )
 
 func (mode *BuildMode) Set(s string) error {
-	badmode := func() error {
+	badmode := func {
 		return fmt.Errorf("buildmode %s not supported on %s/%s", s, objabi.GOOS, objabi.GOARCH)
 	}
 	switch s {
@@ -162,7 +162,7 @@ func (mode *LinkMode) String() string {
 // the external linker be used to complete the link.
 func mustLinkExternal(ctxt *Link) (res bool, reason string) {
 	if ctxt.Debugvlog > 1 {
-		defer func() {
+		defer func {
 			if res {
 				log.Printf("external linking is forced by: %s\n", reason)
 			}

@@ -203,7 +203,7 @@ func (check *Checker) assignVar(lhs ast.Expr, x *operand) Type {
 // return expressions, and returnPos is the position of the return statement.
 func (check *Checker) initVars(lhs []*Var, rhs []ast.Expr, returnPos token.Pos) {
 	l := len(lhs)
-	get, r, commaOk := unpack(func(x *operand, i int) { check.multiExpr(x, rhs[i]) }, len(rhs), l == 2 && !returnPos.IsValid())
+	get, r, commaOk := unpack(func x, i { check.multiExpr(x, rhs[i]) }, len(rhs), l == 2 && !returnPos.IsValid())
 	if get == nil || l != r {
 		// invalidate lhs and use rhs
 		for _, obj := range lhs {
@@ -247,7 +247,7 @@ func (check *Checker) initVars(lhs []*Var, rhs []ast.Expr, returnPos token.Pos) 
 
 func (check *Checker) assignVars(lhs, rhs []ast.Expr) {
 	l := len(lhs)
-	get, r, commaOk := unpack(func(x *operand, i int) { check.multiExpr(x, rhs[i]) }, len(rhs), l == 2)
+	get, r, commaOk := unpack(func x, i { check.multiExpr(x, rhs[i]) }, len(rhs), l == 2)
 	if get == nil {
 		return // error reported by unpack
 	}

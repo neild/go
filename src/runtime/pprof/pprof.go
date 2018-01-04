@@ -220,7 +220,7 @@ func Profiles() []*Profile {
 		all = append(all, p)
 	}
 
-	sort.Slice(all, func(i, j int) bool { return all[i].name < all[j].name })
+	sort.Slice(all, func i, j { return all[i].name < all[j].name })
 	return all
 }
 
@@ -319,7 +319,7 @@ func (p *Profile) WriteTo(w io.Writer, debug int) error {
 	p.mu.Unlock()
 
 	// Map order is non-deterministic; make output deterministic.
-	sort.Slice(all, func(i, j int) bool {
+	sort.Slice(all, func i, j {
 		t, u := all[i], all[j]
 		for k := 0; k < len(t) && k < len(u); k++ {
 			if t[k] != u[k] {
@@ -386,7 +386,7 @@ func printCountCycleProfile(w io.Writer, countName, cycleName string, records []
 func printCountProfile(w io.Writer, debug int, name string, p countProfile) error {
 	// Build count of each stack.
 	var buf bytes.Buffer
-	key := func(stk []uintptr) string {
+	key := func stk {
 		buf.Reset()
 		fmt.Fprintf(&buf, "@")
 		for _, pc := range stk {
@@ -542,7 +542,7 @@ func writeHeap(w io.Writer, debug int) error {
 		return writeHeapProto(w, p, int64(runtime.MemProfileRate))
 	}
 
-	sort.Slice(p, func(i, j int) bool { return p[i].InUseBytes() > p[j].InUseBytes() })
+	sort.Slice(p, func i, j { return p[i].InUseBytes() > p[j].InUseBytes() })
 
 	b := bufio.NewWriter(w)
 	tw := tabwriter.NewWriter(b, 1, 8, 1, '\t', 0)
@@ -803,7 +803,7 @@ func writeBlock(w io.Writer, debug int) error {
 		}
 	}
 
-	sort.Slice(p, func(i, j int) bool { return p[i].Cycles > p[j].Cycles })
+	sort.Slice(p, func i, j { return p[i].Cycles > p[j].Cycles })
 
 	if debug <= 0 {
 		return printCountCycleProfile(w, "contentions", "delay", p)
@@ -847,7 +847,7 @@ func writeMutex(w io.Writer, debug int) error {
 		}
 	}
 
-	sort.Slice(p, func(i, j int) bool { return p[i].Cycles > p[j].Cycles })
+	sort.Slice(p, func i, j { return p[i].Cycles > p[j].Cycles })
 
 	if debug <= 0 {
 		return printCountCycleProfile(w, "contentions", "delay", p)

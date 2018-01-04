@@ -30,7 +30,7 @@ func RelativeTo(pkg *Package) Qualifier {
 	if pkg == nil {
 		return nil
 	}
-	return func(other *Package) string {
+	return func other {
 		if pkg == other {
 			return "" // same package; unqualified
 		}

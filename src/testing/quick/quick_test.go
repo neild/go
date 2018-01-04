@@ -225,7 +225,7 @@ func TestCheckProperty(t *testing.T) {
 }
 
 func TestFailure(t *testing.T) {
-	f := func(x int) bool { return false }
+	f := func x { return false }
 	err := Check(f, nil)
 	if err == nil {
 		t.Errorf("Check didn't return an error")
@@ -242,7 +242,7 @@ func TestFailure(t *testing.T) {
 		t.Errorf("#1 Error was not a SetupError: %s", err)
 	}
 
-	err = CheckEqual(func(x, y int) {}, func(x int) {}, nil)
+	err = CheckEqual(func x, y {}, func x {}, nil)
 	if err == nil {
 		t.Errorf("#2 CheckEqual didn't return an error")
 	}
@@ -250,7 +250,7 @@ func TestFailure(t *testing.T) {
 		t.Errorf("#2 Error was not a SetupError: %s", err)
 	}
 
-	err = CheckEqual(func(x int) int { return 0 }, func(x int) int32 { return 0 }, nil)
+	err = CheckEqual(func x { return 0 }, func x { return 0 }, nil)
 	if err == nil {
 		t.Errorf("#3 CheckEqual didn't return an error")
 	}
@@ -272,12 +272,12 @@ func TestRecursive(t *testing.T) {
 		SliceMap []map[int]R
 	}
 
-	f := func(r R) bool { return true }
+	f := func r { return true }
 	Check(f, nil)
 }
 
 func TestEmptyStruct(t *testing.T) {
-	f := func(struct{}) bool { return true }
+	f := func { return true }
 	Check(f, nil)
 }
 
@@ -287,7 +287,7 @@ type (
 )
 
 func TestMutuallyRecursive(t *testing.T) {
-	f := func(a A) bool { return true }
+	f := func a { return true }
 	Check(f, nil)
 }
 
@@ -299,7 +299,7 @@ func TestNonZeroSliceAndMap(t *testing.T) {
 		M map[int]int
 		S []int
 	}
-	f := func(q Q) bool {
+	f := func q {
 		return q.M != nil && q.S != nil
 	}
 	err := Check(f, nil)
@@ -310,7 +310,7 @@ func TestNonZeroSliceAndMap(t *testing.T) {
 
 func TestInt64(t *testing.T) {
 	var lo, hi int64
-	f := func(x int64) bool {
+	f := func x {
 		if x < lo {
 			lo = x
 		}

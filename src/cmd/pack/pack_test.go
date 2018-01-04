@@ -67,7 +67,7 @@ func testCreate(t *testing.T, dir string) {
 	var buf bytes.Buffer
 	stdout = &buf
 	verbose = true
-	defer func() {
+	defer func {
 		stdout = os.Stdout
 		verbose = false
 	}()
@@ -115,7 +115,7 @@ func TestTableOfContents(t *testing.T) {
 	var buf bytes.Buffer
 	stdout = &buf
 	verbose = true
-	defer func() {
+	defer func {
 		stdout = os.Stdout
 		verbose = false
 	}()
@@ -175,7 +175,7 @@ func TestExtract(t *testing.T) {
 	if err != nil {
 		t.Fatal("os.Chdir: ", err)
 	}
-	defer func() {
+	defer func {
 		err := os.Chdir(pwd)
 		if err != nil {
 			t.Fatal("os.Chdir: ", err)
@@ -214,7 +214,7 @@ func TestHello(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	run := func(args ...string) string {
+	run := func args {
 		return doRun(t, dir, args...)
 	}
 
@@ -242,7 +242,7 @@ func TestLargeDefs(t *testing.T) {
 	}
 	b := bufio.NewWriter(f)
 
-	printf := func(format string, args ...interface{}) {
+	printf := func format, args {
 		_, err := fmt.Fprintf(b, format, args...)
 		if err != nil {
 			t.Fatalf("Writing to %s: %v", large, err)
@@ -279,7 +279,7 @@ func TestLargeDefs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	run := func(args ...string) string {
+	run := func args {
 		return doRun(t, dir, args...)
 	}
 
@@ -315,7 +315,7 @@ func TestIssue21703(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	run := func(args ...string) string {
+	run := func args {
 		return doRun(t, dir, args...)
 	}
 

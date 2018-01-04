@@ -40,7 +40,7 @@ func (f *PerPackageFlag) Set(v string) error {
 // set is the implementation of Set, taking a cwd (current working directory) for easier testing.
 func (f *PerPackageFlag) set(v, cwd string) error {
 	f.present = true
-	match := func(p *Package) bool { return p.Internal.CmdlinePkg || p.Internal.CmdlineFiles } // default predicate with no pattern
+	match := func p { return p.Internal.CmdlinePkg || p.Internal.CmdlineFiles } // default predicate with no pattern
 	// For backwards compatibility with earlier flag splitting, ignore spaces around flags.
 	v = strings.TrimSpace(v)
 	if v == "" {

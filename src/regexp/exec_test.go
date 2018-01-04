@@ -263,7 +263,7 @@ func isSingleBytes(s string) bool {
 
 func tryCompile(s string) (re *Regexp, err error) {
 	// Protect against panic during Compile.
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			err = fmt.Errorf("panic: %v", r)
 		}
@@ -669,7 +669,7 @@ func BenchmarkMatch(b *testing.B) {
 				continue
 			}
 			t := makeText(size.n)
-			b.Run(data.name+"/"+size.name, func(b *testing.B) {
+			b.Run(data.name+"/"+size.name, func b {
 				b.SetBytes(int64(size.n))
 				for i := 0; i < b.N; i++ {
 					if r.Match(t) {
@@ -696,7 +696,7 @@ func BenchmarkMatch_onepass_regex(b *testing.B) {
 		for i, s := range t {
 			bs[i] = []byte{s}
 		}
-		b.Run(size.name, func(b *testing.B) {
+		b.Run(size.name, func b {
 			b.SetBytes(int64(size.n))
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {

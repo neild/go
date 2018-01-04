@@ -87,7 +87,7 @@ func compileTagFilter(name, value string, numLabelUnits map[string]string, ui pl
 
 	if numFilter := parseTagFilterRange(value); numFilter != nil {
 		ui.PrintErr(name, ":Interpreted '", value, "' as range, not regexp")
-		labelFilter := func(vals []int64, unit string) bool {
+		labelFilter := func vals, unit {
 			for _, val := range vals {
 				if numFilter(val, unit) {
 					return true
@@ -95,11 +95,11 @@ func compileTagFilter(name, value string, numLabelUnits map[string]string, ui pl
 			}
 			return false
 		}
-		numLabelUnit := func(key string) string {
+		numLabelUnit := func key {
 			return numLabelUnits[key]
 		}
 		if wantKey == "" {
-			return func(s *profile.Sample) bool {
+			return func s {
 				for key, vals := range s.NumLabel {
 					if labelFilter(vals, numLabelUnit(key)) {
 						return true
@@ -108,7 +108,7 @@ func compileTagFilter(name, value string, numLabelUnits map[string]string, ui pl
 				return false
 			}, nil
 		}
-		return func(s *profile.Sample) bool {
+		return func s {
 			if vals, ok := s.NumLabel[wantKey]; ok {
 				return labelFilter(vals, numLabelUnit(wantKey))
 			}
@@ -125,7 +125,7 @@ func compileTagFilter(name, value string, numLabelUnits map[string]string, ui pl
 		rfx = append(rfx, fx)
 	}
 	if wantKey == "" {
-		return func(s *profile.Sample) bool {
+		return func s {
 		matchedrx:
 			for _, rx := range rfx {
 				for key, vals := range s.Label {
@@ -141,7 +141,7 @@ func compileTagFilter(name, value string, numLabelUnits map[string]string, ui pl
 			return true
 		}, nil
 	}
-	return func(s *profile.Sample) bool {
+	return func s {
 		if vals, ok := s.Label[wantKey]; ok {
 			for _, rx := range rfx {
 				for _, val := range vals {
@@ -175,17 +175,17 @@ func parseTagFilterRange(filter string) func(int64, string) bool {
 	if len(ranges) == 1 {
 		switch match := ranges[0][0]; filter {
 		case match:
-			return func(v int64, u string) bool {
+			return func v, u {
 				sv, su := measurement.Scale(v, u, unit)
 				return su == unit && sv == scaledValue
 			}
 		case match + ":":
-			return func(v int64, u string) bool {
+			return func v, u {
 				sv, su := measurement.Scale(v, u, unit)
 				return su == unit && sv >= scaledValue
 			}
 		case ":" + match:
-			return func(v int64, u string) bool {
+			return func v, u {
 				sv, su := measurement.Scale(v, u, unit)
 				return su == unit && sv <= scaledValue
 			}
@@ -202,7 +202,7 @@ func parseTagFilterRange(filter string) func(int64, string) bool {
 	if unit != unit2 {
 		return nil
 	}
-	return func(v int64, u string) bool {
+	return func v, u {
 		sv, su := measurement.Scale(v, u, unit)
 		return su == unit && sv >= scaledValue && sv <= scaledValue2
 	}

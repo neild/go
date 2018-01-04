@@ -58,7 +58,7 @@ var StdEncoding = NewEncoding(encodeStd)
 // It is typically used in DNS.
 var HexEncoding = NewEncoding(encodeHex)
 
-var removeNewlinesMapper = func(r rune) rune {
+var removeNewlinesMapper = func r {
 	if r == '\r' || r == '\n' {
 		return -1
 	}

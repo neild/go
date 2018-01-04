@@ -420,7 +420,7 @@ func geneq(sym *types.Sym, t *types.Type) {
 
 	case TSTRUCT:
 		var cond *Node
-		and := func(n *Node) {
+		and := func n {
 			if cond == nil {
 				cond = n
 				return

@@ -215,8 +215,8 @@ func (d *Decoder) at(i uint64) (hf HeaderField, ok bool) {
 func (d *Decoder) DecodeFull(p []byte) ([]HeaderField, error) {
 	var hf []HeaderField
 	saveFunc := d.emit
-	defer func() { d.emit = saveFunc }()
-	d.emit = func(f HeaderField) { hf = append(hf, f) }
+	defer func { d.emit = saveFunc }()
+	d.emit = func f { hf = append(hf, f) }
 	if _, err := d.Write(p); err != nil {
 		return nil, err
 	}

@@ -176,7 +176,7 @@ func wbBufFlush(dst *uintptr, src uintptr) {
 
 	// Switch to the system stack so we don't have to worry about
 	// the untyped stack slots or safe points.
-	systemstack(func() {
+	systemstack(func {
 		wbBufFlush1(getg().m.p.ptr())
 	})
 }

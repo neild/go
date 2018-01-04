@@ -123,7 +123,7 @@ func TestWriterBoundaryGoroutines(t *testing.T) {
 	// https://codereview.appspot.com/117600043/
 	w := NewWriter(ioutil.Discard)
 	done := make(chan int)
-	go func() {
+	go func {
 		w.CreateFormField("foo")
 		done <- 1
 	}()

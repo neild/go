@@ -502,7 +502,7 @@ func (f *peFile) emitRelocations(ctxt *Link) {
 
 	// relocsect relocates symbols from first in section sect, and returns
 	// the total number of relocations emitted.
-	relocsect := func(sect *sym.Section, syms []*sym.Symbol, base uint64) int {
+	relocsect := func sect, syms, base {
 		// If main section has no bits, nothing to relocate.
 		if sect.Vaddr >= sect.Seg.Vaddr+sect.Seg.Filelen {
 			return 0
@@ -548,7 +548,7 @@ func (f *peFile) emitRelocations(ctxt *Link) {
 		return relocs
 	}
 
-	f.textSect.emitRelocations(ctxt.Out, func() int {
+	f.textSect.emitRelocations(ctxt.Out, func {
 		n := relocsect(Segtext.Sections[0], ctxt.Textp, Segtext.Vaddr)
 		for _, sect := range Segtext.Sections[1:] {
 			n += relocsect(sect, datap, Segtext.Vaddr)
@@ -556,7 +556,7 @@ func (f *peFile) emitRelocations(ctxt *Link) {
 		return n
 	})
 
-	f.dataSect.emitRelocations(ctxt.Out, func() int {
+	f.dataSect.emitRelocations(ctxt.Out, func {
 		var n int
 		for _, sect := range Segdata.Sections {
 			n += relocsect(sect, datap, Segdata.Vaddr)
@@ -568,7 +568,7 @@ dwarfLoop:
 	for _, sect := range Segdwarf.Sections {
 		for _, pesect := range f.sections {
 			if sect.Name == pesect.name {
-				pesect.emitRelocations(ctxt.Out, func() int {
+				pesect.emitRelocations(ctxt.Out, func {
 					return relocsect(sect, dwarfp, sect.Vaddr)
 				})
 				continue dwarfLoop
@@ -577,7 +577,7 @@ dwarfLoop:
 		Errorf(nil, "emitRelocations: could not find %q section", sect.Name)
 	}
 
-	f.ctorsSect.emitRelocations(ctxt.Out, func() int {
+	f.ctorsSect.emitRelocations(ctxt.Out, func {
 		dottext := ctxt.Syms.Lookup(".text", 0)
 		ctxt.Out.Write32(0)
 		ctxt.Out.Write32(uint32(dottext.Dynid))
@@ -643,7 +643,7 @@ func (f *peFile) mapToPESection(s *sym.Symbol, linkmode LinkMode) (pesectidx int
 // writeSymbols writes all COFF symbol table records.
 func (f *peFile) writeSymbols(ctxt *Link) {
 
-	put := func(ctxt *Link, s *sym.Symbol, name string, type_ SymbolType, addr int64, gotype *sym.Symbol) {
+	put := func ctxt, s, name, type_, addr, gotype {
 		if s == nil {
 			return
 		}

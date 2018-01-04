@@ -32,7 +32,7 @@ func TestFor(t *testing.T) {
 		t.Skip("golang.org/issue/22500")
 	}
 
-	t.Run("LookupDefault", func(t *testing.T) {
+	t.Run("LookupDefault", func t {
 		imp := For(compiler, nil)
 		pkg, err := imp.Import(thePackage)
 		if err != nil {
@@ -43,8 +43,8 @@ func TestFor(t *testing.T) {
 		}
 	})
 
-	t.Run("LookupCustom", func(t *testing.T) {
-		lookup := func(path string) (io.ReadCloser, error) {
+	t.Run("LookupCustom", func t {
+		lookup := func path {
 			if path != "math/bigger" {
 				t.Fatalf("lookup called with unexpected path %q", path)
 			}

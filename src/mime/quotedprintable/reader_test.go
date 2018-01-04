@@ -114,7 +114,7 @@ func TestExhaustive(t *testing.T) {
 
 	var buf bytes.Buffer
 	res := make(map[string]int)
-	everySequence("", "0A \r\n=", 6, func(s string) {
+	everySequence("", "0A \r\n=", 6, func s {
 		if strings.HasSuffix(s, "=") || strings.Contains(s, "==") {
 			return
 		}
@@ -155,7 +155,7 @@ func TestExhaustive(t *testing.T) {
 				panic(err)
 			}
 			qpres := make(chan interface{}, 2)
-			go func() {
+			go func {
 				br := bufio.NewReader(stderr)
 				s, _ := br.ReadString('\n')
 				if s != "" {
@@ -167,7 +167,7 @@ func TestExhaustive(t *testing.T) {
 					}
 				}
 			}()
-			go func() {
+			go func {
 				want, err := cmd.Output()
 				if err == nil {
 					qpres <- want

@@ -554,7 +554,7 @@ func postProcessTrace(ver int, events []*Event) error {
 	gs[0] = gdesc{state: gRunning}
 	var evGC, evSTW *Event
 
-	checkRunning := func(p pdesc, g gdesc, ev *Event, allowG0 bool) error {
+	checkRunning := func p, g, ev, allowG0 {
 		name := EventDescriptions[ev.Type].Name
 		if g.state != gRunning {
 			return fmt.Errorf("g %v is not running while %v (offset %v, time %v)", ev.G, name, ev.Off, ev.Ts)

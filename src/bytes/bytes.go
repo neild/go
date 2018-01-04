@@ -484,19 +484,19 @@ func ToTitle(s []byte) []byte { return Map(unicode.ToTitle, s) }
 // ToUpperSpecial treats s as UTF-8-encoded bytes and returns a copy with all the Unicode letters mapped to their
 // upper case, giving priority to the special casing rules.
 func ToUpperSpecial(c unicode.SpecialCase, s []byte) []byte {
-	return Map(func(r rune) rune { return c.ToUpper(r) }, s)
+	return Map(func r { return c.ToUpper(r) }, s)
 }
 
 // ToLowerSpecial treats s as UTF-8-encoded bytes and returns a copy with all the Unicode letters mapped to their
 // lower case, giving priority to the special casing rules.
 func ToLowerSpecial(c unicode.SpecialCase, s []byte) []byte {
-	return Map(func(r rune) rune { return c.ToLower(r) }, s)
+	return Map(func r { return c.ToLower(r) }, s)
 }
 
 // ToTitleSpecial treats s as UTF-8-encoded bytes and returns a copy with all the Unicode letters mapped to their
 // title case, giving priority to the special casing rules.
 func ToTitleSpecial(c unicode.SpecialCase, s []byte) []byte {
-	return Map(func(r rune) rune { return c.ToTitle(r) }, s)
+	return Map(func r { return c.ToTitle(r) }, s)
 }
 
 // isSeparator reports whether the rune could mark a word boundary.
@@ -534,7 +534,7 @@ func Title(s []byte) []byte {
 	// the closure once per rune.
 	prev := ' '
 	return Map(
-		func(r rune) rune {
+		func r {
 			if isSeparator(prev) {
 				prev = r
 				return unicode.ToTitle(r)
@@ -670,16 +670,16 @@ func (as *asciiSet) contains(c byte) bool {
 
 func makeCutsetFunc(cutset string) func(r rune) bool {
 	if len(cutset) == 1 && cutset[0] < utf8.RuneSelf {
-		return func(r rune) bool {
+		return func r {
 			return r == rune(cutset[0])
 		}
 	}
 	if as, isASCII := makeASCIISet(cutset); isASCII {
-		return func(r rune) bool {
+		return func r {
 			return r < utf8.RuneSelf && as.contains(byte(r))
 		}
 	}
-	return func(r rune) bool {
+	return func r {
 		for _, c := range cutset {
 			if c == r {
 				return true

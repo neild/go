@@ -199,7 +199,7 @@ func newdefer(siz int32) *_defer {
 		if len(pp.deferpool[sc]) == 0 && sched.deferpool[sc] != nil {
 			// Take the slow path on the system stack so
 			// we don't grow newdefer's stack.
-			systemstack(func() {
+			systemstack(func {
 				lock(&sched.deferlock)
 				for len(pp.deferpool[sc]) < cap(pp.deferpool[sc])/2 && sched.deferpool[sc] != nil {
 					d := sched.deferpool[sc]
@@ -218,7 +218,7 @@ func newdefer(siz int32) *_defer {
 	}
 	if d == nil {
 		// Allocate new defer+args.
-		systemstack(func() {
+		systemstack(func {
 			total := roundupsize(totaldefersize(uintptr(siz)))
 			d = (*_defer)(mallocgc(total, deferType, true))
 		})
@@ -253,7 +253,7 @@ func freedefer(d *_defer) {
 		//
 		// Take this slow path on the system stack so
 		// we don't grow freedefer's stack.
-		systemstack(func() {
+		systemstack(func {
 			var first, last *_defer
 			for len(pp.deferpool[sc]) > cap(pp.deferpool[sc])/2 {
 				n := len(pp.deferpool[sc])
@@ -391,7 +391,7 @@ func Goexit() {
 // Used when crashing with panicking.
 // This must match types handled by printany.
 func preprintpanics(p *_panic) {
-	defer func() {
+	defer func {
 		if recover() != nil {
 			throw("panic while printing panic value")
 		}
@@ -594,7 +594,7 @@ func dopanic(unused int) {
 	pc := getcallerpc()
 	sp := getcallersp(unsafe.Pointer(&unused))
 	gp := getg()
-	systemstack(func() {
+	systemstack(func {
 		dopanic_m(gp, pc, sp) // should never return
 	})
 	*(*int)(nil) = 0

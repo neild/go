@@ -238,7 +238,7 @@ func (ar *Archive) readMetadata() *Entry {
 	}
 	buf = buf[16:]
 	str := string(buf)
-	get := func(width, base, bitsize int) int64 {
+	get := func width, base, bitsize {
 		v, err := strconv.ParseInt(strings.TrimRight(str[:width], " "), base, bitsize)
 		if err != nil {
 			log.Fatal("file is not an archive: bad number in entry: ", err)

@@ -28,7 +28,7 @@ func mmap(addr unsafe.Pointer, n uintptr, prot, flags, fd int32, off uint32) (un
 		// that mmap uses the same value both as a pointer and
 		// an errno value.
 		var ret uintptr
-		systemstack(func() {
+		systemstack(func {
 			ret = callCgoMmap(addr, n, prot, flags, fd, off)
 		})
 		if ret < 4096 {
@@ -41,7 +41,7 @@ func mmap(addr unsafe.Pointer, n uintptr, prot, flags, fd int32, off uint32) (un
 
 func munmap(addr unsafe.Pointer, n uintptr) {
 	if _cgo_munmap != nil {
-		systemstack(func() { callCgoMunmap(addr, n) })
+		systemstack(func { callCgoMunmap(addr, n) })
 		return
 	}
 	sysMunmap(addr, n)

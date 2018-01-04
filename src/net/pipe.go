@@ -50,7 +50,7 @@ func (d *pipeDeadline) set(t time.Time) {
 		if closed {
 			d.cancel = make(chan struct{})
 		}
-		d.timer = time.AfterFunc(dur, func() {
+		d.timer = time.AfterFunc(dur, func {
 			close(d.cancel)
 		})
 		return
@@ -238,6 +238,6 @@ func (p *pipe) SetWriteDeadline(t time.Time) error {
 }
 
 func (p *pipe) Close() error {
-	p.once.Do(func() { close(p.localDone) })
+	p.once.Do(func { close(p.localDone) })
 	return nil
 }

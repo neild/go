@@ -92,7 +92,7 @@ func (sc *ServerConn) Read() (*http.Request, error) {
 	// Ensure ordered execution of Reads and Writes
 	id := sc.pipe.Next()
 	sc.pipe.StartRequest(id)
-	defer func() {
+	defer func {
 		sc.pipe.EndRequest(id)
 		if req == nil {
 			sc.pipe.StartResponse(id)
@@ -302,7 +302,7 @@ func (cc *ClientConn) Write(req *http.Request) error {
 	// Ensure ordered execution of Writes
 	id := cc.pipe.Next()
 	cc.pipe.StartRequest(id)
-	defer func() {
+	defer func {
 		cc.pipe.EndRequest(id)
 		if err != nil {
 			cc.pipe.StartResponse(id)

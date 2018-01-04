@@ -32,7 +32,7 @@ func (check *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ b
 	// Note: We must do this _before_ calling unpack because unpack evaluates the
 	//       first argument before we even call arg(x, 0)!
 	if id == _Len || id == _Cap {
-		defer func(b bool) {
+		defer func b {
 			check.hasCallOrRecv = b
 		}(check.hasCallOrRecv)
 		check.hasCallOrRecv = false
@@ -44,7 +44,7 @@ func (check *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ b
 	switch id {
 	default:
 		// make argument getter
-		arg, nargs, _ = unpack(func(x *operand, i int) { check.multiExpr(x, call.Args[i]) }, nargs, false)
+		arg, nargs, _ = unpack(func x, i { check.multiExpr(x, call.Args[i]) }, nargs, false)
 		if arg == nil {
 			return
 		}
@@ -117,7 +117,7 @@ func (check *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ b
 		// check general case by creating custom signature
 		sig := makeSig(S, S, NewSlice(T)) // []T required for variadic signature
 		sig.variadic = true
-		check.arguments(x, call, sig, func(x *operand, i int) {
+		check.arguments(x, call, sig, func x, i {
 			// only evaluate arguments that have not been evaluated before
 			if i < len(alist) {
 				*x = alist[i]
@@ -234,7 +234,7 @@ func (check *Checker) builtin(x *operand, call *ast.CallExpr, id builtinId) (_ b
 			//    same type to succeed (this will result in an error
 			//    because shifts of floats are not permitted)
 			if x.mode == constant_ && y.mode == constant_ {
-				toFloat := func(x *operand) {
+				toFloat := func x {
 					if isNumeric(x.typ) && constant.Sign(constant.Imag(x.val)) == 0 {
 						x.typ = Typ[UntypedFloat]
 					}

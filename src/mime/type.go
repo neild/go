@@ -22,7 +22,7 @@ var (
 )
 
 func clearSyncMap(m *sync.Map) {
-	m.Range(func(k, _ interface{}) bool {
+	m.Range(func k, _ {
 		m.Delete(k)
 		return true
 	})

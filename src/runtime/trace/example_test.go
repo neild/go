@@ -19,7 +19,7 @@ func Example() {
 	if err != nil {
 		log.Fatalf("failed to create trace output file: %v", err)
 	}
-	defer func() {
+	defer func {
 		if err := f.Close(); err != nil {
 			log.Fatalf("failed to close trace file: %v", err)
 		}

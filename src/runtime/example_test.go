@@ -11,7 +11,7 @@ import (
 )
 
 func ExampleFrames() {
-	c := func() {
+	c := func {
 		// Ask runtime.Callers for up to 10 pcs, including runtime.Callers itself.
 		pc := make([]uintptr, 10)
 		n := runtime.Callers(0, pc)
@@ -41,8 +41,8 @@ func ExampleFrames() {
 		}
 	}
 
-	b := func() { c() }
-	a := func() { b() }
+	b := func { c() }
+	a := func { b() }
 
 	a()
 	// Output:

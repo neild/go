@@ -42,7 +42,7 @@ func TestDWARF(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	for _, prog := range []string{"testprog", "testprogcgo"} {
-		t.Run(prog, func(t *testing.T) {
+		t.Run(prog, func t {
 			exe := filepath.Join(tmpDir, prog+".exe")
 			dir := "../../runtime/testdata/" + prog
 			out, err := exec.Command(testenv.GoToolPath(t), "build", "-o", exe, dir).CombinedOutput()

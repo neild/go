@@ -121,7 +121,7 @@ func TestSetGCPercent(t *testing.T) {
 	}
 
 	// Test that the percentage is implemented correctly.
-	defer func() {
+	defer func {
 		SetGCPercent(old)
 		setGCPercentBallast, setGCPercentSink = nil, nil
 	}()

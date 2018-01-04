@@ -87,7 +87,7 @@ var resolveUDPAddrTests = []resolveUDPAddrTest{
 
 func TestResolveUDPAddr(t *testing.T) {
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
+	defer func { testHookLookupIP = origTestHookLookupIP }()
 	testHookLookupIP = lookupLocalhost
 
 	for _, tt := range resolveUDPAddrTests {
@@ -307,7 +307,7 @@ func TestIPv6LinkLocalUnicastUDP(t *testing.T) {
 		}
 		defer ls.teardown()
 		ch := make(chan error, 1)
-		handler := func(ls *localPacketServer, c PacketConn) { packetTransponder(c, ch) }
+		handler := func ls, c { packetTransponder(c, ch) }
 		if err := ls.buildup(handler); err != nil {
 			t.Fatal(err)
 		}

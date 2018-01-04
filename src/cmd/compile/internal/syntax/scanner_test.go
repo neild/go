@@ -337,7 +337,7 @@ func TestScanErrors(t *testing.T) {
 	} {
 		var s scanner
 		nerrors := 0
-		s.init(&bytesReader{[]byte(test.src)}, func(line, col uint, msg string) {
+		s.init(&bytesReader{[]byte(test.src)}, func line, col, msg {
 			nerrors++
 			// only check the first error
 			if nerrors == 1 {

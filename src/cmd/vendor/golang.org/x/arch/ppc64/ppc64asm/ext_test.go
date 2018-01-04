@@ -112,7 +112,7 @@ func testExtDis(
 	}
 	ext.Size = size
 	ext.File = f
-	defer func() {
+	defer func {
 		f.Close()
 		if !*keep {
 			os.Remove(file)
@@ -127,10 +127,10 @@ func testExtDis(
 
 		errors = make([]string, 0, 100) // sampled errors, at most cap
 	)
-	go func() {
+	go func {
 		errc <- extdis(ext)
 	}()
-	generate(func(enc []byte) {
+	generate(func enc {
 		dec, ok := <-ext.Dec
 		if !ok {
 			t.Errorf("decoding stream ended early")
@@ -198,7 +198,7 @@ func writeInst(generate func(func([]byte))) (file string, f *os.File, size int, 
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	size = 0
-	generate(func(x []byte) {
+	generate(func x {
 		if len(x) > 4 {
 			x = x[:4]
 		}
@@ -446,7 +446,7 @@ var (
 
 // randomCases generates random instructions.
 func randomCases(t *testing.T) func(func([]byte)) {
-	return func(try func([]byte)) {
+	return func try {
 		// All the strides are relatively prime to 2 and therefore to 2²⁸,
 		// so we will not repeat any instructions until we have tried all 2²⁸.
 		// Using a stride other than 1 is meant to visit the instructions in a
@@ -473,7 +473,7 @@ func randomCases(t *testing.T) func(func([]byte)) {
 // hexCases generates the cases written in hexadecimal in the encoded string.
 // Spaces in 'encoded' separate entire test cases, not individual bytes.
 func hexCases(t *testing.T, encoded string) func(func([]byte)) {
-	return func(try func([]byte)) {
+	return func try {
 		for _, x := range strings.Fields(encoded) {
 			src, err := hex.DecodeString(x)
 			if err != nil {
@@ -514,7 +514,7 @@ func testdataCases(t *testing.T) func(func([]byte)) {
 		codes = append(codes, code)
 	}
 
-	return func(try func([]byte)) {
+	return func try {
 		for _, code := range codes {
 			try(code)
 		}

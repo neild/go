@@ -78,7 +78,7 @@ func TestEncryptPKCS1v15(t *testing.T) {
 	random := rand.Reader
 	k := (rsaPrivateKey.N.BitLen() + 7) / 8
 
-	tryEncryptDecrypt := func(in []byte, blind bool) bool {
+	tryEncryptDecrypt := func in, blind {
 		if len(in) > k-11 {
 			in = in[0 : k-11]
 		}

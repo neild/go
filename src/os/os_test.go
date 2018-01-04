@@ -42,7 +42,7 @@ type sysDir struct {
 	files []string
 }
 
-var sysdir = func() *sysDir {
+var sysdir = func {
 	switch runtime.GOOS {
 	case "android":
 		return &sysDir{
@@ -529,7 +529,7 @@ func TestReaddirNValues(t *testing.T) {
 	}
 
 	var d *File
-	openDir := func() {
+	openDir := func {
 		var err error
 		d, err = Open(dir)
 		if err != nil {
@@ -537,7 +537,7 @@ func TestReaddirNValues(t *testing.T) {
 		}
 	}
 
-	readDirExpect := func(n, want int, wantErr error) {
+	readDirExpect := func n, want, wantErr {
 		fi, err := d.Readdir(n)
 		if err != wantErr {
 			t.Fatalf("Readdir of %d got error %v, want %v", n, err, wantErr)
@@ -547,7 +547,7 @@ func TestReaddirNValues(t *testing.T) {
 		}
 	}
 
-	readDirNamesExpect := func(n, want int, wantErr error) {
+	readDirNamesExpect := func n, want, wantErr {
 		fi, err := d.Readdirnames(n)
 		if err != wantErr {
 			t.Fatalf("Readdirnames of %d got error %v, want %v", n, err, wantErr)
@@ -608,17 +608,17 @@ func TestReaddirStatFailures(t *testing.T) {
 	touch(t, filepath.Join(dir, "good1"))
 	touch(t, filepath.Join(dir, "x")) // will disappear or have an error
 	touch(t, filepath.Join(dir, "good2"))
-	defer func() {
+	defer func {
 		*LstatP = Lstat
 	}()
 	var xerr error // error to return for x
-	*LstatP = func(path string) (FileInfo, error) {
+	*LstatP = func path {
 		if xerr != nil && strings.HasSuffix(path, "x") {
 			return nil, xerr
 		}
 		return Lstat(path)
 	}
-	readDir := func() ([]FileInfo, error) {
+	readDir := func {
 		d, err := Open(dir)
 		if err != nil {
 			t.Fatal(err)
@@ -626,14 +626,14 @@ func TestReaddirStatFailures(t *testing.T) {
 		defer d.Close()
 		return d.Readdir(-1)
 	}
-	mustReadDir := func(testName string) []FileInfo {
+	mustReadDir := func testName {
 		fis, err := readDir()
 		if err != nil {
 			t.Fatalf("%s: Readdir: %v", testName, err)
 		}
 		return fis
 	}
-	names := func(fis []FileInfo) []string {
+	names := func fis {
 		s := make([]string, len(fis))
 		for i, fi := range fis {
 			s[i] = fi.Name()
@@ -748,7 +748,7 @@ func TestHardLink(t *testing.T) {
 // provides a cleanup function. Used when PWD is read-only.
 func chtmpdir(t *testing.T) func() {
 	if runtime.GOOS != "darwin" || (runtime.GOARCH != "arm" && runtime.GOARCH != "arm64") {
-		return func() {} // only needed on darwin/arm{,64}
+		return func {} // only needed on darwin/arm{,64}
 	}
 	oldwd, err := Getwd()
 	if err != nil {
@@ -761,7 +761,7 @@ func chtmpdir(t *testing.T) func() {
 	if err := Chdir(d); err != nil {
 		t.Fatalf("chtmpdir: %v", err)
 	}
-	return func() {
+	return func {
 		if err := Chdir(oldwd); err != nil {
 			t.Fatalf("chtmpdir: %v", err)
 		}
@@ -1288,7 +1288,7 @@ func TestProgWideChdir(t *testing.T) {
 	c := make(chan bool)
 	cpwd := make(chan string)
 	for i := 0; i < N; i++ {
-		go func(i int) {
+		go func i {
 			// Lock half the goroutines in their own operating system
 			// thread to exercise more scheduler possibilities.
 			if i%2 == 1 {
@@ -1316,7 +1316,7 @@ func TestProgWideChdir(t *testing.T) {
 	if err != nil {
 		t.Fatalf("TempDir: %v", err)
 	}
-	defer func() {
+	defer func {
 		if err := Chdir(oldwd); err != nil {
 			t.Fatalf("Chdir: %v", err)
 		}
@@ -1978,7 +1978,7 @@ func TestReadAtEOF(t *testing.T) {
 
 func TestLongPath(t *testing.T) {
 	tmpdir := newDir("TestLongPath", t)
-	defer func(d string) {
+	defer func d {
 		if err := RemoveAll(d); err != nil {
 			t.Fatalf("RemoveAll failed: %v", err)
 		}
@@ -1990,7 +1990,7 @@ func TestLongPath(t *testing.T) {
 		tmpdir += "/dir3456789"
 	}
 	for _, sz := range sizes {
-		t.Run(fmt.Sprintf("length=%d", sz), func(t *testing.T) {
+		t.Run(fmt.Sprintf("length=%d", sz), func t {
 			sizedTempDir := tmpdir[:sz-1] + "x" // Ensure it does not end with a slash.
 
 			// The various sized runs are for this call to trigger the boundary
@@ -2055,7 +2055,7 @@ func testKillProcess(t *testing.T, processKiller func(p *Process)) {
 	if err != nil {
 		t.Fatalf("Failed to start test process: %v", err)
 	}
-	go func() {
+	go func {
 		time.Sleep(100 * time.Millisecond)
 		processKiller(cmd.Process)
 	}()
@@ -2075,7 +2075,7 @@ func TestSleep(t *testing.T) {
 }
 
 func TestKillStartProcess(t *testing.T) {
-	testKillProcess(t, func(p *Process) {
+	testKillProcess(t, func p {
 		err := p.Kill()
 		if err != nil {
 			t.Fatalf("Failed to kill test process: %v", err)
@@ -2113,7 +2113,7 @@ func TestGetppid(t *testing.T) {
 }
 
 func TestKillFindProcess(t *testing.T) {
-	testKillProcess(t, func(p *Process) {
+	testKillProcess(t, func p {
 		p2, err := FindProcess(p.Pid)
 		if err != nil {
 			t.Fatalf("Failed to find test process: %v", err)
@@ -2129,21 +2129,21 @@ var nilFileMethodTests = []struct {
 	name string
 	f    func(*File) error
 }{
-	{"Chdir", func(f *File) error { return f.Chdir() }},
-	{"Close", func(f *File) error { return f.Close() }},
-	{"Chmod", func(f *File) error { return f.Chmod(0) }},
-	{"Chown", func(f *File) error { return f.Chown(0, 0) }},
-	{"Read", func(f *File) error { _, err := f.Read(make([]byte, 0)); return err }},
-	{"ReadAt", func(f *File) error { _, err := f.ReadAt(make([]byte, 0), 0); return err }},
-	{"Readdir", func(f *File) error { _, err := f.Readdir(1); return err }},
-	{"Readdirnames", func(f *File) error { _, err := f.Readdirnames(1); return err }},
-	{"Seek", func(f *File) error { _, err := f.Seek(0, io.SeekStart); return err }},
-	{"Stat", func(f *File) error { _, err := f.Stat(); return err }},
-	{"Sync", func(f *File) error { return f.Sync() }},
-	{"Truncate", func(f *File) error { return f.Truncate(0) }},
-	{"Write", func(f *File) error { _, err := f.Write(make([]byte, 0)); return err }},
-	{"WriteAt", func(f *File) error { _, err := f.WriteAt(make([]byte, 0), 0); return err }},
-	{"WriteString", func(f *File) error { _, err := f.WriteString(""); return err }},
+	{"Chdir", func f { return f.Chdir() }},
+	{"Close", func f { return f.Close() }},
+	{"Chmod", func f { return f.Chmod(0) }},
+	{"Chown", func f { return f.Chown(0, 0) }},
+	{"Read", func f { _, err := f.Read(make([]byte, 0)); return err }},
+	{"ReadAt", func f { _, err := f.ReadAt(make([]byte, 0), 0); return err }},
+	{"Readdir", func f { _, err := f.Readdir(1); return err }},
+	{"Readdirnames", func f { _, err := f.Readdirnames(1); return err }},
+	{"Seek", func f { _, err := f.Seek(0, io.SeekStart); return err }},
+	{"Stat", func f { _, err := f.Stat(); return err }},
+	{"Sync", func f { return f.Sync() }},
+	{"Truncate", func f { return f.Truncate(0) }},
+	{"Write", func f { _, err := f.Write(make([]byte, 0)); return err }},
+	{"WriteAt", func f { _, err := f.WriteAt(make([]byte, 0), 0); return err }},
+	{"WriteString", func f { _, err := f.WriteString(""); return err }},
 }
 
 // Test that all File methods give ErrInvalid if the receiver is nil.
@@ -2193,7 +2193,7 @@ func TestRemoveAllRace(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 4; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			<-hold
 			err := RemoveAll(root)
@@ -2246,7 +2246,7 @@ func TestPipeThreads(t *testing.T) {
 	creading := make(chan bool, threads)
 	cdone := make(chan bool, threads)
 	for i := 0; i < threads; i++ {
-		go func(i int) {
+		go func i {
 			var b [1]byte
 			creading <- true
 			if _, err := r[i].Read(b[:]); err != nil {

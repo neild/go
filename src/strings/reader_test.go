@@ -107,7 +107,7 @@ func TestReaderAtConcurrent(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
-		go func(i int) {
+		go func i {
 			defer wg.Done()
 			var buf [1]byte
 			r.ReadAt(buf[:], int64(i))
@@ -124,12 +124,12 @@ func TestEmptyReaderConcurrent(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(2)
-		go func() {
+		go func {
 			defer wg.Done()
 			var buf [1]byte
 			r.Read(buf[:])
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			r.Read(nil)
 		}()

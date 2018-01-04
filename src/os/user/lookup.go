@@ -8,7 +8,7 @@ import "sync"
 
 // Current returns the current user.
 func Current() (*User, error) {
-	cache.Do(func() { cache.u, cache.err = current() })
+	cache.Do(func { cache.u, cache.err = current() })
 	if cache.err != nil {
 		return nil, cache.err
 	}

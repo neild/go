@@ -93,9 +93,9 @@ func (w *limitWriter) Write(p []byte) (n int, err error) {
 func TestKillChildAfterCopyError(t *testing.T) {
 	testenv.MustHaveExec(t)
 
-	defer func() { testHookStartProcess = nil }()
+	defer func { testHookStartProcess = nil }()
 	proc := make(chan *os.Process, 1)
-	testHookStartProcess = func(p *os.Process) {
+	testHookStartProcess = func p {
 		proc <- p
 	}
 
@@ -111,7 +111,7 @@ func TestKillChildAfterCopyError(t *testing.T) {
 	rw := &customWriterRecorder{&limitWriter{&out, writeLen}, rec}
 
 	donec := make(chan bool, 1)
-	go func() {
+	go func {
 		h.ServeHTTP(rw, req)
 		donec <- true
 	}()
@@ -197,7 +197,7 @@ func TestBeChildCGIProcess(t *testing.T) {
 		fmt.Printf("\nHello")
 		os.Exit(0)
 	}
-	Serve(http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	Serve(http.HandlerFunc(func rw, req {
 		rw.Header().Set("X-Test-Header", "X-Test-Value")
 		req.ParseForm()
 		if req.FormValue("no-body") == "1" {

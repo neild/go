@@ -129,7 +129,7 @@ func globalCDtorName(name string, options ...Option) (AST, error) {
 func doDemangle(name string, options ...Option) (ret AST, err error) {
 	// When the demangling routines encounter an error, they panic
 	// with a value of type demangleErr.
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			if de, ok := r.(demangleErr); ok {
 				ret = nil
@@ -495,7 +495,7 @@ func (st *state) prefix() AST {
 	// The last name seen, for a constructor/destructor.
 	var last AST
 
-	getLast := func(a AST) AST {
+	getLast := func a {
 		for {
 			if t, ok := a.(*Template); ok {
 				a = t.Name
@@ -1382,8 +1382,8 @@ func (st *state) demangleCastTemplateArgs(tp AST, addSubst bool) AST {
 
 	var args []AST
 	failed := false
-	func() {
-		defer func() {
+	func {
+		defer func {
 			if r := recover(); r != nil {
 				if _, ok := r.(demangleErr); ok {
 					failed = true
@@ -1682,7 +1682,7 @@ func (st *state) templateParam() AST {
 // cast operators.
 func (st *state) setTemplate(a AST, tmpl *Template) {
 	var seen []AST
-	a.Traverse(func(a AST) bool {
+	a.Traverse(func a {
 		switch a := a.(type) {
 		case *TemplateParam:
 			if a.Template != nil {
@@ -2268,7 +2268,7 @@ func (st *state) substitution(forPrefix bool) AST {
 		// We need to update any references to template
 		// parameters to refer to the currently active
 		// template.
-		copy := func(a AST) AST {
+		copy := func a {
 			tp, ok := a.(*TemplateParam)
 			if !ok {
 				return nil
@@ -2290,7 +2290,7 @@ func (st *state) substitution(forPrefix bool) AST {
 			return &TemplateParam{Index: tp.Index, Template: template}
 		}
 		var seen []AST
-		skip := func(a AST) bool {
+		skip := func a {
 			if _, ok := a.(*Typed); ok {
 				return true
 			}
@@ -2349,7 +2349,7 @@ func isLower(c byte) bool {
 // merges qualifiers.
 func simplify(a AST) AST {
 	var seen []AST
-	skip := func(a AST) bool {
+	skip := func a {
 		for _, v := range seen {
 			if v == a {
 				return true
@@ -2426,7 +2426,7 @@ func simplifyOne(a AST) AST {
 		if a.Pack != nil {
 			exprs := make([]AST, len(a.Pack.Args))
 			for i, arg := range a.Pack.Args {
-				copy := func(sub AST) AST {
+				copy := func sub {
 					// Replace the ArgumentPack
 					// with a specific argument.
 					if sub == a.Pack {
@@ -2437,7 +2437,7 @@ func simplifyOne(a AST) AST {
 				}
 
 				var seen []AST
-				skip := func(sub AST) bool {
+				skip := func sub {
 					// Don't traverse into another
 					// pack expansion.
 					if _, ok := sub.(*PackExpansion); ok {
@@ -2469,7 +2469,7 @@ func simplifyOne(a AST) AST {
 func (st *state) findArgumentPack(a AST) *ArgumentPack {
 	var seen []AST
 	var ret *ArgumentPack
-	a.Traverse(func(a AST) bool {
+	a.Traverse(func a {
 		if ret != nil {
 			return false
 		}

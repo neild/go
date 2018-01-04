@@ -94,7 +94,7 @@ func TestCertificateSelection(t *testing.T) {
 
 	config.BuildNameToCertificate()
 
-	pointerToIndex := func(c *Certificate) int {
+	pointerToIndex := func c {
 		for i := range config.Certificates {
 			if c == &config.Certificates[i] {
 				return i
@@ -103,7 +103,7 @@ func TestCertificateSelection(t *testing.T) {
 		return -1
 	}
 
-	certificateForName := func(name string) *Certificate {
+	certificateForName := func name {
 		clientHello := &ClientHelloInfo{
 			ServerName: name,
 		}
@@ -141,7 +141,7 @@ func runDynamicRecordSizingTest(t *testing.T, config *Config) {
 	tlsConn := Server(serverConn, serverConfig)
 
 	recordSizesChan := make(chan []int, 1)
-	go func() {
+	go func {
 		// This goroutine performs a TLS handshake over clientConn and
 		// then reads TLS records until EOF. It writes a slice that
 		// contains all the record sizes to recordSizesChan.
@@ -275,7 +275,7 @@ func TestHairpinInClose(t *testing.T) {
 
 	conn := &hairpinConn{client, nil}
 	tlsConn := Server(conn, &Config{
-		GetCertificate: func(*ClientHelloInfo) (*Certificate, error) {
+		GetCertificate: func {
 			panic("unreachable")
 		},
 	})

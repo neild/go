@@ -51,7 +51,7 @@ func cancel(sigs []os.Signal, action func(int)) {
 	handlers.Lock()
 	defer handlers.Unlock()
 
-	remove := func(n int) {
+	remove := func n {
 		var zerohandler handler
 
 		for c, h := range handlers.m {
@@ -119,7 +119,7 @@ func Notify(c chan<- os.Signal, sig ...os.Signal) {
 		handlers.m[c] = h
 	}
 
-	add := func(n int) {
+	add := func n {
 		if n < 0 {
 			return
 		}

@@ -618,7 +618,7 @@ func TestReader(t *testing.T) {
 	}}
 
 	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
+		t.Run(path.Base(v.file), func t {
 			f, err := os.Open(v.file)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
@@ -711,7 +711,7 @@ func TestPartialRead(t *testing.T) {
 	}}
 
 	for _, v := range vectors {
-		t.Run(path.Base(v.file), func(t *testing.T) {
+		t.Run(path.Base(v.file), func t {
 			f, err := os.Open(v.file)
 			if err != nil {
 				t.Fatalf("Open() error: %v", err)
@@ -1020,7 +1020,7 @@ func TestParsePAX(t *testing.T) {
 }
 
 func TestReadOldGNUSparseMap(t *testing.T) {
-	populateSparseMap := func(sa sparseArray, sps []string) []string {
+	populateSparseMap := func sa, sps {
 		for i := 0; len(sps) > 0 && i < sa.MaxEntries(); i++ {
 			copy(sa.Entry(i), sps[0])
 			sps = sps[1:]
@@ -1140,7 +1140,7 @@ func TestReadOldGNUSparseMap(t *testing.T) {
 }
 
 func TestReadGNUSparsePAXHeaders(t *testing.T) {
-	padInput := func(s string) string {
+	padInput := func s {
 		return s + string(zeroBlock[:blockPadding(int64(len(s)))])
 	}
 
@@ -1296,7 +1296,7 @@ func TestReadGNUSparsePAXHeaders(t *testing.T) {
 		inputHdrs: map[string]string{paxGNUSparseMajor: "1", paxGNUSparseMinor: "0"},
 		wantMap:   sparseDatas{{10737418240, 512}, {21474836480, 512}},
 	}, {
-		inputData: padInput("100\n" + func() string {
+		inputData: padInput("100\n" + func {
 			var ss []string
 			for i := 0; i < 100; i++ {
 				ss = append(ss, fmt.Sprintf("%d\n%d\n", int64(i)<<30, 512))

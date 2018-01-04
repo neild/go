@@ -141,11 +141,11 @@ func TestDialError(t *testing.T) {
 	}
 
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
-	testHookLookupIP = func(ctx context.Context, fn func(context.Context, string) ([]IPAddr, error), host string) ([]IPAddr, error) {
+	defer func { testHookLookupIP = origTestHookLookupIP }()
+	testHookLookupIP = func ctx, fn, host {
 		return nil, &DNSError{Err: "dial error test", Name: "name", Server: "server", IsTimeout: true}
 	}
-	sw.Set(socktest.FilterConnect, func(so *socktest.Status) (socktest.AfterFilter, error) {
+	sw.Set(socktest.FilterConnect, func so {
 		return nil, errOpNotSupported
 	})
 	defer sw.Set(socktest.FilterConnect, nil)
@@ -290,11 +290,11 @@ func TestListenError(t *testing.T) {
 	}
 
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
-	testHookLookupIP = func(_ context.Context, fn func(context.Context, string) ([]IPAddr, error), host string) ([]IPAddr, error) {
+	defer func { testHookLookupIP = origTestHookLookupIP }()
+	testHookLookupIP = func _, fn, host {
 		return nil, &DNSError{Err: "listen error test", Name: "name", Server: "server", IsTimeout: true}
 	}
-	sw.Set(socktest.FilterListen, func(so *socktest.Status) (socktest.AfterFilter, error) {
+	sw.Set(socktest.FilterListen, func so {
 		return nil, errOpNotSupported
 	})
 	defer sw.Set(socktest.FilterListen, nil)
@@ -350,8 +350,8 @@ func TestListenPacketError(t *testing.T) {
 	}
 
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
-	testHookLookupIP = func(_ context.Context, fn func(context.Context, string) ([]IPAddr, error), host string) ([]IPAddr, error) {
+	defer func { testHookLookupIP = origTestHookLookupIP }()
+	testHookLookupIP = func _, fn, host {
 		return nil, &DNSError{Err: "listen error test", Name: "name", Server: "server", IsTimeout: true}
 	}
 
@@ -638,7 +638,7 @@ third:
 }
 
 func TestAcceptError(t *testing.T) {
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		for {
 			ln.(*TCPListener).SetDeadline(time.Now().Add(5 * time.Millisecond))
 			c, err := ln.Accept()

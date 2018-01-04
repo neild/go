@@ -85,7 +85,7 @@ func test(t *testing.T, mode Mode) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		filter = func(fi os.FileInfo) bool {
+		filter = func fi {
 			return isGoFile(fi) && rx.MatchString(fi.Name())
 		}
 	}

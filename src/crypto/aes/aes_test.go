@@ -322,20 +322,20 @@ func TestCipherDecrypt(t *testing.T) {
 // Assembly used to not notice.
 // See issue 7928.
 func TestShortBlocks(t *testing.T) {
-	bytes := func(n int) []byte { return make([]byte, n) }
+	bytes := func n { return make([]byte, n) }
 
 	c, _ := NewCipher(bytes(16))
 
-	mustPanic(t, "crypto/aes: input not full block", func() { c.Encrypt(bytes(1), bytes(1)) })
-	mustPanic(t, "crypto/aes: input not full block", func() { c.Decrypt(bytes(1), bytes(1)) })
-	mustPanic(t, "crypto/aes: input not full block", func() { c.Encrypt(bytes(100), bytes(1)) })
-	mustPanic(t, "crypto/aes: input not full block", func() { c.Decrypt(bytes(100), bytes(1)) })
-	mustPanic(t, "crypto/aes: output not full block", func() { c.Encrypt(bytes(1), bytes(100)) })
-	mustPanic(t, "crypto/aes: output not full block", func() { c.Decrypt(bytes(1), bytes(100)) })
+	mustPanic(t, "crypto/aes: input not full block", func { c.Encrypt(bytes(1), bytes(1)) })
+	mustPanic(t, "crypto/aes: input not full block", func { c.Decrypt(bytes(1), bytes(1)) })
+	mustPanic(t, "crypto/aes: input not full block", func { c.Encrypt(bytes(100), bytes(1)) })
+	mustPanic(t, "crypto/aes: input not full block", func { c.Decrypt(bytes(100), bytes(1)) })
+	mustPanic(t, "crypto/aes: output not full block", func { c.Encrypt(bytes(1), bytes(100)) })
+	mustPanic(t, "crypto/aes: output not full block", func { c.Decrypt(bytes(1), bytes(100)) })
 }
 
 func mustPanic(t *testing.T, msg string, f func()) {
-	defer func() {
+	defer func {
 		err := recover()
 		if err == nil {
 			t.Errorf("function did not panic, wanted %q", msg)

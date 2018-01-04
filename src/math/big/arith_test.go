@@ -133,7 +133,7 @@ func BenchmarkAddVV(b *testing.B) {
 		x := rndV(n)
 		y := rndV(n)
 		z := make([]Word, n)
-		b.Run(fmt.Sprint(n), func(b *testing.B) {
+		b.Run(fmt.Sprint(n), func b {
 			b.SetBytes(int64(n * _W))
 			for i := 0; i < b.N; i++ {
 				addVV(z, x, y)
@@ -246,7 +246,7 @@ func BenchmarkAddVW(b *testing.B) {
 		x := rndV(n)
 		y := rndW()
 		z := make([]Word, n)
-		b.Run(fmt.Sprint(n), func(b *testing.B) {
+		b.Run(fmt.Sprint(n), func b {
 			b.SetBytes(int64(n * _S))
 			for i := 0; i < b.N; i++ {
 				addVW(z, x, y)
@@ -387,7 +387,7 @@ func BenchmarkAddMulVVW(b *testing.B) {
 		x := rndV(n)
 		y := rndW()
 		z := make([]Word, n)
-		b.Run(fmt.Sprint(n), func(b *testing.B) {
+		b.Run(fmt.Sprint(n), func b {
 			b.SetBytes(int64(n * _W))
 			for i := 0; i < b.N; i++ {
 				addMulVVW(z, x, y)

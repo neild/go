@@ -65,7 +65,7 @@ func TestVendorRun(t *testing.T) {
 func TestVendorGOPATH(t *testing.T) {
 	tg := testgo(t)
 	defer tg.cleanup()
-	changeVolume := func(s string, f func(s string) string) string {
+	changeVolume := func s, f {
 		vol := filepath.VolumeName(s)
 		return f(vol) + s[len(vol):]
 	}
@@ -212,7 +212,7 @@ func TestVendorGetBadVendor(t *testing.T) {
 	testenv.MustHaveExternalNetwork(t)
 
 	for _, suffix := range []string{"bad/imp", "bad/imp2", "bad/imp3", "..."} {
-		t.Run(suffix, func(t *testing.T) {
+		t.Run(suffix, func t {
 			tg := testgo(t)
 			defer tg.cleanup()
 			tg.makeTempdir()

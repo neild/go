@@ -159,7 +159,7 @@ func (t *LineTable) go12Init() {
 		return
 	}
 
-	defer func() {
+	defer func {
 		// If we panic parsing, assume it's not a Go 1.2 symbol table.
 		recover()
 	}()
@@ -199,7 +199,7 @@ func (t *LineTable) go12Init() {
 // go12Funcs returns a slice of Funcs derived from the Go 1.2 pcln table.
 func (t *LineTable) go12Funcs() []Func {
 	// Assume it is malformed and return nil on error.
-	defer func() {
+	defer func {
 		recover()
 	}()
 
@@ -352,7 +352,7 @@ func (t *LineTable) findFileLine(entry uint64, filetab, linetab uint32, filenum,
 
 // go12PCToLine maps program counter to line number for the Go 1.2 pcln table.
 func (t *LineTable) go12PCToLine(pc uint64) (line int) {
-	defer func() {
+	defer func {
 		if recover() != nil {
 			line = -1
 		}
@@ -369,7 +369,7 @@ func (t *LineTable) go12PCToLine(pc uint64) (line int) {
 
 // go12PCToFile maps program counter to file name for the Go 1.2 pcln table.
 func (t *LineTable) go12PCToFile(pc uint64) (file string) {
-	defer func() {
+	defer func {
 		if recover() != nil {
 			file = ""
 		}
@@ -390,7 +390,7 @@ func (t *LineTable) go12PCToFile(pc uint64) (file string) {
 
 // go12LineToPC maps a (file, line) pair to a program counter for the Go 1.2 pcln table.
 func (t *LineTable) go12LineToPC(file string, line int) (pc uint64) {
-	defer func() {
+	defer func {
 		if recover() != nil {
 			pc = 0
 		}
@@ -439,7 +439,7 @@ func (t *LineTable) initFileMap() {
 // Every key maps to obj. That's not a very interesting map, but it provides
 // a way for callers to obtain the list of files in the program.
 func (t *LineTable) go12MapFiles(m map[string]*Obj, obj *Obj) {
-	defer func() {
+	defer func {
 		recover()
 	}()
 

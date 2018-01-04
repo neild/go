@@ -22,7 +22,7 @@ func Fprint(w io.Writer, x Node, linebreaks bool) (n int, err error) {
 		linebreaks: linebreaks,
 	}
 
-	defer func() {
+	defer func {
 		n = p.written
 		if e := recover(); e != nil {
 			err = e.(localError).err // re-panics if it's not a localError

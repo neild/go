@@ -72,7 +72,7 @@ func TestConsistentEnviron(t *testing.T) {
 
 func TestUnsetenv(t *testing.T) {
 	const testKey = "GO_TEST_UNSETENV"
-	set := func() bool {
+	set := func {
 		prefix := testKey + "="
 		for _, key := range Environ() {
 			if strings.HasPrefix(key, prefix) {
@@ -100,7 +100,7 @@ func TestClearenv(t *testing.T) {
 	const testValue = "1"
 
 	// reset env
-	defer func(origEnv []string) {
+	defer func origEnv {
 		for _, pair := range origEnv {
 			// Environment variables on Windows can begin with =
 			// http://blogs.msdn.com/b/oldnewthing/archive/2010/05/06/10008132.aspx

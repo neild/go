@@ -105,7 +105,7 @@ func dirList(w ResponseWriter, r *Request, f File) {
 		Error(w, "Error reading directory", StatusInternalServerError)
 		return
 	}
-	sort.Slice(dirs, func(i, j int) bool { return dirs[i].Name() < dirs[j].Name() })
+	sort.Slice(dirs, func i, j { return dirs[i].Name() < dirs[j].Name() })
 
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	fmt.Fprintf(w, "<pre>\n")
@@ -149,7 +149,7 @@ func dirList(w ResponseWriter, r *Request, f File) {
 //
 // Note that *os.File implements the io.ReadSeeker interface.
 func ServeContent(w ResponseWriter, req *Request, name string, modtime time.Time, content io.ReadSeeker) {
-	sizeFunc := func() (int64, error) {
+	sizeFunc := func {
 		size, err := content.Seek(0, io.SeekEnd)
 		if err != nil {
 			return 0, errSeeker
@@ -263,7 +263,7 @@ func serveContent(w ResponseWriter, r *Request, name string, modtime time.Time, 
 			w.Header().Set("Content-Type", "multipart/byteranges; boundary="+mw.Boundary())
 			sendContent = pr
 			defer pr.Close() // cause writing goroutine to fail and exit if CopyN doesn't finish.
-			go func() {
+			go func {
 				for _, ra := range ranges {
 					part, err := mw.CreatePart(ra.mimeHeader(ctype, size))
 					if err != nil {
@@ -616,7 +616,7 @@ func serveFile(w ResponseWriter, r *Request, fs FileSystem, name string, redirec
 	}
 
 	// serveContent will check modification time
-	sizeFunc := func() (int64, error) { return d.Size(), nil }
+	sizeFunc := func { return d.Size(), nil }
 	serveContent(w, r, d.Name(), d.ModTime(), sizeFunc, f)
 }
 

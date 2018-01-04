@@ -128,11 +128,11 @@ func grabSourcesAndBases(sources, bases []profileSource, fetch plugin.Fetcher, o
 	var savesrc, savebase bool
 	var errsrc, errbase error
 	var countsrc, countbase int
-	go func() {
+	go func {
 		defer wg.Done()
 		psrc, msrc, savesrc, countsrc, errsrc = chunkedGrab(sources, fetch, obj, ui)
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		pbase, mbase, savebase, countbase, errbase = chunkedGrab(bases, fetch, obj, ui)
 	}()
@@ -205,7 +205,7 @@ func concurrentGrab(sources []profileSource, fetch plugin.Fetcher, obj plugin.Ob
 	wg := sync.WaitGroup{}
 	wg.Add(len(sources))
 	for i := range sources {
-		go func(s *profileSource) {
+		go func s {
 			defer wg.Done()
 			s.p, s.msrc, s.remote, s.err = grabProfile(s.source, s.addr, fetch, obj, ui)
 		}(&sources[i])
@@ -580,7 +580,7 @@ func adjustURL(source string, duration, timeout time.Duration) (string, time.Dur
 
 // httpGet is a wrapper around http.Get; it is defined as a variable
 // so it can be redefined during for testing.
-var httpGet = func(source string, timeout time.Duration) (*http.Response, error) {
+var httpGet = func source, timeout {
 	url, err := url.Parse(source)
 	if err != nil {
 		return nil, err

@@ -51,7 +51,7 @@ func fprint(w io.Writer, fset *token.FileSet, x interface{}, f FieldFilter) (err
 	}
 
 	// install error handler
-	defer func() {
+	defer func {
 		if e := recover(); e != nil {
 			err = e.(localError).err // re-panics if it's not a localError
 		}

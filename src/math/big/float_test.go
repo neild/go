@@ -45,7 +45,7 @@ func TestFloatZeroValue(t *testing.T) {
 	}
 
 	// zero value can be used in any and all positions of binary operations
-	make := func(x int) *Float {
+	make := func x {
 		var f Float
 		if x != 0 {
 			f.SetInt64(int64(x))
@@ -644,7 +644,7 @@ func TestFloatSetFloat64(t *testing.T) {
 	}
 
 	// test NaN
-	defer func() {
+	defer func {
 		if p, ok := recover().(ErrNaN); !ok {
 			t.Errorf("got %v; want ErrNaN panic", p)
 		}
@@ -1615,8 +1615,8 @@ func TestFloatArithmeticSpecialValues(t *testing.T) {
 				}
 				var errnan bool // set if execution of f panicked with ErrNaN
 				// protect execution of f
-				func() {
-					defer func() {
+				func {
+					defer func {
 						if p := recover(); p != nil {
 							_ = p.(ErrNaN) // re-panic if not ErrNaN
 							errnan = true
@@ -1804,7 +1804,7 @@ func BenchmarkFloatAdd(b *testing.B) {
 		y.SetPrec(prec).SetRat(NewRat(1, 6))
 		z.SetPrec(prec)
 
-		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%v", prec), func b {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				z.Add(x, y)
@@ -1823,7 +1823,7 @@ func BenchmarkFloatSub(b *testing.B) {
 		y.SetPrec(prec).SetRat(NewRat(1, 6))
 		z.SetPrec(prec)
 
-		b.Run(fmt.Sprintf("%v", prec), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%v", prec), func b {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				z.Sub(x, y)

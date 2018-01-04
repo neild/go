@@ -197,7 +197,7 @@ func (tw *Writer) writePAXHeader(hdr *Header, paxHdrs map[string]string) error {
 
 	// Pack the main header.
 	var f formatter // Ignore errors since they are expected
-	fmtStr := func(b []byte, s string) { f.formatString(b, toASCII(s)) }
+	fmtStr := func b, s { f.formatString(b, toASCII(s)) }
 	blk := tw.templateV7Plus(hdr, fmtStr, f.formatOctal)
 	blk.SetFormat(FormatPAX)
 	if err := tw.writeRawHeader(blk, hdr.Size, hdr.Typeflag); err != nil {

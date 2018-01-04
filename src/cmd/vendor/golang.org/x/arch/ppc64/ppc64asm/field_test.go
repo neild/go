@@ -9,7 +9,7 @@ import (
 )
 
 func panicOrNot(f func()) (panicked bool) {
-	defer func() {
+	defer func {
 		if err := recover(); err != nil {
 			panicked = true
 		}
@@ -41,7 +41,7 @@ func TestBitField(t *testing.T) {
 			ou uint32
 			os int32
 		)
-		failed := panicOrNot(func() {
+		failed := panicOrNot(func {
 			ou = tst.b.Parse(tst.i)
 			os = tst.b.ParseSigned(tst.i)
 		})

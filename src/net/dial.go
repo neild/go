@@ -353,7 +353,7 @@ func (d *Dialer) DialContext(ctx context.Context, network, address string) (Conn
 	if oldCancel := d.Cancel; oldCancel != nil {
 		subCtx, cancel := context.WithCancel(ctx)
 		defer cancel()
-		go func() {
+		go func {
 			select {
 			case <-oldCancel:
 				cancel()
@@ -428,7 +428,7 @@ func dialParallel(ctx context.Context, dp *dialParam, primaries, fallbacks addrL
 	}
 	results := make(chan dialResult) // unbuffered
 
-	startRacer := func(ctx context.Context, primary bool) {
+	startRacer := func ctx, primary {
 		ras := primaries
 		if !primary {
 			ras = fallbacks
@@ -537,7 +537,7 @@ func dialSingle(ctx context.Context, dp *dialParam, ra Addr) (c Conn, err error)
 			trace.ConnectStart(dp.network, raStr)
 		}
 		if trace.ConnectDone != nil {
-			defer func() { trace.ConnectDone(dp.network, raStr, err) }()
+			defer func { trace.ConnectDone(dp.network, raStr, err) }()
 		}
 	}
 	la := dp.LocalAddr

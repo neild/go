@@ -76,7 +76,7 @@ func applyCalls(m mapInterface, calls []mapCall) (results []mapResult, final map
 	}
 
 	final = make(map[interface{}]interface{})
-	m.Range(func(k, v interface{}) bool {
+	m.Range(func k, v {
 		final[k] = v
 		return true
 	})
@@ -118,14 +118,14 @@ func TestConcurrentRange(t *testing.T) {
 
 	done := make(chan struct{})
 	var wg sync.WaitGroup
-	defer func() {
+	defer func {
 		close(done)
 		wg.Wait()
 	}()
 	for g := int64(runtime.GOMAXPROCS(0)); g > 0; g-- {
 		r := rand.New(rand.NewSource(g))
 		wg.Add(1)
-		go func(g int64) {
+		go func g {
 			defer wg.Done()
 			for i := int64(0); ; i++ {
 				select {
@@ -151,7 +151,7 @@ func TestConcurrentRange(t *testing.T) {
 	for n := iters; n > 0; n-- {
 		seen := make(map[int64]bool, mapSize)
 
-		m.Range(func(ki, vi interface{}) bool {
+		m.Range(func ki, vi {
 			k, v := ki.(int64), vi.(int64)
 			if v%k != 0 {
 				t.Fatalf("while Storing multiples of %v, Range saw value %v", k, v)

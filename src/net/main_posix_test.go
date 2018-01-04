@@ -18,7 +18,7 @@ func enableSocketConnect() {
 
 func disableSocketConnect(network string) {
 	ss := strings.Split(network, ":")
-	sw.Set(socktest.FilterConnect, func(so *socktest.Status) (socktest.AfterFilter, error) {
+	sw.Set(socktest.FilterConnect, func so {
 		switch ss[0] {
 		case "tcp4":
 			if so.Cookie.Family() == syscall.AF_INET && so.Cookie.Type() == syscall.SOCK_STREAM {

@@ -59,7 +59,7 @@ func gcMarkRootPrepare() {
 	}
 
 	// Compute how many data and BSS root blocks there are.
-	nBlocks := func(bytes uintptr) int {
+	nBlocks := func bytes {
 		return int((bytes + rootBlockBytes - 1) / rootBlockBytes)
 	}
 
@@ -242,7 +242,7 @@ func markroot(gcw *gcWork, i uint32) {
 
 		// scang must be done on the system stack in case
 		// we're trying to scan our own stack.
-		systemstack(func() {
+		systemstack(func {
 			// If this is a self-scan, put the user G in
 			// _Gwaiting to prevent self-deadlock. It may
 			// already be in _Gwaiting if this is a mark
@@ -464,7 +464,7 @@ retry:
 	}
 
 	// Perform assist work
-	systemstack(func() {
+	systemstack(func {
 		gcAssistAlloc1(gp, scanWork)
 		// The user stack may have moved, so this can't touch
 		// anything on it until it returns from systemstack.
@@ -779,7 +779,7 @@ func scanstack(gp *g, gcw *gcWork) {
 
 	// Scan the stack.
 	var cache pcvalueCache
-	scanframe := func(frame *stkframe, unused unsafe.Pointer) bool {
+	scanframe := func frame, unused {
 		scanframeworker(frame, &cache, gcw)
 		return true
 	}

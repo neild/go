@@ -407,7 +407,7 @@ import (
 }
 
 func addImportFn(path ...string) func(*ast.File) bool {
-	return func(f *ast.File) bool {
+	return func f {
 		fixed := false
 		for _, p := range path {
 			if !imports(f, p) {
@@ -420,7 +420,7 @@ func addImportFn(path ...string) func(*ast.File) bool {
 }
 
 func deleteImportFn(path string) func(*ast.File) bool {
-	return func(f *ast.File) bool {
+	return func f {
 		if imports(f, path) {
 			deleteImport(f, path)
 			return true
@@ -430,7 +430,7 @@ func deleteImportFn(path string) func(*ast.File) bool {
 }
 
 func addDelImportFn(p1 string, p2 string) func(*ast.File) bool {
-	return func(f *ast.File) bool {
+	return func f {
 		fixed := false
 		if !imports(f, p1) {
 			addImport(f, p1)
@@ -445,7 +445,7 @@ func addDelImportFn(p1 string, p2 string) func(*ast.File) bool {
 }
 
 func rewriteImportFn(oldnew ...string) func(*ast.File) bool {
-	return func(f *ast.File) bool {
+	return func f {
 		fixed := false
 		for i := 0; i < len(oldnew); i += 2 {
 			if imports(f, oldnew[i]) {

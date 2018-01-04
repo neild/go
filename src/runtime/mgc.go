@@ -722,7 +722,7 @@ func (c *gcControllerState) findRunnableGCWorker(_p_ *p) *g {
 		return nil
 	}
 
-	decIfPositive := func(ptr *int64) bool {
+	decIfPositive := func ptr {
 		if *ptr > 0 {
 			if atomic.Xaddint64(ptr, -1) >= 0 {
 				return true
@@ -1318,7 +1318,7 @@ func gcStart(mode gcMode, trigger gcTrigger) {
 	}
 	systemstack(stopTheWorldWithSema)
 	// Finish sweep before we start concurrent scan.
-	systemstack(func() {
+	systemstack(func {
 		finishsweep_m()
 	})
 	// clearpools before we start the GC. If we wait they memory will not be
@@ -1368,7 +1368,7 @@ func gcStart(mode gcMode, trigger gcTrigger) {
 		gcController.markStartTime = now
 
 		// Concurrent mark.
-		systemstack(func() {
+		systemstack(func {
 			now = startTheWorldWithSema(trace.enabled)
 		})
 		work.pauseNS += now - work.pauseStart
@@ -1442,13 +1442,13 @@ top:
 		// transition lock go while we flush caches.
 		semrelease(&work.markDoneSema)
 
-		systemstack(func() {
+		systemstack(func {
 			// Flush all currently cached workbufs and
 			// ensure all Ps see gcBlackenPromptly. This
 			// also blocks until any remaining mark 1
 			// workers have exited their loop so we can
 			// start new mark 2 workers.
-			forEachP(func(_p_ *p) {
+			forEachP(func _p_ {
 				wbBufFlush1(_p_)
 				_p_.gcw.dispose()
 			})
@@ -1537,7 +1537,7 @@ func gcMarkTermination(nextTriggerRatio float64) {
 	// the root set down a bit (g0 stacks are not scanned, and
 	// we don't need to scan gc's internal state).  We also
 	// need to switch to g0 so we can shrink the stack.
-	systemstack(func() {
+	systemstack(func {
 		gcMark(startTime)
 		// Must return immediately.
 		// The outer function's stack may have moved
@@ -1548,7 +1548,7 @@ func gcMarkTermination(nextTriggerRatio float64) {
 		// before continuing.
 	})
 
-	systemstack(func() {
+	systemstack(func {
 		work.heap2 = work.bytesMarked
 		if debug.gccheckmark > 0 {
 			// Run a full stop-the-world mark using checkmark bits,
@@ -1644,7 +1644,7 @@ func gcMarkTermination(nextTriggerRatio float64) {
 	// so events don't leak into the wrong cycle.
 	mProf_NextCycle()
 
-	systemstack(func() { startTheWorldWithSema(true) })
+	systemstack(func { startTheWorldWithSema(true) })
 
 	// Flush the heap profile so we can start a new cycle next GC.
 	// This is relatively expensive, so we don't do it with the
@@ -1772,7 +1772,7 @@ func gcBgMarkWorker(_p_ *p) {
 		// Go to sleep until woken by gcController.findRunnable.
 		// We can't releasem yet since even the call to gopark
 		// may be preempted.
-		gopark(func(g *g, parkp unsafe.Pointer) bool {
+		gopark(func g, parkp {
 			park := (*parkInfo)(parkp)
 
 			// The worker G is no longer running, so it's
@@ -1826,7 +1826,7 @@ func gcBgMarkWorker(_p_ *p) {
 			throw("work.nwait was > work.nproc")
 		}
 
-		systemstack(func() {
+		systemstack(func {
 			// Mark our goroutine preemptible so its stack
 			// can be scanned. This lets two mark workers
 			// scan each other (otherwise, they would

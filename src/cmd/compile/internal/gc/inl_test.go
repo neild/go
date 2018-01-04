@@ -174,7 +174,7 @@ func TestIntendedInlining(t *testing.T) {
 	cmd.Stdout = pw
 	cmd.Stderr = pw
 	cmdErr := make(chan error, 1)
-	go func() {
+	go func {
 		cmdErr <- cmd.Run()
 		pw.Close()
 	}()

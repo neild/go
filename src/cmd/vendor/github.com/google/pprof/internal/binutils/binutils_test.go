@@ -212,7 +212,7 @@ func TestObjFile(t *testing.T) {
 		t.Fatalf("Symbols: unexpected error %v", err)
 	}
 
-	find := func(name string) *plugin.Sym {
+	find := func name {
 		for _, s := range syms {
 			for _, n := range s.Name {
 				if n == name {

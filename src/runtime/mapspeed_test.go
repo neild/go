@@ -311,7 +311,7 @@ func BenchmarkSmallKeyMap(b *testing.B) {
 
 func BenchmarkMapPopulate(b *testing.B) {
 	for size := 1; size < 1000000; size *= 10 {
-		b.Run(strconv.Itoa(size), func(b *testing.B) {
+		b.Run(strconv.Itoa(size), func b {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				m := make(map[int]bool)

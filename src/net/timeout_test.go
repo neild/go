@@ -39,19 +39,19 @@ var dialTimeoutTests = []struct {
 func TestDialTimeout(t *testing.T) {
 	// Cannot use t.Parallel - modifies global hooks.
 	origTestHookDialChannel := testHookDialChannel
-	defer func() { testHookDialChannel = origTestHookDialChannel }()
+	defer func { testHookDialChannel = origTestHookDialChannel }()
 	defer sw.Set(socktest.FilterConnect, nil)
 
 	for i, tt := range dialTimeoutTests {
 		switch runtime.GOOS {
 		case "plan9", "windows":
-			testHookDialChannel = func() { time.Sleep(tt.guard) }
+			testHookDialChannel = func { time.Sleep(tt.guard) }
 			if runtime.GOOS == "plan9" {
 				break
 			}
 			fallthrough
 		default:
-			sw.Set(socktest.FilterConnect, func(so *socktest.Status) (socktest.AfterFilter, error) {
+			sw.Set(socktest.FilterConnect, func so {
 				time.Sleep(tt.guard)
 				return nil, errTimedout
 			})
@@ -64,7 +64,7 @@ func TestDialTimeout(t *testing.T) {
 		}
 		max := time.NewTimer(tt.max)
 		defer max.Stop()
-		go func() {
+		go func {
 			// This dial never starts to send any TCP SYN
 			// segment because of above socket filter and
 			// test hook.
@@ -114,7 +114,7 @@ func TestDialTimeoutMaxDuration(t *testing.T) {
 		ch := make(chan error)
 		max := time.NewTimer(250 * time.Millisecond)
 		defer max.Stop()
-		go func() {
+		go func {
 			d := Dialer{Timeout: tt.timeout}
 			if tt.delta != 0 {
 				d.Deadline = time.Now().Add(tt.delta)
@@ -170,7 +170,7 @@ func TestAcceptTimeout(t *testing.T) {
 	for i, tt := range acceptTimeoutTests {
 		if tt.timeout < 0 {
 			wg.Add(1)
-			go func() {
+			go func {
 				defer wg.Done()
 				d := Dialer{Timeout: 100 * time.Millisecond}
 				c, err := d.Dial(ln.Addr().Network(), ln.Addr().String())
@@ -225,7 +225,7 @@ func TestAcceptTimeoutMustReturn(t *testing.T) {
 	max := time.NewTimer(time.Second)
 	defer max.Stop()
 	ch := make(chan error)
-	go func() {
+	go func {
 		if err := ln.(*TCPListener).SetDeadline(noDeadline); err != nil {
 			t.Error(err)
 		}
@@ -271,7 +271,7 @@ func TestAcceptTimeoutMustNotReturn(t *testing.T) {
 	max := time.NewTimer(100 * time.Millisecond)
 	defer max.Stop()
 	ch := make(chan error)
-	go func() {
+	go func {
 		if err := ln.(*TCPListener).SetDeadline(time.Now().Add(-5 * time.Second)); err != nil {
 			t.Error(err)
 		}
@@ -306,7 +306,7 @@ var readTimeoutTests = []struct {
 }
 
 func TestReadTimeout(t *testing.T) {
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		c, err := ln.Accept()
 		if err != nil {
 			t.Error(err)
@@ -382,7 +382,7 @@ func TestReadTimeoutMustNotReturn(t *testing.T) {
 	max := time.NewTimer(100 * time.Millisecond)
 	defer max.Stop()
 	ch := make(chan error)
-	go func() {
+	go func {
 		if err := c.SetDeadline(time.Now().Add(-5 * time.Second)); err != nil {
 			t.Error(err)
 		}
@@ -437,7 +437,7 @@ func TestReadFromTimeout(t *testing.T) {
 
 	ch := make(chan Addr)
 	defer close(ch)
-	handler := func(ls *localPacketServer, c PacketConn) {
+	handler := func ls, c {
 		if dst, ok := <-ch; ok {
 			c.WriteTo([]byte("READFROM TIMEOUT TEST"), dst)
 		}
@@ -568,7 +568,7 @@ func TestWriteTimeoutMustNotReturn(t *testing.T) {
 	max := time.NewTimer(100 * time.Millisecond)
 	defer max.Stop()
 	ch := make(chan error)
-	go func() {
+	go func {
 		if err := c.SetDeadline(time.Now().Add(-5 * time.Second)); err != nil {
 			t.Error(err)
 		}
@@ -818,7 +818,7 @@ func testVariousDeadlines(t *testing.T) {
 
 	ch := make(chan error, 1)
 	pasvch := make(chan result)
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -827,7 +827,7 @@ func testVariousDeadlines(t *testing.T) {
 			}
 			// The server, with no timeouts of its own,
 			// sending bytes to clients as fast as it can.
-			go func() {
+			go func {
 				t0 := time.Now()
 				n, err := io.Copy(c, neverEnding('a'))
 				dt := time.Since(t0)
@@ -886,7 +886,7 @@ func testVariousDeadlines(t *testing.T) {
 			max := time.NewTimer(tooLong)
 			defer max.Stop()
 			actvch := make(chan result)
-			go func() {
+			go func {
 				t0 := time.Now()
 				if err := c.SetDeadline(t0.Add(timeout)); err != nil {
 					t.Error(err)
@@ -930,7 +930,7 @@ func TestReadWriteProlongedTimeout(t *testing.T) {
 		t.Skipf("not supported on %s", runtime.GOOS)
 	}
 
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		c, err := ln.Accept()
 		if err != nil {
 			t.Error(err)
@@ -940,7 +940,7 @@ func TestReadWriteProlongedTimeout(t *testing.T) {
 
 		var wg sync.WaitGroup
 		wg.Add(2)
-		go func() {
+		go func {
 			defer wg.Done()
 			var b [1]byte
 			for {
@@ -959,7 +959,7 @@ func TestReadWriteProlongedTimeout(t *testing.T) {
 				}
 			}
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			var b [1]byte
 			for {
@@ -1029,7 +1029,7 @@ func TestReadWriteDeadlineRace(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(3)
-	go func() {
+	go func {
 		defer wg.Done()
 		tic := time.NewTicker(2 * time.Microsecond)
 		defer tic.Stop()
@@ -1049,14 +1049,14 @@ func TestReadWriteDeadlineRace(t *testing.T) {
 			<-tic.C
 		}
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var b [1]byte
 		for i := 0; i < N; i++ {
 			c.Read(b[:]) // ignore possible timeout errors
 		}
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var b [1]byte
 		for i := 0; i < N; i++ {

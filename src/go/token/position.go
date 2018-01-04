@@ -260,7 +260,7 @@ func (f *File) Line(p Pos) int {
 }
 
 func searchLineInfos(a []lineInfo, x int) int {
-	return sort.Search(len(a), func(i int) bool { return a[i].Offset > x }) - 1
+	return sort.Search(len(a), func i { return a[i].Offset > x }) - 1
 }
 
 // unpack returns the filename and line and column number for a file offset.
@@ -404,7 +404,7 @@ func (s *FileSet) Iterate(f func(*File) bool) {
 }
 
 func searchFiles(a []*File, x int) int {
-	return sort.Search(len(a), func(i int) bool { return a[i].base > x }) - 1
+	return sort.Search(len(a), func i { return a[i].base > x }) - 1
 }
 
 func (s *FileSet) file(p Pos) *File {

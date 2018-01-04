@@ -97,7 +97,7 @@ func TestReader(t *testing.T) {
 	}, {
 		desc:  "1MiB sawtooth",
 		input: mustLoadFile("testdata/pass-sawtooth.bz2"),
-		output: func() []byte {
+		output: func {
 			b := make([]byte, 1<<20)
 			for i := range b {
 				b[i] = byte(i)

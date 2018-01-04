@@ -461,7 +461,7 @@ func callinstr(np **Node, init *Nodes, wr int, skip int) bool {
 	// the heap or not is impossible to know at compile time
 	if class == PAUTOHEAP || class == PEXTERN || b.Op == OINDEX || b.Op == ODOTPTR || b.Op == OIND {
 		hasCalls := false
-		inspect(n, func(n *Node) bool {
+		inspect(n, func n {
 			switch n.Op {
 			case OCALL, OCALLFUNC, OCALLMETH, OCALLINTER:
 				hasCalls = true

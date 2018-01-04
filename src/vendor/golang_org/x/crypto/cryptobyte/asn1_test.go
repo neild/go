@@ -35,7 +35,7 @@ var readASN1TestData = []readASN1Test{
 
 func TestReadASN1(t *testing.T) {
 	for _, test := range readASN1TestData {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.name, func t {
 			var in, out String = test.in, nil
 			ok := in.ReadASN1(&out, test.tag)
 			if ok != test.ok || ok && !bytes.Equal(out, test.out.([]byte)) {
@@ -77,7 +77,7 @@ var optionalOctetStringTestData = []struct {
 
 func TestReadASN1OptionalOctetString(t *testing.T) {
 	for _, test := range optionalOctetStringTestData {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.name, func t {
 			in := String(test.in)
 			var out []byte
 			var present bool
@@ -100,7 +100,7 @@ var optionalIntTestData = []readASN1Test{
 
 func TestReadASN1OptionalInteger(t *testing.T) {
 	for _, test := range optionalIntTestData {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.name, func t {
 			in := String(test.in)
 			var out int
 			ok := in.ReadOptionalASN1Integer(&out, test.tag, defaultInt)
@@ -139,7 +139,7 @@ func TestReadASN1IntegerSigned(t *testing.T) {
 	}
 
 	// Repeat the same cases, reading into a big.Int.
-	t.Run("big.Int", func(t *testing.T) {
+	t.Run("big.Int", func t {
 		for i, test := range testData64 {
 			in := String(test.in)
 			var out big.Int

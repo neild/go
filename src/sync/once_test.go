@@ -16,7 +16,7 @@ func (o *one) Increment() {
 }
 
 func run(t *testing.T, once *Once, o *one, c chan bool) {
-	once.Do(func() { o.Increment() })
+	once.Do(func { o.Increment() })
 	if v := *o; v != 1 {
 		t.Errorf("once failed inside run: %d is not 1", v)
 	}
@@ -41,26 +41,26 @@ func TestOnce(t *testing.T) {
 
 func TestOncePanic(t *testing.T) {
 	var once Once
-	func() {
-		defer func() {
+	func {
+		defer func {
 			if r := recover(); r == nil {
 				t.Fatalf("Once.Do did not panic")
 			}
 		}()
-		once.Do(func() {
+		once.Do(func {
 			panic("failed")
 		})
 	}()
 
-	once.Do(func() {
+	once.Do(func {
 		t.Fatalf("Once.Do called twice")
 	})
 }
 
 func BenchmarkOnce(b *testing.B) {
 	var once Once
-	f := func() {}
-	b.RunParallel(func(pb *testing.PB) {
+	f := func {}
+	b.RunParallel(func pb {
 		for pb.Next() {
 			once.Do(f)
 		}

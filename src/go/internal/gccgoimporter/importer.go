@@ -78,7 +78,7 @@ func openExportFile(fpath string) (reader io.ReadSeeker, closer io.Closer, err e
 		return
 	}
 	closer = f
-	defer func() {
+	defer func {
 		if err != nil && closer != nil {
 			f.Close()
 		}

@@ -138,7 +138,7 @@ func (op boolOp) checkSuspect(f *File, exprs []ast.Expr) {
 // hasSideEffects reports whether evaluation of e has side effects.
 func hasSideEffects(e ast.Expr) bool {
 	safe := true
-	ast.Inspect(e, func(node ast.Node) bool {
+	ast.Inspect(e, func node {
 		switch n := node.(type) {
 		// Using CallExpr here will catch conversions
 		// as well as function and method invocations.

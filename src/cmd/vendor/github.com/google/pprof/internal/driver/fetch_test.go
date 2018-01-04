@@ -158,7 +158,7 @@ func (o testObj) Open(file string, start, limit, offset uint64) (plugin.ObjFile,
 	return nil, fmt.Errorf("not found: %s", file)
 }
 func (testObj) Demangler(_ string) func(names []string) (map[string]string, error) {
-	return func(names []string) (map[string]string, error) { return nil, nil }
+	return func names { return nil, nil }
 }
 func (testObj) Disasm(file string, start, end uint64) ([]plugin.Inst, error) { return nil, nil }
 
@@ -176,7 +176,7 @@ func TestFetch(t *testing.T) {
 
 	// Intercept http.Get calls from HTTPFetcher.
 	savedHTTPGet := httpGet
-	defer func() { httpGet = savedHTTPGet }()
+	defer func { httpGet = savedHTTPGet }()
 	httpGet = stubHTTPGet
 
 	type testcase struct {
@@ -208,7 +208,7 @@ func TestFetch(t *testing.T) {
 
 func TestFetchWithBase(t *testing.T) {
 	baseVars := pprofVariables
-	defer func() { pprofVariables = baseVars }()
+	defer func { pprofVariables = baseVars }()
 
 	const path = "testdata/"
 	type testcase struct {
@@ -265,7 +265,7 @@ func TestFetchWithBase(t *testing.T) {
 	}
 
 	for _, tc := range testcases {
-		t.Run(tc.desc, func(t *testing.T) {
+		t.Run(tc.desc, func t {
 			pprofVariables = baseVars.makeCopy()
 
 			base := make([]*string, len(tc.bases))
@@ -365,7 +365,7 @@ func TestHttpsInsecure(t *testing.T) {
 
 	baseVars := pprofVariables
 	pprofVariables = baseVars.makeCopy()
-	defer func() { pprofVariables = baseVars }()
+	defer func { pprofVariables = baseVars }()
 
 	tlsConfig := &tls.Config{Certificates: []tls.Certificate{selfSignedCert(t)}}
 
@@ -375,17 +375,17 @@ func TestHttpsInsecure(t *testing.T) {
 	}
 
 	donec := make(chan error, 1)
-	go func(donec chan<- error) {
+	go func donec {
 		donec <- http.Serve(l, nil)
 	}(donec)
-	defer func() {
+	defer func {
 		if got, want := <-donec, closedError(); !strings.Contains(got.Error(), want) {
 			t.Fatalf("Serve got error %v, want %q", got, want)
 		}
 	}()
 	defer l.Close()
 
-	go func() {
+	go func {
 		deadline := time.Now().Add(5 * time.Second)
 		for time.Now().Before(deadline) {
 			// Simulate a hotspot function. Spin in the inner loop for 100M iterations

@@ -17,7 +17,7 @@ func xposBefore(p, q src.XPos) bool {
 }
 
 func findScope(marks []Mark, pos src.XPos) ScopeID {
-	i := sort.Search(len(marks), func(i int) bool {
+	i := sort.Search(len(marks), func i {
 		return xposBefore(pos, marks[i].Pos)
 	})
 	if i == 0 {

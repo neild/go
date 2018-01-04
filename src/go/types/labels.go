@@ -98,12 +98,12 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *ast.Labele
 	// All forward jumps jumping over a variable declaration are possibly
 	// invalid (they may still jump out of the block and be ok).
 	// recordVarDecl records them for the given position.
-	recordVarDecl := func(pos token.Pos) {
+	recordVarDecl := func pos {
 		varDeclPos = pos
 		badJumps = append(badJumps[:0], fwdJumps...) // copy fwdJumps to badJumps
 	}
 
-	jumpsOverVarDecl := func(jmp *ast.BranchStmt) bool {
+	jumpsOverVarDecl := func jmp {
 		if varDeclPos.IsValid() {
 			for _, bad := range badJumps {
 				if jmp == bad {
@@ -114,14 +114,14 @@ func (check *Checker) blockBranches(all *Scope, parent *block, lstmt *ast.Labele
 		return false
 	}
 
-	blockBranches := func(lstmt *ast.LabeledStmt, list []ast.Stmt) {
+	blockBranches := func lstmt, list {
 		// Unresolved forward jumps inside the nested block
 		// become forward jumps in the current block.
 		fwdJumps = append(fwdJumps, check.blockBranches(all, b, lstmt, list)...)
 	}
 
 	var stmtBranches func(ast.Stmt)
-	stmtBranches = func(s ast.Stmt) {
+	stmtBranches = func s {
 		switch s := s.(type) {
 		case *ast.DeclStmt:
 			if d, _ := s.Decl.(*ast.GenDecl); d != nil && d.Tok == token.VAR {

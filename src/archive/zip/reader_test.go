@@ -483,7 +483,7 @@ var tests = []ZipTest{
 
 func TestReader(t *testing.T) {
 	for _, zt := range tests {
-		t.Run(zt.Name, func(t *testing.T) {
+		t.Run(zt.Name, func t {
 			readTestZip(t, zt)
 		})
 	}
@@ -539,7 +539,7 @@ func readTestZip(t *testing.T, zt ZipTest) {
 	done := make(chan bool)
 	for i := 0; i < 5; i++ {
 		for j, ft := range zt.File {
-			go func(j int, ft ZipTestFile) {
+			go func j, ft {
 				readTestFile(t, zt, ft, z.File[j])
 				done <- true
 			}(j, ft)
@@ -670,14 +670,14 @@ func messWith(fileName string, corrupter func(b []byte)) (r io.ReaderAt, size in
 }
 
 func returnCorruptCRC32Zip() (r io.ReaderAt, size int64) {
-	return messWith("go-with-datadesc-sig.zip", func(b []byte) {
+	return messWith("go-with-datadesc-sig.zip", func b {
 		// Corrupt one of the CRC32s in the data descriptor:
 		b[0x2d]++
 	})
 }
 
 func returnCorruptNotStreamedZip() (r io.ReaderAt, size int64) {
-	return messWith("crc32-not-streamed.zip", func(b []byte) {
+	return messWith("crc32-not-streamed.zip", func b {
 		// Corrupt foo.txt's final crc32 byte, in both
 		// the file header and TOC. (0x7e -> 0x7f)
 		b[0x11]++

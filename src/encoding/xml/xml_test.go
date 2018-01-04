@@ -246,7 +246,7 @@ func (d *downCaser) Read(p []byte) (int, error) {
 
 func TestRawTokenAltEncoding(t *testing.T) {
 	d := NewDecoder(strings.NewReader(testInputAltEncoding))
-	d.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+	d.CharsetReader = func charset, input {
 		if charset != "x-testing-uppercase" {
 			t.Fatalf("unexpected charset %q", charset)
 		}
@@ -799,7 +799,7 @@ func TestIssue12417(t *testing.T) {
 }
 
 func tokenMap(mapping func(t Token) Token) func(TokenReader) TokenReader {
-	return func(src TokenReader) TokenReader {
+	return func src {
 		return mapper{
 			t: src,
 			f: mapping,
@@ -830,7 +830,7 @@ func TestNewTokenDecoderIdempotent(t *testing.T) {
 
 func TestWrapDecoder(t *testing.T) {
 	d := NewDecoder(strings.NewReader(`<quote>[Re-enter Clown with a letter, and FABIAN]</quote>`))
-	m := tokenMap(func(t Token) Token {
+	m := tokenMap(func t {
 		switch tok := t.(type) {
 		case StartElement:
 			if tok.Name.Local == "quote" {
@@ -875,7 +875,7 @@ func (Failure) UnmarshalXML(*Decoder, StartElement) error {
 }
 
 func TestTokenUnmarshaler(t *testing.T) {
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			t.Error("Unexpected panic using custom token unmarshaler")
 		}

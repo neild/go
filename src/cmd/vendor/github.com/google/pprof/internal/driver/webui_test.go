@@ -50,9 +50,9 @@ func TestWebInterface(t *testing.T) {
 	// Custom http server creator
 	var server *httptest.Server
 	serverCreated := make(chan bool)
-	creator := func(a *plugin.HTTPServerArgs) error {
+	creator := func a {
 		server = httptest.NewServer(http.HandlerFunc(
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				if h := a.Handlers[r.URL.Path]; h != nil {
 					h.ServeHTTP(w, r)
 				}
@@ -126,7 +126,7 @@ func TestWebInterface(t *testing.T) {
 		path := server.URL + c.path
 		for count := 0; count < 2; count++ {
 			wg.Add(1)
-			go func() {
+			go func {
 				http.Get(path)
 				wg.Done()
 			}()

@@ -306,7 +306,7 @@ func TestEvalSymlinksCanonicalNamesWith8dot3Disabled(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		err := setVolume8dot3Setting(tempVol, true)
 		if err != nil {
 			t.Fatal(err)
@@ -324,7 +324,7 @@ func TestEvalSymlinksCanonicalNamesWith8dot3Disabled(t *testing.T) {
 }
 
 func TestToNorm(t *testing.T) {
-	stubBase := func(path string) (string, error) {
+	stubBase := func path {
 		vol := filepath.VolumeName(path)
 		path = path[len(vol):]
 
@@ -418,7 +418,7 @@ func TestToNorm(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		err := os.RemoveAll(tmp)
 		if err != nil {
 			t.Fatal(err)
@@ -440,7 +440,7 @@ func TestToNorm(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		err := os.Chdir(cwd)
 		if err != nil {
 			t.Fatal(err)
@@ -498,7 +498,7 @@ func testWalkMklink(t *testing.T, linktype string) {
 	if !strings.Contains(string(output), fmt.Sprintf(" /%s ", linktype)) {
 		t.Skipf(`skipping test; mklink does not supports /%s parameter`, linktype)
 	}
-	testWalkSymlink(t, func(target, link string) error {
+	testWalkSymlink(t, func target, link {
 		output, err := exec.Command("cmd", "/c", "mklink", "/"+linktype, link, target).CombinedOutput()
 		if err != nil {
 			return fmt.Errorf(`"mklink /%s %v %v" command failed: %v\n%v`, linktype, link, target, err, string(output))

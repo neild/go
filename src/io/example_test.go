@@ -141,7 +141,7 @@ func ExampleTeeReader() {
 	var buf bytes.Buffer
 	tee := io.TeeReader(r, &buf)
 
-	printall := func(r io.Reader) {
+	printall := func r {
 		b, err := ioutil.ReadAll(r)
 		if err != nil {
 			log.Fatal(err)
@@ -247,7 +247,7 @@ func ExampleMultiWriter() {
 func ExamplePipe() {
 	r, w := io.Pipe()
 
-	go func() {
+	go func {
 		fmt.Fprint(w, "some text to be read\n")
 		w.Close()
 	}()

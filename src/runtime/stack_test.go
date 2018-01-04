@@ -34,9 +34,9 @@ func TestStackMem(t *testing.T) {
 	for b := 0; b < BatchCount; b++ {
 		c := make(chan bool, BatchSize)
 		for i := 0; i < BatchSize; i++ {
-			go func() {
+			go func {
 				var f func(k int, a [ArraySize]byte)
-				f = func(k int, a [ArraySize]byte) {
+				f = func k, a {
 					if k == 0 {
 						time.Sleep(time.Millisecond)
 						return
@@ -83,7 +83,7 @@ func TestStackGrowth(t *testing.T) {
 	// in a normal goroutine
 	var growDuration time.Duration // For debugging failures
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 		start := time.Now()
 		growStack(nil)
@@ -93,7 +93,7 @@ func TestStackGrowth(t *testing.T) {
 
 	// in locked goroutine
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 		LockOSThread()
 		growStack(nil)
@@ -103,14 +103,14 @@ func TestStackGrowth(t *testing.T) {
 
 	// in finalizer
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 		done := make(chan bool)
 		var startTime time.Time
 		var started, progress uint32
-		go func() {
+		go func {
 			s := new(string)
-			SetFinalizer(s, func(ss *string) {
+			SetFinalizer(s, func ss {
 				startTime = time.Now()
 				atomic.StoreUint32(&started, 1)
 				growStack(&progress)
@@ -182,10 +182,10 @@ func TestStackGrowthCallback(t *testing.T) {
 
 	// test stack growth at chan op
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 		c := make(chan int, 1)
-		growStackWithCallback(func() {
+		growStackWithCallback(func {
 			c <- 1
 			<-c
 		})
@@ -193,10 +193,10 @@ func TestStackGrowthCallback(t *testing.T) {
 
 	// test stack growth at map op
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 		m := make(map[int]int)
-		growStackWithCallback(func() {
+		growStackWithCallback(func {
 			_, _ = m[1]
 			m[1] = 1
 		})
@@ -204,11 +204,11 @@ func TestStackGrowthCallback(t *testing.T) {
 
 	// test stack growth at goroutine creation
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
-		growStackWithCallback(func() {
+		growStackWithCallback(func {
 			done := make(chan bool)
-			go func() {
+			go func {
 				done <- true
 			}()
 			<-done
@@ -219,7 +219,7 @@ func TestStackGrowthCallback(t *testing.T) {
 
 func growStackWithCallback(cb func()) {
 	var f func(n int)
-	f = func(n int) {
+	f = func n {
 		if n == 0 {
 			cb()
 			return
@@ -239,7 +239,7 @@ func set(p *int, x int) {
 func TestDeferPtrs(t *testing.T) {
 	var y int
 
-	defer func() {
+	defer func {
 		if y != 42 {
 			t.Errorf("defer's stack references were not adjusted appropriately")
 		}
@@ -268,7 +268,7 @@ func TestDeferPtrsGoexit(t *testing.T) {
 
 func testDeferPtrsGoexit(c chan int, i int) {
 	var y int
-	defer func() {
+	defer func {
 		c <- y
 	}()
 	defer setBig(&y, 42, bigBuf{})
@@ -294,7 +294,7 @@ func TestDeferPtrsPanic(t *testing.T) {
 
 func testDeferPtrsPanic(c chan int, i int) {
 	var y int
-	defer func() {
+	defer func {
 		if recover() == nil {
 			c <- -1
 			return
@@ -302,7 +302,7 @@ func testDeferPtrsPanic(c chan int, i int) {
 		c <- y
 	}()
 	defer setBig(&y, 42, bigBuf{})
-	useStackAndCall(i, func() { panic(1) })
+	useStackAndCall(i, func { panic(1) })
 }
 
 // TestPanicUseStack checks that a chain of Panic structs on the stack are
@@ -310,15 +310,15 @@ func testDeferPtrsPanic(c chan int, i int) {
 // happens as a result of the panic.
 func TestPanicUseStack(t *testing.T) {
 	pc := make([]uintptr, 10000)
-	defer func() {
+	defer func {
 		recover()
 		Callers(0, pc) // force stack walk
-		useStackAndCall(100, func() {
-			defer func() {
+		useStackAndCall(100, func {
+			defer func {
 				recover()
 				Callers(0, pc) // force stack walk
-				useStackAndCall(200, func() {
-					defer func() {
+				useStackAndCall(200, func {
+					defer func {
 						recover()
 						Callers(0, pc) // force stack walk
 					}()
@@ -334,16 +334,16 @@ func TestPanicUseStack(t *testing.T) {
 func TestPanicFar(t *testing.T) {
 	var xtree *xtreeNode
 	pc := make([]uintptr, 10000)
-	defer func() {
+	defer func {
 		// At this point we created a large stack and unwound
 		// it via recovery. Force a stack walk, which will
 		// check the stack's consistency.
 		Callers(0, pc)
 	}()
-	defer func() {
+	defer func {
 		recover()
 	}()
-	useStackAndCall(100, func() {
+	useStackAndCall(100, func {
 		// Kick off the GC and make it do something nontrivial.
 		// (This used to force stack barriers to stick around.)
 		xtree = makeTree(18)
@@ -376,7 +376,7 @@ func useStackAndCall(n int, f func()) {
 }
 
 func useStack(n int) {
-	useStackAndCall(n, func() {})
+	useStackAndCall(n, func {})
 }
 
 func growing(c chan int, done chan struct{}) {
@@ -443,7 +443,7 @@ func TestStackPanic(t *testing.T) {
 	// in the middle of gopanic. But it can happen.
 	// To make this test effective, edit panic.go:gopanic and uncomment
 	// the GC() call just before freedefer(d).
-	defer func() {
+	defer func {
 		if x := recover(); x == nil {
 			t.Errorf("recover failed")
 		}
@@ -455,7 +455,7 @@ func TestStackPanic(t *testing.T) {
 func BenchmarkStackCopy(b *testing.B) {
 	c := make(chan bool)
 	for i := 0; i < b.N; i++ {
-		go func() {
+		go func {
 			count(1000000)
 			c <- true
 		}()
@@ -473,7 +473,7 @@ func count(n int) int {
 func BenchmarkStackCopyNoCache(b *testing.B) {
 	c := make(chan bool)
 	for i := 0; i < b.N; i++ {
-		go func() {
+		go func {
 			count1(1000000)
 			c <- true
 		}()
@@ -706,22 +706,22 @@ type I interface {
 }
 
 func TestStackWrapperStackPanic(t *testing.T) {
-	t.Run("sigpanic", func(t *testing.T) {
+	t.Run("sigpanic", func t {
 		// nil calls to interface methods cause a sigpanic.
-		testStackWrapperPanic(t, func() { I.M(nil) }, "runtime_test.I.M")
+		testStackWrapperPanic(t, func { I.M(nil) }, "runtime_test.I.M")
 	})
-	t.Run("panicwrap", func(t *testing.T) {
+	t.Run("panicwrap", func t {
 		// Nil calls to value method wrappers call panicwrap.
 		wrapper := (*structWithMethod).nop
-		testStackWrapperPanic(t, func() { wrapper(nil) }, "runtime_test.(*structWithMethod).nop")
+		testStackWrapperPanic(t, func { wrapper(nil) }, "runtime_test.(*structWithMethod).nop")
 	})
 }
 
 func testStackWrapperPanic(t *testing.T, cb func(), expect string) {
 	// Test that the stack trace from a panicking wrapper includes
 	// the wrapper, even though elide these when they don't panic.
-	t.Run("CallersFrames", func(t *testing.T) {
-		defer func() {
+	t.Run("CallersFrames", func t {
+		defer func {
 			err := recover()
 			if err == nil {
 				t.Fatalf("expected panic")
@@ -743,8 +743,8 @@ func testStackWrapperPanic(t *testing.T, cb func(), expect string) {
 		}()
 		cb()
 	})
-	t.Run("Stack", func(t *testing.T) {
-		defer func() {
+	t.Run("Stack", func t {
+		defer func {
 			err := recover()
 			if err == nil {
 				t.Fatalf("expected panic")

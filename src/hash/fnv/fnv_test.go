@@ -107,15 +107,15 @@ func TestGoldenMarshal(t *testing.T) {
 		newHash func() hash.Hash
 		gold    []golden
 	}{
-		{"32", func() hash.Hash { return New32() }, golden32},
-		{"32a", func() hash.Hash { return New32a() }, golden32a},
-		{"64", func() hash.Hash { return New64() }, golden64},
-		{"64a", func() hash.Hash { return New64a() }, golden64a},
-		{"128", func() hash.Hash { return New128() }, golden128},
-		{"128a", func() hash.Hash { return New128a() }, golden128a},
+		{"32", func { return New32() }, golden32},
+		{"32a", func { return New32a() }, golden32a},
+		{"64", func { return New64() }, golden64},
+		{"64a", func { return New64a() }, golden64a},
+		{"128", func { return New128() }, golden128},
+		{"128a", func { return New128a() }, golden128a},
 	}
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func t {
 			for _, g := range tt.gold {
 				h := tt.newHash()
 				h2 := tt.newHash()

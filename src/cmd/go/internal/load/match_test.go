@@ -65,7 +65,7 @@ var matchPatternTests = `
 `
 
 func TestMatchPattern(t *testing.T) {
-	testPatterns(t, "matchPattern", matchPatternTests, func(pattern, name string) bool {
+	testPatterns(t, "matchPattern", matchPatternTests, func pattern, name {
 		return matchPattern(pattern)(name)
 	})
 }
@@ -106,7 +106,7 @@ var treeCanMatchPatternTests = `
 `
 
 func TestTreeCanMatchPattern(t *testing.T) {
-	testPatterns(t, "treeCanMatchPattern", treeCanMatchPatternTests, func(pattern, name string) bool {
+	testPatterns(t, "treeCanMatchPattern", treeCanMatchPatternTests, func pattern, name {
 		return treeCanMatchPattern(pattern)(name)
 	})
 }

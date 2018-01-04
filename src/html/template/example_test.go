@@ -25,7 +25,7 @@ func Example() {
 	</body>
 </html>`
 
-	check := func(err error) {
+	check := func err {
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -83,7 +83,7 @@ func Example() {
 }
 
 func Example_autoescaping() {
-	check := func(err error) {
+	check := func err {
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -222,7 +222,7 @@ func (b *Buffer) ReadFrom(r io.Reader) (n int64, err error) {
 // with ErrTooLarge.
 func makeSlice(n int) []byte {
 	// If the make fails, give a known error.
-	defer func() {
+	defer func {
 		if recover() != nil {
 			panic(ErrTooLarge)
 		}

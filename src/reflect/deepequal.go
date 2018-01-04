@@ -34,7 +34,7 @@ func deepValueEqual(v1, v2 Value, visited map[visit]bool, depth int) bool {
 	// We want to avoid putting more in the visited map than we need to.
 	// For any possible reference cycle that might be encountered,
 	// hard(t) needs to return true for at least one of the types in the cycle.
-	hard := func(k Kind) bool {
+	hard := func k {
 		switch k {
 		case Map, Slice, Ptr, Interface:
 			return true

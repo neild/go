@@ -353,7 +353,7 @@ func mProf_Malloc(p unsafe.Pointer, size uintptr) {
 	// This reduces potential contention and chances of deadlocks.
 	// Since the object must be alive during call to mProf_Malloc,
 	// it's fine to do this non-atomically.
-	systemstack(func() {
+	systemstack(func {
 		setprofilebucket(p, b)
 	})
 }
@@ -720,7 +720,7 @@ func ThreadCreateProfile(p []StackRecord) (n int, ok bool) {
 func GoroutineProfile(p []StackRecord) (n int, ok bool) {
 	gp := getg()
 
-	isOK := func(gp1 *g) bool {
+	isOK := func gp1 {
 		// Checking isSystemGoroutine here makes GoroutineProfile
 		// consistent with both NumGoroutine and Stack.
 		return gp1 != gp && readgstatus(gp1) != _Gdead && !isSystemGoroutine(gp1)
@@ -742,7 +742,7 @@ func GoroutineProfile(p []StackRecord) (n int, ok bool) {
 		// Save current goroutine.
 		sp := getcallersp(unsafe.Pointer(&p))
 		pc := getcallerpc()
-		systemstack(func() {
+		systemstack(func {
 			saveg(pc, sp, gp, &r[0])
 		})
 		r = r[1:]
@@ -787,7 +787,7 @@ func Stack(buf []byte, all bool) int {
 		gp := getg()
 		sp := getcallersp(unsafe.Pointer(&buf))
 		pc := getcallerpc()
-		systemstack(func() {
+		systemstack(func {
 			g0 := getg()
 			// Force traceback=1 to override GOTRACEBACK setting,
 			// so that Stack's results are consistent.
@@ -828,7 +828,7 @@ func tracealloc(p unsafe.Pointer, size uintptr, typ *_type) {
 		goroutineheader(gp)
 		pc := getcallerpc()
 		sp := getcallersp(unsafe.Pointer(&p))
-		systemstack(func() {
+		systemstack(func {
 			traceback(pc, sp, 0, gp)
 		})
 	} else {
@@ -848,7 +848,7 @@ func tracefree(p unsafe.Pointer, size uintptr) {
 	goroutineheader(gp)
 	pc := getcallerpc()
 	sp := getcallersp(unsafe.Pointer(&p))
-	systemstack(func() {
+	systemstack(func {
 		traceback(pc, sp, 0, gp)
 	})
 	print("\n")

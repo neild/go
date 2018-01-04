@@ -386,7 +386,7 @@ func TestIndexRune(t *testing.T) {
 	}
 
 	haystack := []byte("test世界")
-	allocs := testing.AllocsPerRun(1000, func() {
+	allocs := testing.AllocsPerRun(1000, func {
 		if i := IndexRune(haystack, 's'); i != 2 {
 			t.Fatalf("'s' at %d; want 2", i)
 		}
@@ -403,7 +403,7 @@ func TestIndexRune(t *testing.T) {
 func TestCountByte(t *testing.T) {
 	b := make([]byte, 5015) // bigger than a page
 	windows := []int{1, 2, 3, 4, 15, 16, 17, 31, 32, 33, 63, 64, 65, 128}
-	testCountWindow := func(i, window int) {
+	testCountWindow := func i, window {
 		for j := 0; j < window; j++ {
 			b[i+j] = byte(100)
 			p := Count(b[i:i+window], []byte{100})
@@ -489,7 +489,7 @@ func benchBytes(b *testing.B, sizes []int, f func(b *testing.B, n int)) {
 		if isRaceBuilder && n > 4<<10 {
 			continue
 		}
-		b.Run(valName(n), func(b *testing.B) {
+		b.Run(valName(n), func b {
 			if len(bmbuf) < n {
 				bmbuf = make([]byte, n)
 			}
@@ -512,7 +512,7 @@ func BenchmarkIndexBytePortable(b *testing.B) {
 }
 
 func bmIndexByte(index func([]byte, byte) int) func(b *testing.B, n int) {
-	return func(b *testing.B, n int) {
+	return func b, n {
 		buf := bmbuf[0:n]
 		buf[n-1] = 'x'
 		for i := 0; i < b.N; i++ {
@@ -534,7 +534,7 @@ func BenchmarkIndexRuneASCII(b *testing.B) {
 }
 
 func bmIndexRuneASCII(index func([]byte, rune) int) func(b *testing.B, n int) {
-	return func(b *testing.B, n int) {
+	return func b, n {
 		buf := bmbuf[0:n]
 		buf[n-1] = 'x'
 		for i := 0; i < b.N; i++ {
@@ -548,7 +548,7 @@ func bmIndexRuneASCII(index func([]byte, rune) int) func(b *testing.B, n int) {
 }
 
 func bmIndexRune(index func([]byte, rune) int) func(b *testing.B, n int) {
-	return func(b *testing.B, n int) {
+	return func b, n {
 		buf := bmbuf[0:n]
 		utf8.EncodeRune(buf[n-3:], '世')
 		for i := 0; i < b.N; i++ {
@@ -564,7 +564,7 @@ func bmIndexRune(index func([]byte, rune) int) func(b *testing.B, n int) {
 }
 
 func BenchmarkEqual(b *testing.B) {
-	b.Run("0", func(b *testing.B) {
+	b.Run("0", func b {
 		var buf [4]byte
 		buf1 := buf[0:0]
 		buf2 := buf[1:1]
@@ -586,7 +586,7 @@ func BenchmarkEqualPort(b *testing.B) {
 }
 
 func bmEqual(equal func([]byte, []byte) bool) func(b *testing.B, n int) {
-	return func(b *testing.B, n int) {
+	return func b, n {
 		if len(bmbuf) < 2*n {
 			bmbuf = make([]byte, 2*n)
 		}
@@ -606,7 +606,7 @@ func bmEqual(equal func([]byte, []byte) bool) func(b *testing.B, n int) {
 }
 
 func BenchmarkIndex(b *testing.B) {
-	benchBytes(b, indexSizes, func(b *testing.B, n int) {
+	benchBytes(b, indexSizes, func b, n {
 		buf := bmbuf[0:n]
 		buf[n-1] = 'x'
 		for i := 0; i < b.N; i++ {
@@ -620,7 +620,7 @@ func BenchmarkIndex(b *testing.B) {
 }
 
 func BenchmarkIndexEasy(b *testing.B) {
-	benchBytes(b, indexSizes, func(b *testing.B, n int) {
+	benchBytes(b, indexSizes, func b, n {
 		buf := bmbuf[0:n]
 		buf[n-1] = 'x'
 		buf[n-7] = 'x'
@@ -636,7 +636,7 @@ func BenchmarkIndexEasy(b *testing.B) {
 }
 
 func BenchmarkCount(b *testing.B) {
-	benchBytes(b, indexSizes, func(b *testing.B, n int) {
+	benchBytes(b, indexSizes, func b, n {
 		buf := bmbuf[0:n]
 		buf[n-1] = 'x'
 		for i := 0; i < b.N; i++ {
@@ -650,7 +650,7 @@ func BenchmarkCount(b *testing.B) {
 }
 
 func BenchmarkCountEasy(b *testing.B) {
-	benchBytes(b, indexSizes, func(b *testing.B, n int) {
+	benchBytes(b, indexSizes, func b, n {
 		buf := bmbuf[0:n]
 		buf[n-1] = 'x'
 		buf[n-7] = 'x'
@@ -666,7 +666,7 @@ func BenchmarkCountEasy(b *testing.B) {
 }
 
 func BenchmarkCountSingle(b *testing.B) {
-	benchBytes(b, indexSizes, func(b *testing.B, n int) {
+	benchBytes(b, indexSizes, func b, n {
 		buf := bmbuf[0:n]
 		step := 8
 		for i := 0; i < len(buf); i += step {
@@ -883,7 +883,7 @@ func TestFieldsFunc(t *testing.T) {
 			continue
 		}
 	}
-	pred := func(c rune) bool { return c == 'X' }
+	pred := func c { return c == 'X' }
 	var fieldsFuncTests = []FieldsTest{
 		{"", []string{}},
 		{"XX", []string{}},
@@ -995,7 +995,7 @@ func TestMap(t *testing.T) {
 	a := tenRunes('a')
 
 	// 1.  Grow. This triggers two reallocations in Map.
-	maxRune := func(r rune) rune { return unicode.MaxRune }
+	maxRune := func r { return unicode.MaxRune }
 	m := Map(maxRune, []byte(a))
 	expect := tenRunes(unicode.MaxRune)
 	if string(m) != expect {
@@ -1003,7 +1003,7 @@ func TestMap(t *testing.T) {
 	}
 
 	// 2. Shrink
-	minRune := func(r rune) rune { return 'a' }
+	minRune := func r { return 'a' }
 	m = Map(minRune, []byte(tenRunes(unicode.MaxRune)))
 	expect = a
 	if string(m) != expect {
@@ -1025,7 +1025,7 @@ func TestMap(t *testing.T) {
 	}
 
 	// 5. Drop
-	dropNotLatin := func(r rune) rune {
+	dropNotLatin := func r {
 		if unicode.Is(unicode.Latin, r) {
 			return r
 		}
@@ -1038,7 +1038,7 @@ func TestMap(t *testing.T) {
 	}
 
 	// 6. Invalid rune
-	invalidRune := func(r rune) rune {
+	invalidRune := func r {
 		return utf8.MaxRune + 1
 	}
 	m = Map(invalidRune, []byte("x"))
@@ -1082,7 +1082,7 @@ func TestRepeat(t *testing.T) {
 }
 
 func repeat(b []byte, count int) (err error) {
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			switch v := r.(type) {
 			case error:
@@ -1251,7 +1251,7 @@ var isSpace = predicate{unicode.IsSpace, "IsSpace"}
 var isDigit = predicate{unicode.IsDigit, "IsDigit"}
 var isUpper = predicate{unicode.IsUpper, "IsUpper"}
 var isValidRune = predicate{
-	func(r rune) bool {
+	func r {
 		return r != utf8.RuneError
 	},
 	"IsValidRune",
@@ -1264,7 +1264,7 @@ type TrimFuncTest struct {
 
 func not(p predicate) predicate {
 	return predicate{
-		func(r rune) bool {
+		func r {
 			return !p.f(r)
 		},
 		"not " + p.name,
@@ -1444,7 +1444,7 @@ func TestEqualFold(t *testing.T) {
 }
 
 func TestBufferGrowNegative(t *testing.T) {
-	defer func() {
+	defer func {
 		if err := recover(); err == nil {
 			t.Fatal("Grow(-1) should have panicked")
 		}
@@ -1454,7 +1454,7 @@ func TestBufferGrowNegative(t *testing.T) {
 }
 
 func TestBufferTruncateNegative(t *testing.T) {
-	defer func() {
+	defer func {
 		if err := recover(); err == nil {
 			t.Fatal("Truncate(-1) should have panicked")
 		}
@@ -1464,7 +1464,7 @@ func TestBufferTruncateNegative(t *testing.T) {
 }
 
 func TestBufferTruncateOutOfRange(t *testing.T) {
-	defer func() {
+	defer func {
 		if err := recover(); err == nil {
 			t.Fatal("Truncate(20) should have panicked")
 		}
@@ -1543,7 +1543,7 @@ func TestContainsRune(t *testing.T) {
 	}
 }
 
-var makeFieldsInput = func() []byte {
+var makeFieldsInput = func {
 	x := make([]byte, 1<<20)
 	// Input is ~10% space, ~10% 2-byte UTF-8, rest ASCII non-space.
 	for i := range x {
@@ -1563,7 +1563,7 @@ var makeFieldsInput = func() []byte {
 	return x
 }
 
-var makeFieldsInputASCII = func() []byte {
+var makeFieldsInputASCII = func {
 	x := make([]byte, 1<<20)
 	// Input is ~10% space, rest ASCII non-space.
 	for i := range x {
@@ -1586,9 +1586,9 @@ var bytesdata = []struct {
 
 func BenchmarkFields(b *testing.B) {
 	for _, sd := range bytesdata {
-		b.Run(sd.name, func(b *testing.B) {
+		b.Run(sd.name, func b {
 			for j := 1 << 4; j <= 1<<20; j <<= 4 {
-				b.Run(fmt.Sprintf("%d", j), func(b *testing.B) {
+				b.Run(fmt.Sprintf("%d", j), func b {
 					b.ReportAllocs()
 					b.SetBytes(int64(j))
 					data := sd.data[:j]
@@ -1603,9 +1603,9 @@ func BenchmarkFields(b *testing.B) {
 
 func BenchmarkFieldsFunc(b *testing.B) {
 	for _, sd := range bytesdata {
-		b.Run(sd.name, func(b *testing.B) {
+		b.Run(sd.name, func b {
 			for j := 1 << 4; j <= 1<<20; j <<= 4 {
-				b.Run(fmt.Sprintf("%d", j), func(b *testing.B) {
+				b.Run(fmt.Sprintf("%d", j), func b {
 					b.ReportAllocs()
 					b.SetBytes(int64(j))
 					data := sd.data[:j]
@@ -1686,7 +1686,7 @@ func BenchmarkRepeat(b *testing.B) {
 
 func BenchmarkBytesCompare(b *testing.B) {
 	for n := 1; n <= 2048; n <<= 1 {
-		b.Run(fmt.Sprint(n), func(b *testing.B) {
+		b.Run(fmt.Sprint(n), func b {
 			var x = make([]byte, n)
 			var y = make([]byte, n)
 
@@ -1711,7 +1711,7 @@ func BenchmarkIndexAnyASCII(b *testing.B) {
 	cs := "0123456789abcdef"
 	for k := 1; k <= 4096; k <<= 4 {
 		for j := 1; j <= 16; j <<= 1 {
-			b.Run(fmt.Sprintf("%d:%d", k, j), func(b *testing.B) {
+			b.Run(fmt.Sprintf("%d:%d", k, j), func b {
 				for i := 0; i < b.N; i++ {
 					IndexAny(x[:k], cs[:j])
 				}
@@ -1724,7 +1724,7 @@ func BenchmarkTrimASCII(b *testing.B) {
 	cs := "0123456789abcdef"
 	for k := 1; k <= 4096; k <<= 4 {
 		for j := 1; j <= 16; j <<= 1 {
-			b.Run(fmt.Sprintf("%d:%d", k, j), func(b *testing.B) {
+			b.Run(fmt.Sprintf("%d:%d", k, j), func b {
 				x := Repeat([]byte(cs[:j]), k) // Always matches set
 				for i := 0; i < b.N; i++ {
 					Trim(x[:k], cs[:j])
@@ -1737,7 +1737,7 @@ func BenchmarkTrimASCII(b *testing.B) {
 func BenchmarkIndexPeriodic(b *testing.B) {
 	key := []byte{1, 1}
 	for _, skip := range [...]int{2, 4, 8, 16, 32, 64} {
-		b.Run(fmt.Sprintf("IndexPeriodic%d", skip), func(b *testing.B) {
+		b.Run(fmt.Sprintf("IndexPeriodic%d", skip), func b {
 			buf := make([]byte, 1<<16)
 			for i := 0; i < len(buf); i += skip {
 				buf[i] = 1

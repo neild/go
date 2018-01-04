@@ -11,7 +11,7 @@ import (
 )
 
 func BenchmarkFastrand(b *testing.B) {
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			Fastrand()
 		}
@@ -23,7 +23,7 @@ func BenchmarkFastrandHashiter(b *testing.B) {
 	for i := 0; i < 10; i++ {
 		m[i] = i
 	}
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			for _ = range m {
 				break
@@ -36,7 +36,7 @@ var sink32 uint32
 
 func BenchmarkFastrandn(b *testing.B) {
 	for n := uint32(2); n <= 5; n++ {
-		b.Run(strconv.Itoa(int(n)), func(b *testing.B) {
+		b.Run(strconv.Itoa(int(n)), func b {
 			for i := 0; i < b.N; i++ {
 				sink32 = Fastrandn(n)
 			}

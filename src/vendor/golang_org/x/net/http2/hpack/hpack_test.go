@@ -492,7 +492,7 @@ func TestHuffmanMaxStrLen(t *testing.T) {
 	const msg = "Some string"
 	huff := AppendHuffmanString(nil, msg)
 
-	testGood := func(max int) {
+	testGood := func max {
 		var out bytes.Buffer
 		if err := huffmanDecode(&out, max, huff); err != nil {
 			t.Errorf("For maxLen=%d, unexpected error: %v", max, err)
@@ -670,7 +670,7 @@ func TestEmitEnabled(t *testing.T) {
 
 	numCallback := 0
 	var dec *Decoder
-	dec = NewDecoder(8<<20, func(HeaderField) {
+	dec = NewDecoder(8<<20, func {
 		numCallback++
 		dec.SetEmitEnabled(false)
 	})
@@ -691,7 +691,7 @@ func TestEmitEnabled(t *testing.T) {
 func TestSaveBufLimit(t *testing.T) {
 	const maxStr = 1 << 10
 	var got []HeaderField
-	dec := NewDecoder(initialHeaderTableSize, func(hf HeaderField) {
+	dec := NewDecoder(initialHeaderTableSize, func hf {
 		got = append(got, hf)
 	})
 	dec.SetMaxStringLength(maxStr)

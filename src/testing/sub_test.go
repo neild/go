@@ -76,9 +76,9 @@ func TestTestContext(t *T) {
 			maxParallel:   tc.max,
 		}
 		for j, call := range tc.run {
-			doCall := func(f func()) chan bool {
+			doCall := func f {
 				done := make(chan bool)
-				go func() {
+				go func {
 					f()
 					done <- true
 				}()
@@ -133,22 +133,22 @@ func TestTRun(t *T) {
 --- FAIL: failnow skips future sequential and parallel tests at same level (N.NNs)
     --- FAIL: failnow skips future sequential and parallel tests at same level/#00 (N.NNs)
     `,
-		f: func(t *T) {
+		f: func t {
 			ranSeq := false
 			ranPar := false
-			t.Run("", func(t *T) {
-				t.Run("par", func(t *T) {
+			t.Run("", func t {
+				t.Run("par", func t {
 					t.Parallel()
 					ranPar = true
 				})
-				t.Run("seq", func(t *T) {
+				t.Run("seq", func t {
 					ranSeq = true
 				})
 				t.FailNow()
-				t.Run("seq", func(t *T) {
+				t.Run("seq", func t {
 					realTest.Error("test must be skipped")
 				})
-				t.Run("par", func(t *T) {
+				t.Run("par", func t {
 					t.Parallel()
 					realTest.Error("test must be skipped.")
 				})
@@ -169,10 +169,10 @@ func TestTRun(t *T) {
     --- FAIL: failure in parallel test propagates upwards/#00 (N.NNs)
         --- FAIL: failure in parallel test propagates upwards/#00/par (N.NNs)
 		`,
-		f: func(t *T) {
-			t.Run("", func(t *T) {
+		f: func t {
+			t.Run("", func t {
 				t.Parallel()
-				t.Run("par", func(t *T) {
+				t.Run("par", func t {
 					t.Parallel()
 					t.Fail()
 				})
@@ -185,7 +185,7 @@ func TestTRun(t *T) {
 		output: `
 === RUN   skipping without message, chatty
 --- SKIP: skipping without message, chatty (N.NNs)`,
-		f: func(t *T) { t.SkipNow() },
+		f: func t { t.SkipNow() },
 	}, {
 		desc:   "chatty with recursion",
 		ok:     true,
@@ -197,22 +197,22 @@ func TestTRun(t *T) {
 --- PASS: chatty with recursion (N.NNs)
     --- PASS: chatty with recursion/#00 (N.NNs)
         --- PASS: chatty with recursion/#00/#00 (N.NNs)`,
-		f: func(t *T) {
-			t.Run("", func(t *T) {
-				t.Run("", func(t *T) {})
+		f: func t {
+			t.Run("", func t {
+				t.Run("", func t {})
 			})
 		},
 	}, {
 		desc: "skipping without message, not chatty",
 		ok:   true,
-		f:    func(t *T) { t.SkipNow() },
+		f:    func t { t.SkipNow() },
 	}, {
 		desc: "skipping after error",
 		output: `
 --- FAIL: skipping after error (N.NNs)
 	sub_test.go:NNN: an error
 	sub_test.go:NNN: skipped`,
-		f: func(t *T) {
+		f: func t {
 			t.Error("an error")
 			t.Skip("skipped")
 		},
@@ -220,11 +220,11 @@ func TestTRun(t *T) {
 		desc:   "use Run to locally synchronize parallelism",
 		ok:     true,
 		maxPar: 1,
-		f: func(t *T) {
+		f: func t {
 			var count uint32
-			t.Run("waitGroup", func(t *T) {
+			t.Run("waitGroup", func t {
 				for i := 0; i < 4; i++ {
-					t.Run("par", func(t *T) {
+					t.Run("par", func t {
 						t.Parallel()
 						atomic.AddUint32(&count, 1)
 					})
@@ -241,12 +241,12 @@ func TestTRun(t *T) {
 		// itself subtests of parallel tests, the counts can get askew.
 		ok:     true,
 		maxPar: 1,
-		f: func(t *T) {
-			t.Run("a", func(t *T) {
+		f: func t {
+			t.Run("a", func t {
 				t.Parallel()
-				t.Run("b", func(t *T) {
+				t.Run("b", func t {
 					// Sequential: ensure running count is decremented.
-					t.Run("c", func(t *T) {
+					t.Run("c", func t {
 						t.Parallel()
 					})
 
@@ -260,16 +260,16 @@ func TestTRun(t *T) {
 		// itself subtests of parallel tests, the counts can get askew.
 		ok:     true,
 		maxPar: 2,
-		f: func(t *T) {
+		f: func t {
 			for i := 0; i < 2; i++ {
-				t.Run("a", func(t *T) {
+				t.Run("a", func t {
 					t.Parallel()
 					time.Sleep(time.Nanosecond)
 					for i := 0; i < 2; i++ {
-						t.Run("b", func(t *T) {
+						t.Run("b", func t {
 							time.Sleep(time.Nanosecond)
 							for i := 0; i < 2; i++ {
-								t.Run("c", func(t *T) {
+								t.Run("c", func t {
 									t.Parallel()
 									time.Sleep(time.Nanosecond)
 								})
@@ -284,23 +284,23 @@ func TestTRun(t *T) {
 		desc:   "stress test",
 		ok:     true,
 		maxPar: 4,
-		f: func(t *T) {
+		f: func t {
 			t.Parallel()
 			for i := 0; i < 12; i++ {
-				t.Run("a", func(t *T) {
+				t.Run("a", func t {
 					t.Parallel()
 					time.Sleep(time.Nanosecond)
 					for i := 0; i < 12; i++ {
-						t.Run("b", func(t *T) {
+						t.Run("b", func t {
 							time.Sleep(time.Nanosecond)
 							for i := 0; i < 12; i++ {
-								t.Run("c", func(t *T) {
+								t.Run("c", func t {
 									t.Parallel()
 									time.Sleep(time.Nanosecond)
-									t.Run("d1", func(t *T) {})
-									t.Run("d2", func(t *T) {})
-									t.Run("d3", func(t *T) {})
-									t.Run("d4", func(t *T) {})
+									t.Run("d1", func t {})
+									t.Run("d2", func t {})
+									t.Run("d3", func t {})
+									t.Run("d4", func t {})
 								})
 							}
 						})
@@ -312,19 +312,19 @@ func TestTRun(t *T) {
 		desc:   "skip output",
 		ok:     true,
 		maxPar: 4,
-		f: func(t *T) {
+		f: func t {
 			t.Skip()
 		},
 	}, {
 		desc:   "panic on goroutine fail after test exit",
 		ok:     false,
 		maxPar: 4,
-		f: func(t *T) {
+		f: func t {
 			ch := make(chan bool)
-			t.Run("", func(t *T) {
-				go func() {
+			t.Run("", func t {
+				go func {
 					<-ch
-					defer func() {
+					defer func {
 						if r := recover(); r == nil {
 							realTest.Errorf("expected panic")
 						}
@@ -371,7 +371,7 @@ func TestTRun(t *T) {
 }
 
 func TestBRun(t *T) {
-	work := func(b *B) {
+	work := func b {
 		for i := 0; i < b.N; i++ {
 			time.Sleep(time.Nanosecond)
 		}
@@ -384,10 +384,10 @@ func TestBRun(t *T) {
 		f      func(*B)
 	}{{
 		desc: "simulate sequential run of subbenchmarks.",
-		f: func(b *B) {
-			b.Run("", func(b *B) { work(b) })
+		f: func b {
+			b.Run("", func b { work(b) })
 			time1 := b.result.NsPerOp()
-			b.Run("", func(b *B) { work(b) })
+			b.Run("", func b { work(b) })
 			time2 := b.result.NsPerOp()
 			if time1 >= time2 {
 				t.Errorf("no time spent in benchmark t1 >= t2 (%d >= %d)", time1, time2)
@@ -395,9 +395,9 @@ func TestBRun(t *T) {
 		},
 	}, {
 		desc: "bytes set by all benchmarks",
-		f: func(b *B) {
-			b.Run("", func(b *B) { b.SetBytes(10); work(b) })
-			b.Run("", func(b *B) { b.SetBytes(10); work(b) })
+		f: func b {
+			b.Run("", func b { b.SetBytes(10); work(b) })
+			b.Run("", func b { b.SetBytes(10); work(b) })
 			if b.result.Bytes != 20 {
 				t.Errorf("bytes: got: %d; want 20", b.result.Bytes)
 			}
@@ -405,10 +405,10 @@ func TestBRun(t *T) {
 	}, {
 		desc: "bytes set by some benchmarks",
 		// In this case the bytes result is meaningless, so it must be 0.
-		f: func(b *B) {
-			b.Run("", func(b *B) { b.SetBytes(10); work(b) })
-			b.Run("", func(b *B) { work(b) })
-			b.Run("", func(b *B) { b.SetBytes(10); work(b) })
+		f: func b {
+			b.Run("", func b { b.SetBytes(10); work(b) })
+			b.Run("", func b { work(b) })
+			b.Run("", func b { b.SetBytes(10); work(b) })
 			if b.result.Bytes != 0 {
 				t.Errorf("bytes: got: %d; want 0", b.result.Bytes)
 			}
@@ -417,30 +417,30 @@ func TestBRun(t *T) {
 		desc:   "failure carried over to root",
 		failed: true,
 		output: "--- FAIL: root",
-		f:      func(b *B) { b.Fail() },
+		f:      func b { b.Fail() },
 	}, {
 		desc:   "skipping without message, chatty",
 		chatty: true,
 		output: "--- SKIP: root",
-		f:      func(b *B) { b.SkipNow() },
+		f:      func b { b.SkipNow() },
 	}, {
 		desc:   "skipping with message, chatty",
 		chatty: true,
 		output: `
 --- SKIP: root
 	sub_test.go:NNN: skipping`,
-		f: func(b *B) { b.Skip("skipping") },
+		f: func b { b.Skip("skipping") },
 	}, {
 		desc:   "chatty with recursion",
 		chatty: true,
-		f: func(b *B) {
-			b.Run("", func(b *B) {
-				b.Run("", func(b *B) {})
+		f: func b {
+			b.Run("", func b {
+				b.Run("", func b {})
 			})
 		},
 	}, {
 		desc: "skipping without message, not chatty",
-		f:    func(b *B) { b.SkipNow() },
+		f:    func b { b.SkipNow() },
 	}, {
 		desc:   "skipping after error",
 		failed: true,
@@ -448,25 +448,25 @@ func TestBRun(t *T) {
 --- FAIL: root
 	sub_test.go:NNN: an error
 	sub_test.go:NNN: skipped`,
-		f: func(b *B) {
+		f: func b {
 			b.Error("an error")
 			b.Skip("skipped")
 		},
 	}, {
 		desc: "memory allocation",
-		f: func(b *B) {
+		f: func b {
 			const bufSize = 256
-			alloc := func(b *B) {
+			alloc := func b {
 				var buf [bufSize]byte
 				for i := 0; i < b.N; i++ {
 					_ = append([]byte(nil), buf[:]...)
 				}
 			}
-			b.Run("", func(b *B) {
+			b.Run("", func b {
 				alloc(b)
 				b.ReportAllocs()
 			})
-			b.Run("", func(b *B) {
+			b.Run("", func b {
 				alloc(b)
 				b.ReportAllocs()
 			})
@@ -494,7 +494,7 @@ func TestBRun(t *T) {
 				w:      buf,
 				chatty: tc.chatty,
 			},
-			benchFunc: func(b *B) { ok = b.Run("test", tc.f) }, // Use Run to catch failure.
+			benchFunc: func b { ok = b.Run("test", tc.f) }, // Use Run to catch failure.
 			benchTime: time.Microsecond,
 		}
 		root.runN(1)
@@ -526,13 +526,13 @@ func makeRegexp(s string) string {
 func TestBenchmarkOutput(t *T) {
 	// Ensure Benchmark initialized common.w by invoking it with an error and
 	// normal case.
-	Benchmark(func(b *B) { b.Error("do not print this output") })
-	Benchmark(func(b *B) {})
+	Benchmark(func b { b.Error("do not print this output") })
+	Benchmark(func b {})
 }
 
 func TestBenchmarkStartsFrom1(t *T) {
 	var first = true
-	Benchmark(func(b *B) {
+	Benchmark(func b {
 		if first && b.N != 1 {
 			panic(fmt.Sprintf("Benchmark() first N=%v; want 1", b.N))
 		}
@@ -542,7 +542,7 @@ func TestBenchmarkStartsFrom1(t *T) {
 
 func TestBenchmarkReadMemStatsBeforeFirstRun(t *T) {
 	var first = true
-	Benchmark(func(b *B) {
+	Benchmark(func b {
 		if first && (b.startAllocs == 0 || b.startBytes == 0) {
 			panic(fmt.Sprintf("ReadMemStats not called before first run"))
 		}
@@ -554,9 +554,9 @@ func TestParallelSub(t *T) {
 	c := make(chan int)
 	block := make(chan int)
 	for i := 0; i < 10; i++ {
-		go func(i int) {
+		go func i {
 			<-block
-			t.Run(fmt.Sprint(i), func(t *T) {})
+			t.Run(fmt.Sprint(i), func t {})
 			c <- 1
 		}(i)
 	}
@@ -573,7 +573,7 @@ func (fw funcWriter) Write(b []byte) (int, error) { return fw(b) }
 func TestRacyOutput(t *T) {
 	var runs int32  // The number of running Writes
 	var races int32 // Incremented for each race detected
-	raceDetector := func(b []byte) (int, error) {
+	raceDetector := func b {
 		// Check if some other goroutine is concurrently calling Write.
 		if atomic.LoadInt32(&runs) > 0 {
 			atomic.AddInt32(&races, 1) // Race detected!
@@ -589,12 +589,12 @@ func TestRacyOutput(t *T) {
 		common:  common{w: funcWriter(raceDetector), chatty: true},
 		context: newTestContext(1, newMatcher(regexp.MatchString, "", "")),
 	}
-	root.Run("", func(t *T) {
+	root.Run("", func t {
 		for i := 0; i < 100; i++ {
 			wg.Add(1)
-			go func(i int) {
+			go func i {
 				defer wg.Done()
-				t.Run(fmt.Sprint(i), func(t *T) {
+				t.Run(fmt.Sprint(i), func t {
 					t.Logf("testing run %d", i)
 				})
 			}(i)
@@ -608,9 +608,9 @@ func TestRacyOutput(t *T) {
 }
 
 func TestBenchmark(t *T) {
-	res := Benchmark(func(b *B) {
+	res := Benchmark(func b {
 		for i := 0; i < 5; i++ {
-			b.Run("", func(b *B) {
+			b.Run("", func b {
 				for i := 0; i < b.N; i++ {
 					time.Sleep(time.Millisecond)
 				}

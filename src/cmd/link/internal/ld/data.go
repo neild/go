@@ -935,7 +935,7 @@ func (p *GCProg) Init(ctxt *Link, name string) {
 }
 
 func (p *GCProg) writeByte(ctxt *Link) func(x byte) {
-	return func(x byte) {
+	return func x {
 		p.sym.AddUint8(x)
 	}
 }
@@ -1142,7 +1142,7 @@ func (ctxt *Link) dodata() {
 	for symn := range data {
 		symn := sym.SymKind(symn)
 		wg.Add(1)
-		go func() {
+		go func {
 			data[symn], dataMaxAlign[symn] = dodataSect(ctxt, symn, data[symn])
 			wg.Done()
 		}()
@@ -1429,12 +1429,12 @@ func (ctxt *Link) dodata() {
 	// situation.
 	// TODO(mwhudson): It would make sense to do this more widely, but it makes
 	// the system linker segfault on darwin.
-	addrelrosection := func(suffix string) *sym.Section {
+	addrelrosection := func suffix {
 		return addsection(ctxt.Arch, segro, suffix, 04)
 	}
 
 	if ctxt.UseRelro() {
-		addrelrosection = func(suffix string) *sym.Section {
+		addrelrosection = func suffix {
 			seg := &Segrelrodata
 			if ctxt.LinkMode == LinkExternal {
 				// Using a separate segment with an external

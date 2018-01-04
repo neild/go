@@ -161,7 +161,7 @@ type WSAMsg struct {
 //sys	WSASocket(af int32, typ int32, protocol int32, protinfo *syscall.WSAProtocolInfo, group uint32, flags uint32) (handle syscall.Handle, err error) [failretval==syscall.InvalidHandle] = ws2_32.WSASocketW
 
 func loadWSASendRecvMsg() error {
-	sendRecvMsgFunc.once.Do(func() {
+	sendRecvMsgFunc.once.Do(func {
 		var s syscall.Handle
 		s, sendRecvMsgFunc.err = syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, syscall.IPPROTO_UDP)
 		if sendRecvMsgFunc.err != nil {

@@ -377,7 +377,7 @@ func checkTime(time Time, test *ParseTest, t *testing.T) {
 
 func TestFormatAndParse(t *testing.T) {
 	const fmt = "Mon MST " + RFC3339 // all fields
-	f := func(sec int64) bool {
+	f := func sec {
 		t1 := Unix(sec/2, 0)
 		if t1.Year() < 1000 || t1.Year() > 9999 || t1.Unix() != sec {
 			// not required to work
@@ -394,7 +394,7 @@ func TestFormatAndParse(t *testing.T) {
 		}
 		return true
 	}
-	f32 := func(sec int32) bool { return f(int64(sec)) }
+	f32 := func sec { return f(int64(sec)) }
 	cfg := &quick.Config{MaxCount: 10000}
 
 	// Try a reasonable date first, then the huge ones.

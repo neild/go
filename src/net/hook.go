@@ -11,12 +11,8 @@ var (
 	testHookDialTCP func(ctx context.Context, net string, laddr, raddr *TCPAddr) (*TCPConn, error)
 
 	testHookHostsPath = "/etc/hosts"
-	testHookLookupIP  = func(
-		ctx context.Context,
-		fn func(context.Context, string) ([]IPAddr, error),
-		host string,
-	) ([]IPAddr, error) {
+	testHookLookupIP  = func ctx, fn, host {
 		return fn(ctx, host)
 	}
-	testHookSetKeepAlive = func() {}
+	testHookSetKeepAlive = func {}
 )

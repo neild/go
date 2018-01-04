@@ -719,7 +719,7 @@ func synthesizemaptypes(ctxt *Link, die *dwarf.DWDie) {
 
 		// Construct type to represent an array of BucketSize keys
 		keyname := nameFromDIESym(keytype)
-		dwhks := mkinternaltype(ctxt, dwarf.DW_ABRV_ARRAYTYPE, "[]key", keyname, "", func(dwhk *dwarf.DWDie) {
+		dwhks := mkinternaltype(ctxt, dwarf.DW_ABRV_ARRAYTYPE, "[]key", keyname, "", func dwhk {
 			newattr(dwhk, dwarf.DW_AT_byte_size, dwarf.DW_CLS_CONSTANT, BucketSize*keysize, 0)
 			t := keytype
 			if indirectKey {
@@ -733,7 +733,7 @@ func synthesizemaptypes(ctxt *Link, die *dwarf.DWDie) {
 
 		// Construct type to represent an array of BucketSize values
 		valname := nameFromDIESym(valtype)
-		dwhvs := mkinternaltype(ctxt, dwarf.DW_ABRV_ARRAYTYPE, "[]val", valname, "", func(dwhv *dwarf.DWDie) {
+		dwhvs := mkinternaltype(ctxt, dwarf.DW_ABRV_ARRAYTYPE, "[]val", valname, "", func dwhv {
 			newattr(dwhv, dwarf.DW_AT_byte_size, dwarf.DW_CLS_CONSTANT, BucketSize*valsize, 0)
 			t := valtype
 			if indirectVal {
@@ -746,7 +746,7 @@ func synthesizemaptypes(ctxt *Link, die *dwarf.DWDie) {
 		})
 
 		// Construct bucket<K,V>
-		dwhbs := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "bucket", keyname, valname, func(dwhb *dwarf.DWDie) {
+		dwhbs := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "bucket", keyname, valname, func dwhb {
 			// Copy over all fields except the field "data" from the generic
 			// bucket. "data" will be replaced with keys/values below.
 			copychildrenexcept(ctxt, dwhb, bucket, findchild(bucket, "data"))
@@ -770,7 +770,7 @@ func synthesizemaptypes(ctxt *Link, die *dwarf.DWDie) {
 		})
 
 		// Construct hash<K,V>
-		dwhs := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "hash", keyname, valname, func(dwh *dwarf.DWDie) {
+		dwhs := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "hash", keyname, valname, func dwh {
 			copychildren(ctxt, dwh, hash)
 			substitutetype(dwh, "buckets", defptrto(ctxt, dwhbs))
 			substitutetype(dwh, "oldbuckets", defptrto(ctxt, dwhbs))
@@ -801,14 +801,14 @@ func synthesizechantypes(ctxt *Link, die *dwarf.DWDie) {
 		elemtype := walksymtypedef(ctxt, defgotype(ctxt, elemgotype))
 
 		// sudog<T>
-		dwss := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "sudog", elemname, "", func(dws *dwarf.DWDie) {
+		dwss := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "sudog", elemname, "", func dws {
 			copychildren(ctxt, dws, sudog)
 			substitutetype(dws, "elem", defptrto(ctxt, elemtype))
 			newattr(dws, dwarf.DW_AT_byte_size, dwarf.DW_CLS_CONSTANT, int64(sudogsize), nil)
 		})
 
 		// waitq<T>
-		dwws := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "waitq", elemname, "", func(dww *dwarf.DWDie) {
+		dwws := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "waitq", elemname, "", func dww {
 
 			copychildren(ctxt, dww, waitq)
 			substitutetype(dww, "first", defptrto(ctxt, dwss))
@@ -817,7 +817,7 @@ func synthesizechantypes(ctxt *Link, die *dwarf.DWDie) {
 		})
 
 		// hchan<T>
-		dwhs := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "hchan", elemname, "", func(dwh *dwarf.DWDie) {
+		dwhs := mkinternaltype(ctxt, dwarf.DW_ABRV_STRUCTTYPE, "hchan", elemname, "", func dwh {
 			copychildren(ctxt, dwh, hchan)
 			substitutetype(dwh, "recvq", dwws)
 			substitutetype(dwh, "sendq", dwws)

@@ -743,7 +743,7 @@ func makeReader(r io.Reader) Reader {
 }
 
 func fixedHuffmanDecoderInit() {
-	fixedOnce.Do(func() {
+	fixedOnce.Do(func {
 		// These come from the RFC section 3.2.6.
 		var bits [288]int
 		for i := 0; i < 144; i++ {

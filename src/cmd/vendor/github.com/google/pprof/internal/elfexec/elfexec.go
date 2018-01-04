@@ -41,7 +41,7 @@ func parseNotes(reader io.Reader, alignment int, order binary.ByteOrder) ([]elfN
 
 	// padding returns the number of bytes required to pad the given size to an
 	// alignment boundary.
-	padding := func(size int) int {
+	padding := func size {
 		return ((size + (alignment - 1)) &^ (alignment - 1)) - size
 	}
 
@@ -124,7 +124,7 @@ func GetBuildID(binary io.ReaderAt) ([]byte, error) {
 		return nil, err
 	}
 
-	findBuildID := func(notes []elfNote) ([]byte, error) {
+	findBuildID := func notes {
 		var buildID []byte
 		for _, note := range notes {
 			if note.Name == "GNU" && note.Type == noteTypeGNUBuildID {

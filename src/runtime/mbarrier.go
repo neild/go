@@ -187,7 +187,7 @@ func writebarrierptr_prewrite1(dst *uintptr, src uintptr) {
 		releasem(mp)
 		return
 	}
-	systemstack(func() {
+	systemstack(func {
 		if mp.p == 0 && memstats.enablegc && !mp.inwb && inheap(src) {
 			throw("writebarrierptr_prewrite1 called with mp.p == nil")
 		}
@@ -210,7 +210,7 @@ func writebarrierptr(dst *uintptr, src uintptr) {
 		return
 	}
 	if src != 0 && src < minPhysPageSize {
-		systemstack(func() {
+		systemstack(func {
 			print("runtime: writebarrierptr *", dst, " = ", hex(src), "\n")
 			throw("bad pointer in write barrier")
 		})
@@ -232,7 +232,7 @@ func writebarrierptr_prewrite(dst *uintptr, src uintptr) {
 		return
 	}
 	if src != 0 && src < minPhysPageSize {
-		systemstack(func() { throw("bad pointer in write barrier") })
+		systemstack(func { throw("bad pointer in write barrier") })
 	}
 	writebarrierptr_prewrite1(dst, src)
 }

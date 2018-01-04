@@ -50,7 +50,7 @@ func BenchmarkSignP256(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			_, _, _ = Sign(rand.Reader, priv, hashed)
 		}
@@ -65,7 +65,7 @@ func BenchmarkSignP384(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			_, _, _ = Sign(rand.Reader, priv, hashed)
 		}
@@ -81,7 +81,7 @@ func BenchmarkVerifyP256(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			Verify(&priv.PublicKey, hashed, r, s)
 		}
@@ -94,7 +94,7 @@ func BenchmarkKeyGeneration(b *testing.B) {
 
 	b.ReportAllocs()
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			GenerateKey(p256, rand.Reader)
 		}

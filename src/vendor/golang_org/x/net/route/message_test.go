@@ -73,7 +73,7 @@ func TestMonitorAndParseRIB(t *testing.T) {
 	}
 	pv.teardown()
 
-	go func() {
+	go func {
 		b := make([]byte, os.Getpagesize())
 		for {
 			// There's no easy way to unblock this read

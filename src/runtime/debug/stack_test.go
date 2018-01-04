@@ -44,7 +44,7 @@ func TestStack(t *testing.T) {
 		t.Fatal("too few lines")
 	}
 	n := 0
-	frame := func(line, code string) {
+	frame := func line, code {
 		check(t, lines[n], code)
 		n++
 		check(t, lines[n], line)

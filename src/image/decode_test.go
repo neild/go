@@ -79,7 +79,7 @@ func withinTolerance(c0, c1 color.Color, tolerance int) bool {
 }
 
 func TestDecode(t *testing.T) {
-	rgba := func(c color.Color) string {
+	rgba := func c {
 		r, g, b, a := c.RGBA()
 		return fmt.Sprintf("rgba = 0x%04x, 0x%04x, 0x%04x, 0x%04x for %T%v", r, g, b, a, c, c)
 	}

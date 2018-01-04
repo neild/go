@@ -1016,7 +1016,7 @@ func stripParens(x ast.Expr) ast.Expr {
 		// parentheses must not be stripped if there are any
 		// unparenthesized composite literals starting with
 		// a type name
-		ast.Inspect(px.X, func(node ast.Node) bool {
+		ast.Inspect(px.X, func node {
 			switch x := node.(type) {
 			case *ast.ParenExpr:
 				// parentheses protect enclosed composite literals
@@ -1327,7 +1327,7 @@ func (p *printer) stmt(stmt ast.Stmt, nextIsRBrace bool) {
 func keepTypeColumn(specs []ast.Spec) []bool {
 	m := make([]bool, len(specs))
 
-	populate := func(i, j int, keepType bool) {
+	populate := func i, j, keepType {
 		if keepType {
 			for ; i < j; i++ {
 				m[i] = true
@@ -1608,7 +1608,7 @@ func (p *printer) funcBody(headerSize int, sep whiteSpace, b *ast.BlockStmt) {
 	}
 
 	// save/restore composite literal nesting level
-	defer func(level int) {
+	defer func level {
 		p.level = level
 	}(p.level)
 	p.level = 0

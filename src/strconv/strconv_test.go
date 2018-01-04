@@ -20,22 +20,22 @@ var (
 		desc  string
 		fn    func()
 	}{
-		{0, `AppendInt(localBuf[:0], 123, 10)`, func() {
+		{0, `AppendInt(localBuf[:0], 123, 10)`, func {
 			var localBuf [64]byte
 			AppendInt(localBuf[:0], 123, 10)
 		}},
-		{0, `AppendInt(globalBuf[:0], 123, 10)`, func() { AppendInt(globalBuf[:0], 123, 10) }},
-		{0, `AppendFloat(localBuf[:0], 1.23, 'g', 5, 64)`, func() {
+		{0, `AppendInt(globalBuf[:0], 123, 10)`, func { AppendInt(globalBuf[:0], 123, 10) }},
+		{0, `AppendFloat(localBuf[:0], 1.23, 'g', 5, 64)`, func {
 			var localBuf [64]byte
 			AppendFloat(localBuf[:0], 1.23, 'g', 5, 64)
 		}},
-		{0, `AppendFloat(globalBuf[:0], 1.23, 'g', 5, 64)`, func() { AppendFloat(globalBuf[:0], 1.23, 'g', 5, 64) }},
-		{0, `ParseFloat("123.45", 64)`, func() { ParseFloat("123.45", 64) }},
-		{0, `ParseFloat("123.456789123456789", 64)`, func() { ParseFloat("123.456789123456789", 64) }},
-		{0, `ParseFloat("1.000000000000000111022302462515654042363166809082031251", 64)`, func() {
+		{0, `AppendFloat(globalBuf[:0], 1.23, 'g', 5, 64)`, func { AppendFloat(globalBuf[:0], 1.23, 'g', 5, 64) }},
+		{0, `ParseFloat("123.45", 64)`, func { ParseFloat("123.45", 64) }},
+		{0, `ParseFloat("123.456789123456789", 64)`, func { ParseFloat("123.456789123456789", 64) }},
+		{0, `ParseFloat("1.000000000000000111022302462515654042363166809082031251", 64)`, func {
 			ParseFloat("1.000000000000000111022302462515654042363166809082031251", 64)
 		}},
-		{0, `ParseFloat("1.0000000000000001110223024625156540423631668090820312500...001", 64)`, func() {
+		{0, `ParseFloat("1.0000000000000001110223024625156540423631668090820312500...001", 64)`, func {
 			ParseFloat(nextToOne, 64)
 		}},
 	}

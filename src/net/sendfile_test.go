@@ -27,7 +27,7 @@ func TestSendfile(t *testing.T) {
 	defer ln.Close()
 
 	errc := make(chan error, 1)
-	go func(ln Listener) {
+	go func ln {
 		// Wait for a connection.
 		conn, err := ln.Accept()
 		if err != nil {
@@ -36,7 +36,7 @@ func TestSendfile(t *testing.T) {
 			return
 		}
 
-		go func() {
+		go func {
 			defer close(errc)
 			defer conn.Close()
 

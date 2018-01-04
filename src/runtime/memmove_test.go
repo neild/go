@@ -202,7 +202,7 @@ func cmpb(a, b []byte) int {
 
 func benchmarkSizes(b *testing.B, sizes []int, fn func(b *testing.B, n int)) {
 	for _, n := range sizes {
-		b.Run(fmt.Sprint(n), func(b *testing.B) {
+		b.Run(fmt.Sprint(n), func b {
 			b.SetBytes(int64(n))
 			fn(b, n)
 		})
@@ -215,7 +215,7 @@ var bufSizes = []int{
 }
 
 func BenchmarkMemmove(b *testing.B) {
-	benchmarkSizes(b, bufSizes, func(b *testing.B, n int) {
+	benchmarkSizes(b, bufSizes, func b, n {
 		x := make([]byte, n)
 		y := make([]byte, n)
 		for i := 0; i < b.N; i++ {
@@ -225,7 +225,7 @@ func BenchmarkMemmove(b *testing.B) {
 }
 
 func BenchmarkMemmoveUnalignedDst(b *testing.B) {
-	benchmarkSizes(b, bufSizes, func(b *testing.B, n int) {
+	benchmarkSizes(b, bufSizes, func b, n {
 		x := make([]byte, n+1)
 		y := make([]byte, n)
 		for i := 0; i < b.N; i++ {
@@ -235,7 +235,7 @@ func BenchmarkMemmoveUnalignedDst(b *testing.B) {
 }
 
 func BenchmarkMemmoveUnalignedSrc(b *testing.B) {
-	benchmarkSizes(b, bufSizes, func(b *testing.B, n int) {
+	benchmarkSizes(b, bufSizes, func b, n {
 		x := make([]byte, n)
 		y := make([]byte, n+1)
 		for i := 0; i < b.N; i++ {
@@ -279,7 +279,7 @@ func TestMemclr(t *testing.T) {
 func BenchmarkMemclr(b *testing.B) {
 	for _, n := range []int{5, 16, 64, 256, 4096, 65536} {
 		x := make([]byte, n)
-		b.Run(fmt.Sprint(n), func(b *testing.B) {
+		b.Run(fmt.Sprint(n), func b {
 			b.SetBytes(int64(n))
 			for i := 0; i < b.N; i++ {
 				MemclrBytes(x)
@@ -288,7 +288,7 @@ func BenchmarkMemclr(b *testing.B) {
 	}
 	for _, m := range []int{1, 4, 8, 16, 64} {
 		x := make([]byte, m<<20)
-		b.Run(fmt.Sprint(m, "M"), func(b *testing.B) {
+		b.Run(fmt.Sprint(m, "M"), func b {
 			b.SetBytes(int64(m << 20))
 			for i := 0; i < b.N; i++ {
 				MemclrBytes(x)
@@ -298,7 +298,7 @@ func BenchmarkMemclr(b *testing.B) {
 }
 
 func BenchmarkGoMemclr(b *testing.B) {
-	benchmarkSizes(b, []int{5, 16, 64, 256}, func(b *testing.B, n int) {
+	benchmarkSizes(b, []int{5, 16, 64, 256}, func b, n {
 		x := make([]byte, n)
 		for i := 0; i < b.N; i++ {
 			for j := range x {

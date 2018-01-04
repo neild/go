@@ -392,7 +392,7 @@ func warn(pos token.Pos, msg string, args ...interface{}) {
 // countUses returns the number of uses of the identifier x in scope.
 func countUses(x *ast.Ident, scope []ast.Stmt) int {
 	count := 0
-	ff := func(n interface{}) {
+	ff := func n {
 		if n, ok := n.(ast.Node); ok && refersTo(n, x) {
 			count++
 		}
@@ -407,7 +407,7 @@ func countUses(x *ast.Ident, scope []ast.Stmt) int {
 // with f(x.Pos()) and fnot(x.Pos()).
 func rewriteUses(x *ast.Ident, f, fnot func(token.Pos) ast.Expr, scope []ast.Stmt) {
 	var lastF ast.Expr
-	ff := func(n interface{}) {
+	ff := func n {
 		ptr, ok := n.(*ast.Expr)
 		if !ok {
 			return
@@ -434,7 +434,7 @@ func rewriteUses(x *ast.Ident, f, fnot func(token.Pos) ast.Expr, scope []ast.Stm
 // assignsTo reports whether any of the code in scope assigns to or takes the address of x.
 func assignsTo(x *ast.Ident, scope []ast.Stmt) bool {
 	assigned := false
-	ff := func(n interface{}) {
+	ff := func n {
 		if assigned {
 			return
 		}
@@ -533,7 +533,7 @@ func renameTop(f *ast.File, old, new string) bool {
 	// Rename top-level old to new, both unresolved names
 	// (probably defined in another file) and names that resolve
 	// to a declaration we renamed.
-	walk(f, func(n interface{}) {
+	walk(f, func n {
 		id, ok := n.(*ast.Ident)
 		if ok && isTopName(id, old) {
 			id.Name = new
@@ -730,7 +730,7 @@ func usesImport(f *ast.File, path string) (used bool) {
 		return true
 	}
 
-	walk(f, func(n interface{}) {
+	walk(f, func n {
 		sel, ok := n.(*ast.SelectorExpr)
 		if ok && isTopName(sel.X, name) {
 			used = true
@@ -785,7 +785,7 @@ type rename struct {
 }
 
 func renameFix(tab []rename) func(*ast.File) bool {
-	return func(f *ast.File) bool {
+	return func f {
 		return renameFixTab(f, tab)
 	}
 }
@@ -814,7 +814,7 @@ func renameFixTab(f *ast.File, tab []rename) bool {
 			continue
 		}
 		optr, opkg, onam := parseName(t.Old)
-		walk(f, func(n interface{}) {
+		walk(f, func n {
 			np, ok := n.(*ast.Expr)
 			if !ok {
 				return

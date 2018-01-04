@@ -133,7 +133,7 @@ func sweepone() uintptr {
 //go:nowritebarrier
 func gosweepone() uintptr {
 	var ret uintptr
-	systemstack(func() {
+	systemstack(func {
 		ret = sweepone()
 	})
 	return ret

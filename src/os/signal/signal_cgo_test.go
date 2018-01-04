@@ -107,7 +107,7 @@ func TestTerminalSignal(t *testing.T) {
 	const prompt = "prompt> "
 
 	// Read data from master in the background.
-	go func() {
+	go func {
 		input := bufio.NewReader(master)
 		var line, handled []byte
 		for {

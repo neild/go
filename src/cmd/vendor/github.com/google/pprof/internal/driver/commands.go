@@ -257,7 +257,7 @@ func usage(commandLine bool) string {
 	if commandLine {
 		prefix = "-"
 	}
-	fmtHelp := func(c, d string) string {
+	fmtHelp := func c, d {
 		return fmt.Sprintf("    %-16s %s", c, strings.SplitN(d, "\n", 2)[0])
 	}
 
@@ -364,7 +364,7 @@ var kcachegrind = []string{"kcachegrind"}
 // the terminal screen. This is used to avoid dumping binary data on
 // the screen.
 func awayFromTTY(format string) PostProcessor {
-	return func(input io.Reader, output io.Writer, ui plugin.UI) error {
+	return func input, output, ui {
 		if output == os.Stdout && (ui.IsTerminal() || interactiveMode) {
 			tempFile, err := newTempFile("", "profile", "."+format)
 			if err != nil {
@@ -379,7 +379,7 @@ func awayFromTTY(format string) PostProcessor {
 }
 
 func invokeDot(format string) PostProcessor {
-	return func(input io.Reader, output io.Writer, ui plugin.UI) error {
+	return func input, output, ui {
 		cmd := exec.Command("dot", "-T"+format)
 		cmd.Stdin, cmd.Stdout, cmd.Stderr = input, output, os.Stderr
 		if err := cmd.Run(); err != nil {
@@ -393,7 +393,7 @@ func invokeDot(format string) PostProcessor {
 // the image to have panning capabilities when viewed in a browser.
 func massageDotSVG() PostProcessor {
 	generateSVG := invokeDot("svg")
-	return func(input io.Reader, output io.Writer, ui plugin.UI) error {
+	return func input, output, ui {
 		baseSVG := new(bytes.Buffer)
 		if err := generateSVG(input, baseSVG, ui); err != nil {
 			return err
@@ -404,7 +404,7 @@ func massageDotSVG() PostProcessor {
 }
 
 func invokeVisualizer(suffix string, visualizers []string) PostProcessor {
-	return func(input io.Reader, output io.Writer, ui plugin.UI) error {
+	return func input, output, ui {
 		tempFile, err := newTempFile(os.TempDir(), "pprof", "."+suffix)
 		if err != nil {
 			return err
@@ -428,7 +428,7 @@ func invokeVisualizer(suffix string, visualizers []string) PostProcessor {
 				// open the input file. This needs to be done even if we're
 				// waiting for the visualizer as it can be just a wrapper that
 				// spawns a browser tab and returns right away.
-				defer func(t <-chan time.Time) {
+				defer func t {
 					<-t
 				}(time.After(time.Second))
 				// On interactive mode, let the visualizer run in the background

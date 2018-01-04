@@ -25,7 +25,7 @@ func TestIsSpace(t *T) {
 }
 
 func TestSplitRegexp(t *T) {
-	res := func(s ...string) []string { return s }
+	res := func s { return s }
 	testCases := []struct {
 		pattern string
 		result  []string

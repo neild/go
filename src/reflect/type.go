@@ -1403,7 +1403,7 @@ func (t *structType) FieldByName(name string) (f StructField, present bool) {
 	if !hasAnon {
 		return
 	}
-	return t.FieldByNameFunc(func(s string) bool { return s == name })
+	return t.FieldByNameFunc(func s { return s == name })
 }
 
 // TypeOf returns the reflection Type that represents the dynamic type of i.
@@ -2045,7 +2045,7 @@ func FuncOf(in, out []Type, variadic bool) Type {
 		}
 	}
 
-	addToCache := func(tt *rtype) Type {
+	addToCache := func tt {
 		var rts []*rtype
 		if rti, ok := funcLookupCache.m.Load(hash); ok {
 			rts = rti.([]*rtype)
@@ -2450,7 +2450,7 @@ func StructOf(fields []StructField) Type {
 					)
 
 					if ft.kind&kindDirectIface != 0 {
-						tfn = MakeFunc(mtyp, func(in []Value) []Value {
+						tfn = MakeFunc(mtyp, func in {
 							var args []Value
 							var recv = in[0]
 							if len(in) > 1 {
@@ -2458,7 +2458,7 @@ func StructOf(fields []StructField) Type {
 							}
 							return recv.Field(ifield).Method(imethod).Call(args)
 						})
-						ifn = MakeFunc(mtyp, func(in []Value) []Value {
+						ifn = MakeFunc(mtyp, func in {
 							var args []Value
 							var recv = in[0]
 							if len(in) > 1 {
@@ -2467,7 +2467,7 @@ func StructOf(fields []StructField) Type {
 							return recv.Field(ifield).Method(imethod).Call(args)
 						})
 					} else {
-						tfn = MakeFunc(mtyp, func(in []Value) []Value {
+						tfn = MakeFunc(mtyp, func in {
 							var args []Value
 							var recv = in[0]
 							if len(in) > 1 {
@@ -2475,7 +2475,7 @@ func StructOf(fields []StructField) Type {
 							}
 							return recv.Field(ifield).Method(imethod).Call(args)
 						})
-						ifn = MakeFunc(mtyp, func(in []Value) []Value {
+						ifn = MakeFunc(mtyp, func in {
 							var args []Value
 							var recv = Indirect(in[0])
 							if len(in) > 1 {
@@ -2668,7 +2668,7 @@ func StructOf(fields []StructField) Type {
 		}
 	}
 
-	addToCache := func(t Type) Type {
+	addToCache := func t {
 		var ts []Type
 		if ti, ok := structLookupCache.m.Load(hash); ok {
 			ts = ti.([]Type)
@@ -2763,7 +2763,7 @@ func StructOf(fields []StructField) Type {
 	typ.ptrdata = typeptrdata(typ.common())
 	typ.alg = new(typeAlg)
 	if hashable {
-		typ.alg.hash = func(p unsafe.Pointer, seed uintptr) uintptr {
+		typ.alg.hash = func p, seed {
 			o := seed
 			for _, ft := range typ.fields {
 				pi := add(p, ft.offset(), "&x.field safe")
@@ -2774,7 +2774,7 @@ func StructOf(fields []StructField) Type {
 	}
 
 	if comparable {
-		typ.alg.equal = func(p, q unsafe.Pointer) bool {
+		typ.alg.equal = func p, q {
 			for _, ft := range typ.fields {
 				pi := add(p, ft.offset(), "&x.field safe")
 				qi := add(q, ft.offset(), "&x.field safe")
@@ -2989,7 +2989,7 @@ func ArrayOf(count int, elem Type) Type {
 	array.alg = new(typeAlg)
 	if ealg.equal != nil {
 		eequal := ealg.equal
-		array.alg.equal = func(p, q unsafe.Pointer) bool {
+		array.alg.equal = func p, q {
 			for i := 0; i < count; i++ {
 				pi := arrayAt(p, i, esize, "i < count")
 				qi := arrayAt(q, i, esize, "i < count")
@@ -3003,7 +3003,7 @@ func ArrayOf(count int, elem Type) Type {
 	}
 	if ealg.hash != nil {
 		ehash := ealg.hash
-		array.alg.hash = func(ptr unsafe.Pointer, seed uintptr) uintptr {
+		array.alg.hash = func ptr, seed {
 			o := seed
 			for i := 0; i < count; i++ {
 				o = ehash(arrayAt(ptr, i, esize, "i < count"), o)
@@ -3136,7 +3136,7 @@ func funcLayout(t *rtype, rcvr *rtype) (frametype *rtype, argSize, retOffset uin
 	x.str = resolveReflectName(newName(s, "", false))
 
 	// cache result for future callers
-	framePool = &sync.Pool{New: func() interface{} {
+	framePool = &sync.Pool{New: func {
 		return unsafe_New(x)
 	}}
 	lti, _ := layoutCache.LoadOrStore(k, layoutType{

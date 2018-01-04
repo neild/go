@@ -369,7 +369,7 @@ func generateTrace(params *traceParams) (ViewerData, error) {
 	ginfos := make(map[uint64]*gInfo)
 	stacks := params.parsed.Stacks
 
-	getGInfo := func(g uint64) *gInfo {
+	getGInfo := func g {
 		info, ok := ginfos[g]
 		if !ok {
 			info = &gInfo{}
@@ -381,7 +381,7 @@ func generateTrace(params *traceParams) (ViewerData, error) {
 	// Since we make many calls to setGState, we record a sticky
 	// error in setGStateErr and check it after every event.
 	var setGStateErr error
-	setGState := func(ev *trace.Event, g uint64, oldState, newState gState) {
+	setGState := func ev, g, oldState, newState {
 		info := getGInfo(g)
 		if oldState == gWaiting && info.state == gWaitingGC {
 			// For checking, gWaiting counts as any gWaiting*.

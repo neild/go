@@ -29,7 +29,7 @@ func TestTCPSpuriousConnSetupCompletion(t *testing.T) {
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go func(ln Listener) {
+	go func ln {
 		defer wg.Done()
 		for {
 			c, err := ln.Accept()
@@ -37,7 +37,7 @@ func TestTCPSpuriousConnSetupCompletion(t *testing.T) {
 				return
 			}
 			wg.Add(1)
-			go func(c Conn) {
+			go func c {
 				var b [1]byte
 				c.Read(b[:])
 				c.Close()
@@ -51,8 +51,8 @@ func TestTCPSpuriousConnSetupCompletion(t *testing.T) {
 	throttle := make(chan struct{}, runtime.GOMAXPROCS(-1)*2)
 	for i := 0; i < attempts; i++ {
 		throttle <- struct{}{}
-		go func(i int) {
-			defer func() {
+		go func i {
+			defer func {
 				<-throttle
 				wg.Done()
 			}()
@@ -95,12 +95,12 @@ func TestTCPSpuriousConnSetupCompletionWithCancel(t *testing.T) {
 	for i := 0; i < tries; i++ {
 		sem <- true
 		ctx, cancel := context.WithCancel(context.Background())
-		go func() {
+		go func {
 			defer wg.Done()
 			time.Sleep(time.Duration(rand.Int63n(int64(5 * time.Millisecond))))
 			cancel()
 		}()
-		go func(i int) {
+		go func i {
 			defer wg.Done()
 			var dialer Dialer
 			// Try to connect to a real host on a port

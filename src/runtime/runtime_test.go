@@ -77,7 +77,7 @@ func BenchmarkDefer(b *testing.B) {
 }
 
 func defer1() {
-	defer func(x, y, z int) {
+	defer func x, y, z {
 		if recover() != nil || x != 1 || y != 2 || z != 3 {
 			panic("bad recover")
 		}
@@ -92,7 +92,7 @@ func BenchmarkDefer10(b *testing.B) {
 
 func defer2() {
 	for i := 0; i < 10; i++ {
-		defer func(x, y, z int) {
+		defer func x, y, z {
 			if recover() != nil || x != 1 || y != 2 || z != 3 {
 				panic("bad recover")
 			}
@@ -102,7 +102,7 @@ func defer2() {
 
 func BenchmarkDeferMany(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		defer func(x, y, z int) {
+		defer func x, y, z {
 			if recover() != nil || x != 1 || y != 2 || z != 3 {
 				panic("bad recover")
 			}
@@ -170,7 +170,7 @@ func testSetPanicOnFault(t *testing.T, addr uintptr, nfault *int) {
 		t.Skip("nacl doesn't seem to fault on high addresses")
 	}
 
-	defer func() {
+	defer func {
 		if err := recover(); err != nil {
 			*nfault++
 		}
@@ -291,7 +291,7 @@ func TestBadOpen(t *testing.T) {
 
 func TestAppendGrowth(t *testing.T) {
 	var x []int64
-	check := func(want int) {
+	check := func want {
 		if cap(x) != want {
 			t.Errorf("len=%d, cap=%d, want cap=%d", len(x), cap(x), want)
 		}
@@ -312,7 +312,7 @@ var One = []int64{1}
 
 func TestAppendSliceGrowth(t *testing.T) {
 	var x []int64
-	check := func(want int) {
+	check := func want {
 		if cap(x) != want {
 			t.Errorf("len=%d, cap=%d, want cap=%d", len(x), cap(x), want)
 		}

@@ -22,22 +22,22 @@ func TestMemStats(t *testing.T) {
 	st := new(MemStats)
 	ReadMemStats(st)
 
-	nz := func(x interface{}) error {
+	nz := func x {
 		if x != reflect.Zero(reflect.TypeOf(x)).Interface() {
 			return nil
 		}
 		return fmt.Errorf("zero value")
 	}
-	le := func(thresh float64) func(interface{}) error {
-		return func(x interface{}) error {
+	le := func thresh {
+		return func x {
 			if reflect.ValueOf(x).Convert(reflect.TypeOf(thresh)).Float() < thresh {
 				return nil
 			}
 			return fmt.Errorf("insanely high value (overflow?); want <= %v", thresh)
 		}
 	}
-	eq := func(x interface{}) func(interface{}) error {
-		return func(y interface{}) error {
+	eq := func x {
+		return func y {
 			if x == y {
 				return nil
 			}
@@ -119,7 +119,7 @@ func TestMemStats(t *testing.T) {
 }
 
 func TestStringConcatenationAllocs(t *testing.T) {
-	n := testing.AllocsPerRun(1e3, func() {
+	n := testing.AllocsPerRun(1e3, func {
 		b := make([]byte, 10)
 		for i := 0; i < 10; i++ {
 			b[i] = byte(i) + '0'
@@ -211,7 +211,7 @@ var n = flag.Int("n", 1000, "number of goroutines")
 
 func BenchmarkGoroutineSelect(b *testing.B) {
 	quit := make(chan struct{})
-	read := func(ch chan struct{}) {
+	read := func ch {
 		for {
 			select {
 			case _, ok := <-ch:
@@ -227,7 +227,7 @@ func BenchmarkGoroutineSelect(b *testing.B) {
 }
 
 func BenchmarkGoroutineBlocking(b *testing.B) {
-	read := func(ch chan struct{}) {
+	read := func ch {
 		for {
 			if _, ok := <-ch; !ok {
 				return
@@ -238,7 +238,7 @@ func BenchmarkGoroutineBlocking(b *testing.B) {
 }
 
 func BenchmarkGoroutineForRange(b *testing.B) {
-	read := func(ch chan struct{}) {
+	read := func ch {
 		for range ch {
 		}
 	}
@@ -275,7 +275,7 @@ func benchHelper(b *testing.B, n int, read func(chan struct{})) {
 
 func BenchmarkGoroutineIdle(b *testing.B) {
 	quit := make(chan struct{})
-	fn := func() {
+	fn := func {
 		<-quit
 	}
 	for i := 0; i < *n; i++ {

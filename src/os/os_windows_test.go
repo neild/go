@@ -273,7 +273,7 @@ func TestDirectoryJunction(t *testing.T) {
 		{
 			// Create link similar to what mklink does, by inserting \??\ at the front of absolute target.
 			name: "standard",
-			mklink: func(link, target string) error {
+			mklink: func link, target {
 				var t reparseData
 				t.addSubstituteName(`\??\` + target)
 				t.addPrintName(target)
@@ -283,7 +283,7 @@ func TestDirectoryJunction(t *testing.T) {
 		{
 			// Do as junction utility https://technet.microsoft.com/en-au/sysinternals/bb896768.aspx does - set PrintNameLength to 0.
 			name: "have_blank_print_name",
-			mklink: func(link, target string) error {
+			mklink: func link, target {
 				var t reparseData
 				t.addSubstituteName(`\??\` + target)
 				t.addPrintName("")
@@ -297,7 +297,7 @@ func TestDirectoryJunction(t *testing.T) {
 		tests = append(tests,
 			dirLinkTest{
 				name: "use_mklink_cmd",
-				mklink: func(link, target string) error {
+				mklink: func link, target {
 					output, err := osexec.Command("cmd", "/c", "mklink", "/J", link, target).CombinedOutput()
 					if err != nil {
 						t.Errorf("failed to run mklink %v %v: %v %q", link, target, err, output)
@@ -369,7 +369,7 @@ func TestDirectorySymbolicLink(t *testing.T) {
 		tests = append(tests,
 			dirLinkTest{
 				name: "use_mklink_cmd",
-				mklink: func(link, target string) error {
+				mklink: func link, target {
 					output, err := osexec.Command("cmd", "/c", "mklink", "/D", link, target).CombinedOutput()
 					if err != nil {
 						t.Errorf("failed to run mklink %v %v: %v %q", link, target, err, output)
@@ -399,14 +399,14 @@ func TestDirectorySymbolicLink(t *testing.T) {
 	tests = append(tests,
 		dirLinkTest{
 			name: "use_os_pkg",
-			mklink: func(link, target string) error {
+			mklink: func link, target {
 				return os.Symlink(target, link)
 			},
 		},
 		dirLinkTest{
 			// Create link similar to what mklink does, by inserting \??\ at the front of absolute target.
 			name: "standard",
-			mklink: func(link, target string) error {
+			mklink: func link, target {
 				var t reparseData
 				t.addPrintName(target)
 				t.addSubstituteName(`\??\` + target)
@@ -415,7 +415,7 @@ func TestDirectorySymbolicLink(t *testing.T) {
 		},
 		dirLinkTest{
 			name: "relative",
-			mklink: func(link, target string) error {
+			mklink: func link, target {
 				var t reparseData
 				t.addSubstituteNameNoNUL(filepath.Base(target))
 				t.addPrintNameNoNUL(filepath.Base(target))
@@ -486,7 +486,7 @@ func TestNetworkSymbolicLink(t *testing.T) {
 		}
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		err := windows.NetShareDel(nil, wShareName, 0)
 		if err != nil {
 			t.Fatal(err)
@@ -681,7 +681,7 @@ func TestStatSymlinkLoop(t *testing.T) {
 
 func TestReadStdin(t *testing.T) {
 	old := poll.ReadConsole
-	defer func() {
+	defer func {
 		poll.ReadConsole = old
 	}()
 
@@ -699,9 +699,9 @@ func TestReadStdin(t *testing.T) {
 	for _, consoleSize := range []int{1, 2, 3, 10, 16, 100, 1000} {
 		for _, readSize := range []int{1, 2, 3, 4, 5, 8, 10, 16, 20, 50, 100} {
 			for _, s := range tests {
-				t.Run(fmt.Sprintf("c%d/r%d/%s", consoleSize, readSize, s), func(t *testing.T) {
+				t.Run(fmt.Sprintf("c%d/r%d/%s", consoleSize, readSize, s), func t {
 					s16 := utf16.Encode([]rune(s))
-					poll.ReadConsole = func(h syscall.Handle, buf *uint16, toread uint32, read *uint32, inputControl *byte) error {
+					poll.ReadConsole = func h, buf, toread, read, inputControl {
 						if inputControl != nil {
 							t.Fatalf("inputControl not nil")
 						}

@@ -17,7 +17,7 @@ var Interrupted = make(chan struct{})
 func processSignals() {
 	sig := make(chan os.Signal)
 	signal.Notify(sig, signalsToIgnore...)
-	go func() {
+	go func {
 		<-sig
 		close(Interrupted)
 	}()

@@ -62,7 +62,7 @@ func TestEncodeIntSlice(t *testing.T) {
 	s32 := []int32{532, 590, 651, 715, 782, 852, 925, 1001, 1080}
 	s64 := []int64{1162, 1247, 1335, 1426, 1520, 1617, 1717, 1820, 1926}
 
-	t.Run("int8", func(t *testing.T) {
+	t.Run("int8", func t {
 		var sink bytes.Buffer
 		enc := NewEncoder(&sink)
 		enc.Encode(s8)
@@ -76,7 +76,7 @@ func TestEncodeIntSlice(t *testing.T) {
 		}
 	})
 
-	t.Run("int16", func(t *testing.T) {
+	t.Run("int16", func t {
 		var sink bytes.Buffer
 		enc := NewEncoder(&sink)
 		enc.Encode(s16)
@@ -90,7 +90,7 @@ func TestEncodeIntSlice(t *testing.T) {
 		}
 	})
 
-	t.Run("int32", func(t *testing.T) {
+	t.Run("int32", func t {
 		var sink bytes.Buffer
 		enc := NewEncoder(&sink)
 		enc.Encode(s32)
@@ -104,7 +104,7 @@ func TestEncodeIntSlice(t *testing.T) {
 		}
 	})
 
-	t.Run("int64", func(t *testing.T) {
+	t.Run("int64", func t {
 		var sink bytes.Buffer
 		enc := NewEncoder(&sink)
 		enc.Encode(s64)
@@ -256,7 +256,7 @@ func TestWrongTypeDecoder(t *testing.T) {
 // Types not supported at top level by the Encoder.
 var unsupportedValues = []interface{}{
 	make(chan int),
-	func(a int) bool { return true },
+	func a { return true },
 }
 
 func TestUnsupported(t *testing.T) {
@@ -815,7 +815,7 @@ type Bug2 struct {
 
 func TestChanFuncIgnored(t *testing.T) {
 	c := make(chan int)
-	f := func() {}
+	f := func {}
 	fp := &f
 	b0 := Bug2{23, c, &c, f, &fp}
 	var buf bytes.Buffer
@@ -926,7 +926,7 @@ func TestTopLevelNilPointer(t *testing.T) {
 }
 
 func encodeAndRecover(value interface{}) (encodeErr, panicErr error) {
-	defer func() {
+	defer func {
 		e := recover()
 		if e != nil {
 			switch err := e.(type) {

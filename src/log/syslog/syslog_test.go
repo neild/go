@@ -71,7 +71,7 @@ func runStreamSyslog(l net.Listener, done chan<- string, wg *sync.WaitGroup) {
 			return
 		}
 		wg.Add(1)
-		go func(c net.Conn) {
+		go func c {
 			defer wg.Done()
 			c.SetReadDeadline(time.Now().Add(5 * time.Second))
 			b := bufio.NewReader(c)
@@ -113,7 +113,7 @@ func startServer(n, la string, done chan<- string) (addr string, sock io.Closer,
 		addr = l.LocalAddr().String()
 		sock = l
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			runPktSyslog(l, done)
 		}()
@@ -125,7 +125,7 @@ func startServer(n, la string, done chan<- string) (addr string, sock io.Closer,
 		addr = l.Addr().String()
 		sock = l
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			runStreamSyslog(l, done, wg)
 		}()
@@ -315,7 +315,7 @@ func TestConcurrentWrite(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			err := w.Info("test")
 			if err != nil {
@@ -329,7 +329,7 @@ func TestConcurrentWrite(t *testing.T) {
 
 func TestConcurrentReconnect(t *testing.T) {
 	crashy = true
-	defer func() { crashy = false }()
+	defer func { crashy = false }()
 
 	const N = 10
 	const M = 100
@@ -348,7 +348,7 @@ func TestConcurrentReconnect(t *testing.T) {
 
 	// count all the messages arriving
 	count := make(chan int)
-	go func() {
+	go func {
 		ct := 0
 		for range done {
 			ct++
@@ -365,7 +365,7 @@ func TestConcurrentReconnect(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(N)
 	for i := 0; i < N; i++ {
-		go func() {
+		go func {
 			defer wg.Done()
 			w, err := Dial(net, addr, LOG_USER|LOG_ERR, "tag")
 			if err != nil {

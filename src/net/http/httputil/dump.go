@@ -105,14 +105,14 @@ func DumpRequestOut(req *http.Request, body bool) ([]byte, error) {
 	dr := &delegateReader{c: make(chan io.Reader)}
 
 	t := &http.Transport{
-		Dial: func(net, addr string) (net.Conn, error) {
+		Dial: func net, addr {
 			return &dumpConn{io.MultiWriter(&buf, pw), dr}, nil
 		},
 	}
 	defer t.CloseIdleConnections()
 
 	// Wait for the request before replying with a dummy response:
-	go func() {
+	go func {
 		req, err := http.ReadRequest(bufio.NewReader(pr))
 		if err == nil {
 			// Ensure all the body is read; otherwise

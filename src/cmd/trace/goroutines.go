@@ -64,7 +64,7 @@ var (
 
 // analyzeGoroutines generates statistics about execution of all goroutines and stores them in gs.
 func analyzeGoroutines(events []*trace.Event) {
-	gsInit.Do(func() {
+	gsInit.Do(func {
 		gs = trace.GoroutineStats(events)
 	})
 }

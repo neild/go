@@ -73,7 +73,7 @@ func copyFile(dst, src string) (err error) {
 	if err != nil {
 		return err
 	}
-	defer func() {
+	defer func {
 		e := d.Close()
 		if err == nil {
 			err = e

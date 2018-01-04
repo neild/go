@@ -43,7 +43,7 @@ func cgoCheckWriteBarrier(dst *uintptr, src uintptr) {
 		return
 	}
 
-	systemstack(func() {
+	systemstack(func {
 		println("write of Go pointer", hex(src), "to non-Go memory", hex(uintptr(unsafe.Pointer(dst))))
 		throw(cgoWriteBarrierFail)
 	})
@@ -136,7 +136,7 @@ func cgoCheckTypedBlock(typ *_type, src unsafe.Pointer, off, size uintptr) {
 		// We can't expand the GC program without extra storage
 		// space we can't easily get.
 		// Fortunately we have the type information.
-		systemstack(func() {
+		systemstack(func {
 			cgoCheckUsingType(typ, src, off, size)
 		})
 		return
@@ -150,7 +150,7 @@ func cgoCheckTypedBlock(typ *_type, src unsafe.Pointer, off, size uintptr) {
 		if i >= off && bits&bitPointer != 0 {
 			v := *(*unsafe.Pointer)(add(src, i))
 			if cgoIsGoPointer(v) {
-				systemstack(func() {
+				systemstack(func {
 					throw(cgoWriteBarrierFail)
 				})
 			}
@@ -185,7 +185,7 @@ func cgoCheckBits(src unsafe.Pointer, gcbits *byte, off, size uintptr) {
 			if bits&1 != 0 {
 				v := *(*unsafe.Pointer)(add(src, i))
 				if cgoIsGoPointer(v) {
-					systemstack(func() {
+					systemstack(func {
 						throw(cgoWriteBarrierFail)
 					})
 				}

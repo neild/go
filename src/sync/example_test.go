@@ -28,7 +28,7 @@ func ExampleWaitGroup() {
 		// Increment the WaitGroup counter.
 		wg.Add(1)
 		// Launch a goroutine to fetch the URL.
-		go func(url string) {
+		go func url {
 			// Decrement the counter when the goroutine completes.
 			defer wg.Done()
 			// Fetch the URL.
@@ -41,12 +41,12 @@ func ExampleWaitGroup() {
 
 func ExampleOnce() {
 	var once sync.Once
-	onceBody := func() {
+	onceBody := func {
 		fmt.Println("Only once")
 	}
 	done := make(chan bool)
 	for i := 0; i < 10; i++ {
-		go func() {
+		go func {
 			once.Do(onceBody)
 			done <- true
 		}()

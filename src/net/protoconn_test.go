@@ -71,7 +71,7 @@ func TestTCPConnSpecificMethods(t *testing.T) {
 		t.Fatal(err)
 	}
 	ch := make(chan error, 1)
-	handler := func(ls *localServer, ln Listener) { transponder(ls.Listener, ch) }
+	handler := func ls, ln { transponder(ls.Listener, ch) }
 	ls, err := (&streamListener{Listener: ln}).newLocalServer()
 	if err != nil {
 		t.Fatal(err)
@@ -156,7 +156,7 @@ func TestUDPConnSpecificMethods(t *testing.T) {
 		f.Close()
 	}
 
-	defer func() {
+	defer func {
 		if p := recover(); p != nil {
 			t.Fatalf("panicked: %v", p)
 		}
@@ -194,7 +194,7 @@ func TestIPConnSpecificMethods(t *testing.T) {
 		f.Close()
 	}
 
-	defer func() {
+	defer func {
 		if p := recover(); p != nil {
 			t.Fatalf("panicked: %v", p)
 		}
@@ -342,7 +342,7 @@ func TestUnixConnSpecificMethods(t *testing.T) {
 		f.Close()
 	}
 
-	defer func() {
+	defer func {
 		if p := recover(); p != nil {
 			t.Fatalf("panicked: %v", p)
 		}

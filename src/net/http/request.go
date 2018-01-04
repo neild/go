@@ -493,7 +493,7 @@ var errMissingHost = errors.New("http: Request.Write on Request with no Host or 
 func (r *Request) write(w io.Writer, usingProxy bool, extraHeaders Header, waitForContinue func() bool) (err error) {
 	trace := httptrace.ContextClientTrace(r.Context())
 	if trace != nil && trace.WroteRequest != nil {
-		defer func() {
+		defer func {
 			trace.WroteRequest(httptrace.WroteRequestInfo{
 				Err: err,
 			})
@@ -797,21 +797,21 @@ func NewRequest(method, url string, body io.Reader) (*Request, error) {
 		case *bytes.Buffer:
 			req.ContentLength = int64(v.Len())
 			buf := v.Bytes()
-			req.GetBody = func() (io.ReadCloser, error) {
+			req.GetBody = func {
 				r := bytes.NewReader(buf)
 				return ioutil.NopCloser(r), nil
 			}
 		case *bytes.Reader:
 			req.ContentLength = int64(v.Len())
 			snapshot := *v
-			req.GetBody = func() (io.ReadCloser, error) {
+			req.GetBody = func {
 				r := snapshot
 				return ioutil.NopCloser(&r), nil
 			}
 		case *strings.Reader:
 			req.ContentLength = int64(v.Len())
 			snapshot := *v
-			req.GetBody = func() (io.ReadCloser, error) {
+			req.GetBody = func {
 				r := snapshot
 				return ioutil.NopCloser(&r), nil
 			}
@@ -832,7 +832,7 @@ func NewRequest(method, url string, body io.Reader) (*Request, error) {
 		// variable to mean explicitly zero.
 		if req.GetBody != nil && req.ContentLength == 0 {
 			req.Body = NoBody
-			req.GetBody = func() (io.ReadCloser, error) { return NoBody, nil }
+			req.GetBody = func { return NoBody, nil }
 		}
 	}
 
@@ -925,7 +925,7 @@ func readRequest(b *bufio.Reader, deleteHostHeader bool) (req *Request, err erro
 	if s, err = tp.ReadLine(); err != nil {
 		return nil, err
 	}
-	defer func() {
+	defer func {
 		putTextprotoReader(tp)
 		if err == io.EOF {
 			err = io.ErrUnexpectedEOF

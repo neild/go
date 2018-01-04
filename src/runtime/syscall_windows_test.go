@@ -137,7 +137,7 @@ func TestEnumWindows(t *testing.T) {
 	d := GetDLL(t, "user32.dll")
 	isWindows := d.Proc("IsWindow")
 	counter := 0
-	cb := syscall.NewCallback(func(hwnd syscall.Handle, lparam uintptr) uintptr {
+	cb := syscall.NewCallback(func hwnd, lparam {
 		if lparam != 888 {
 			t.Error("lparam was not passed to callback")
 		}
@@ -172,7 +172,7 @@ func nestedCall(t *testing.T, f func()) {
 
 func TestCallback(t *testing.T) {
 	var x = false
-	nestedCall(t, func() { x = true })
+	nestedCall(t, func { x = true })
 	if !x {
 		t.Fatal("nestedCall did not call func")
 	}
@@ -189,7 +189,7 @@ func TestCallbackPanicLocked(t *testing.T) {
 	if !runtime.LockedOSThread() {
 		t.Fatal("runtime.LockOSThread didn't")
 	}
-	defer func() {
+	defer func {
 		s := recover()
 		if s == nil {
 			t.Fatal("did not panic")
@@ -201,7 +201,7 @@ func TestCallbackPanicLocked(t *testing.T) {
 			t.Fatal("lost lock on OS thread after panic")
 		}
 	}()
-	nestedCall(t, func() { panic("callback panic") })
+	nestedCall(t, func { panic("callback panic") })
 	panic("nestedCall returned")
 }
 
@@ -210,7 +210,7 @@ func TestCallbackPanic(t *testing.T) {
 	if runtime.LockedOSThread() {
 		t.Fatal("locked OS thread on entry to TestCallbackPanic")
 	}
-	defer func() {
+	defer func {
 		s := recover()
 		if s == nil {
 			t.Fatal("did not panic")
@@ -222,7 +222,7 @@ func TestCallbackPanic(t *testing.T) {
 			t.Fatal("locked OS thread on exit from TestCallbackPanic")
 		}
 	}()
-	nestedCall(t, func() { panic("callback panic") })
+	nestedCall(t, func { panic("callback panic") })
 	panic("nestedCall returned")
 }
 
@@ -235,12 +235,12 @@ func TestCallbackPanicLoop(t *testing.T) {
 
 func TestBlockingCallback(t *testing.T) {
 	c := make(chan int)
-	go func() {
+	go func {
 		for i := 0; i < 10; i++ {
 			c <- <-c
 		}
 	}()
-	nestedCall(t, func() {
+	nestedCall(t, func {
 		for i := 0; i < 10; i++ {
 			c <- i
 			if j := <-c; j != i {
@@ -299,49 +299,49 @@ func (f cbDLLFunc) build() string {
 }
 
 var cbFuncs = [...]interface{}{
-	2: func(i1, i2 uintptr) uintptr {
+	2: func i1, i2 {
 		if i1+i2 != 3 {
 			panic("bad input")
 		}
 		return 0
 	},
-	3: func(i1, i2, i3 uintptr) uintptr {
+	3: func i1, i2, i3 {
 		if i1+i2+i3 != 6 {
 			panic("bad input")
 		}
 		return 0
 	},
-	4: func(i1, i2, i3, i4 uintptr) uintptr {
+	4: func i1, i2, i3, i4 {
 		if i1+i2+i3+i4 != 10 {
 			panic("bad input")
 		}
 		return 0
 	},
-	5: func(i1, i2, i3, i4, i5 uintptr) uintptr {
+	5: func i1, i2, i3, i4, i5 {
 		if i1+i2+i3+i4+i5 != 15 {
 			panic("bad input")
 		}
 		return 0
 	},
-	6: func(i1, i2, i3, i4, i5, i6 uintptr) uintptr {
+	6: func i1, i2, i3, i4, i5, i6 {
 		if i1+i2+i3+i4+i5+i6 != 21 {
 			panic("bad input")
 		}
 		return 0
 	},
-	7: func(i1, i2, i3, i4, i5, i6, i7 uintptr) uintptr {
+	7: func i1, i2, i3, i4, i5, i6, i7 {
 		if i1+i2+i3+i4+i5+i6+i7 != 28 {
 			panic("bad input")
 		}
 		return 0
 	},
-	8: func(i1, i2, i3, i4, i5, i6, i7, i8 uintptr) uintptr {
+	8: func i1, i2, i3, i4, i5, i6, i7, i8 {
 		if i1+i2+i3+i4+i5+i6+i7+i8 != 36 {
 			panic("bad input")
 		}
 		return 0
 	},
-	9: func(i1, i2, i3, i4, i5, i6, i7, i8, i9 uintptr) uintptr {
+	9: func i1, i2, i3, i4, i5, i6, i7, i8, i9 {
 		if i1+i2+i3+i4+i5+i6+i7+i8+i9 != 45 {
 			panic("bad input")
 		}
@@ -383,13 +383,13 @@ func (d *cbDLL) build(t *testing.T, dir string) string {
 var cbDLLs = []cbDLL{
 	{
 		"test",
-		func(out, src string) []string {
+		func out, src {
 			return []string{"gcc", "-shared", "-s", "-Werror", "-o", out, src}
 		},
 	},
 	{
 		"testO2",
-		func(out, src string) []string {
+		func out, src {
 			return []string{"gcc", "-shared", "-s", "-Werror", "-o", out, "-O2", src}
 		},
 	},
@@ -412,7 +412,7 @@ func (test *cbTest) run(t *testing.T, dllpath string) {
 }
 
 func (test *cbTest) runOne(t *testing.T, dll *syscall.DLL, proc string, cb uintptr) {
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			t.Errorf("dll call %v(..., %d) failed: %v", proc, test.param, r)
 		}
@@ -559,7 +559,7 @@ func use(buf []byte) {
 
 func forceStackCopy() (r int) {
 	var f func(int) int
-	f = func(i int) int {
+	f = func i {
 		var buf [256]byte
 		use(buf[:])
 		if i == 0 {
@@ -614,7 +614,7 @@ uintptr_t cfunc(callback f, uintptr_t n) {
 
 	proc := dll.MustFindProc("cfunc")
 
-	cb := syscall.NewCallback(func(n uintptr) uintptr {
+	cb := syscall.NewCallback(func n {
 		forceStackCopy()
 		return n
 	})
@@ -625,7 +625,7 @@ uintptr_t cfunc(callback f, uintptr_t n) {
 		err syscall.Errno
 	}
 	c := make(chan result)
-	go func() {
+	go func {
 		r, _, err := proc.Call(cb, 100)
 		c <- result{r, err.(syscall.Errno)}
 	}()
@@ -799,7 +799,7 @@ func TestNumCPU(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		err = cmd.Wait()
 		childOutput := string(buf.Bytes())
 		if err != nil {
@@ -812,7 +812,7 @@ func TestNumCPU(t *testing.T) {
 		}
 	}()
 
-	defer func() {
+	defer func {
 		err = resumeChildThread(kernel32, cmd.Process.Pid)
 		if err != nil {
 			t.Fatal(err)
@@ -859,7 +859,7 @@ func TestDLLPreloadMitigation(t *testing.T) {
 	if err != nil {
 		t.Fatal("TempDir failed: ", err)
 	}
-	defer func() {
+	defer func {
 		err := os.RemoveAll(tmpdir)
 		if err != nil {
 			t.Error(err)
@@ -976,7 +976,7 @@ func BenchmarkChanToSyscallPing(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	go func() {
+	go func {
 		for i := 0; i < n; i++ {
 			syscall.WaitForSingleObject(event, syscall.INFINITE)
 			ch <- 1
@@ -1001,7 +1001,7 @@ func BenchmarkSyscallToSyscallPing(b *testing.B) {
 	if err != nil {
 		b.Fatal(err)
 	}
-	go func() {
+	go func {
 		for i := 0; i < n; i++ {
 			syscall.WaitForSingleObject(event1, syscall.INFINITE)
 			err := setEvent(event2)
@@ -1023,7 +1023,7 @@ func BenchmarkChanToChanPing(b *testing.B) {
 	n := b.N
 	ch1 := make(chan int)
 	ch2 := make(chan int)
-	go func() {
+	go func {
 		for i := 0; i < n; i++ {
 			<-ch1
 			ch2 <- 1

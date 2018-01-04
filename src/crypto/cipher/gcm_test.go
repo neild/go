@@ -380,7 +380,7 @@ func TestGCMAsm(t *testing.T) {
 	}
 
 	// run test for all permutations
-	test := func(ks int, pt, ad []byte) error {
+	test := func ks, pt, ad {
 		key := make([]byte, ks)
 		if _, err := io.ReadFull(rand.Reader, key); err != nil {
 			return err

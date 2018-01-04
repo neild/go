@@ -95,7 +95,7 @@ type mediaTypeTest struct {
 
 func TestParseMediaType(t *testing.T) {
 	// Convenience map initializer
-	m := func(s ...string) map[string]string {
+	m := func s {
 		sm := make(map[string]string)
 		for i := 0; i < len(s); i += 2 {
 			sm[s[i]] = s[i+1]

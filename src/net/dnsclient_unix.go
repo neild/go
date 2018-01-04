@@ -480,7 +480,7 @@ func (r *Resolver) goLookupIPCNAMEOrder(ctx context.Context, name string, order 
 	for _, fqdn := range conf.nameList(name) {
 		for _, qtype := range qtypes {
 			dnsWaitGroup.Add(1)
-			go func(qtype uint16) {
+			go func qtype {
 				defer dnsWaitGroup.Done()
 				cname, rrs, err := r.tryOneName(ctx, conf, fqdn, qtype)
 				lane <- racer{cname, rrs, err}

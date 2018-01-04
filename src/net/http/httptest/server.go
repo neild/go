@@ -275,7 +275,7 @@ func (s *Server) Client() *http.Client {
 
 func (s *Server) goServe() {
 	s.wg.Add(1)
-	go func() {
+	go func {
 		defer s.wg.Done()
 		s.Config.Serve(s.Listener)
 	}()
@@ -285,7 +285,7 @@ func (s *Server) goServe() {
 // connections are idle.
 func (s *Server) wrap() {
 	oldHook := s.Config.ConnState
-	s.Config.ConnState = func(c net.Conn, cs http.ConnState) {
+	s.Config.ConnState = func c, cs {
 		s.mu.Lock()
 		defer s.mu.Unlock()
 		switch cs {

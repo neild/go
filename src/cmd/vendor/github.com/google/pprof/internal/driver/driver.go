@@ -316,7 +316,7 @@ func sampleFormat(p *profile.Profile, sampleIndex string, mean bool) (value, mea
 }
 
 func valueExtractor(ix int) sampleValueFunc {
-	return func(v []int64) int64 {
+	return func v {
 		return v[ix]
 	}
 }

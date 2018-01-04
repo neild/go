@@ -79,10 +79,10 @@ func TestAssembly(t *testing.T) {
 	defer os.RemoveAll(dir)
 
 	nameRegexp := regexp.MustCompile("func \\w+")
-	t.Run("platform", func(t *testing.T) {
+	t.Run("platform", func t {
 		for _, ats := range allAsmTests {
 			ats := ats
-			t.Run(ats.os+"/"+ats.arch, func(tt *testing.T) {
+			t.Run(ats.os+"/"+ats.arch, func tt {
 				tt.Parallel()
 
 				asm := ats.compileToAsm(tt, dir)

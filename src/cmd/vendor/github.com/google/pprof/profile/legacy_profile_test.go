@@ -306,7 +306,7 @@ sub/dir-ect_o.ry profile: total 999
 			typ: "sub/dir-ect_o.ry",
 		},
 	} {
-		t.Run(test.typ, func(t *testing.T) {
+		t.Run(test.typ, func t {
 			p, err := parseGoCount([]byte(test.in))
 			if err != nil {
 				t.Fatalf("parseGoCount(%q) = %v", test.in, err)

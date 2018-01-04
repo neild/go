@@ -82,7 +82,7 @@ var (
 )
 
 func TestParseProcNet(t *testing.T) {
-	defer func() {
+	defer func {
 		if p := recover(); p != nil {
 			t.Fatalf("panicked: %v", p)
 		}

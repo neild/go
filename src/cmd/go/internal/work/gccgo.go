@@ -206,7 +206,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 		fortran = len(root.Package.FFiles) > 0
 	}
 
-	readCgoFlags := func(flagsFile string) error {
+	readCgoFlags := func flagsFile {
 		flags, err := ioutil.ReadFile(flagsFile)
 		if err != nil {
 			return err
@@ -229,7 +229,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 	}
 
 	newID := 0
-	readAndRemoveCgoFlags := func(archive string) (string, error) {
+	readAndRemoveCgoFlags := func archive {
 		newID++
 		newArchive := root.Objdir + fmt.Sprintf("_pkg%d_.a", newID)
 		if err := b.copyFile(root, newArchive, archive, 0666, false); err != nil {
@@ -267,7 +267,7 @@ func (tools gccgoToolchain) link(b *Builder, root *Action, out, importcfg string
 	// a shared library action, they all do).
 	var walk func(a *Action, seenShlib bool)
 	var err error
-	walk = func(a *Action, seenShlib bool) {
+	walk = func a, seenShlib {
 		if actionsSeen[a] {
 			return
 		}
@@ -485,7 +485,7 @@ func gccgoPkgpath(p *load.Package) string {
 }
 
 func gccgoCleanPkgpath(p *load.Package) string {
-	clean := func(r rune) rune {
+	clean := func r {
 		switch {
 		case 'A' <= r && r <= 'Z', 'a' <= r && r <= 'z',
 			'0' <= r && r <= '9':

@@ -32,7 +32,7 @@ type parser struct {
 
 func (p *parser) init(filename string, src io.Reader, imports map[string]*types.Package) {
 	p.scanner.Init(src)
-	p.scanner.Error = func(_ *scanner.Scanner, msg string) { p.error(msg) }
+	p.scanner.Error = func _, msg { p.error(msg) }
 	p.scanner.Mode = scanner.ScanIdents | scanner.ScanInts | scanner.ScanFloats | scanner.ScanStrings | scanner.ScanComments | scanner.SkipComments
 	p.scanner.Whitespace = 1<<'\t' | 1<<'\n' | 1<<' '
 	p.scanner.Filename = filename // for good error messages
@@ -794,7 +794,7 @@ func (p *parser) parseInitDataDirective() {
 
 	case "checksum":
 		// Don't let the scanner try to parse the checksum as a number.
-		defer func(mode uint) {
+		defer func mode {
 			p.scanner.Mode = mode
 		}(p.scanner.Mode)
 		p.scanner.Mode &^= scanner.ScanInts | scanner.ScanFloats

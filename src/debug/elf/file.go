@@ -125,7 +125,7 @@ func (s *Section) Open() io.ReadSeeker {
 	}
 	if s.compressionType == COMPRESS_ZLIB {
 		return &readSeekerFromReader{
-			reset: func() (io.Reader, error) {
+			reset: func {
 				fr := io.NewSectionReader(s.sr, s.compressionOffset, int64(s.FileSize)-s.compressionOffset)
 				return zlib.NewReader(fr)
 			},
@@ -1063,7 +1063,7 @@ func (f *File) applyRelocationsSPARC64(dst []byte, rels []byte) error {
 func (f *File) DWARF() (*dwarf.Data, error) {
 	// sectionData gets the data for s, checks its size, and
 	// applies any applicable relations.
-	sectionData := func(i int, s *Section) ([]byte, error) {
+	sectionData := func i, s {
 		b, err := s.Data()
 		if err != nil && uint64(len(b)) < s.Size {
 			return nil, err

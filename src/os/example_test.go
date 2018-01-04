@@ -90,7 +90,7 @@ func ExampleExpandEnv() {
 }
 
 func ExampleLookupEnv() {
-	show := func(key string) {
+	show := func key {
 		val, ok := os.LookupEnv(key)
 		if !ok {
 			fmt.Printf("%s not set\n", key)

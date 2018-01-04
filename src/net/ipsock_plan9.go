@@ -139,7 +139,7 @@ func fixErr(err error) {
 	if !ok {
 		return
 	}
-	nonNilInterface := func(a Addr) bool {
+	nonNilInterface := func a {
 		switch a := a.(type) {
 		case *TCPAddr:
 			return a == nil
@@ -165,13 +165,13 @@ func fixErr(err error) {
 }
 
 func dialPlan9(ctx context.Context, net string, laddr, raddr Addr) (fd *netFD, err error) {
-	defer func() { fixErr(err) }()
+	defer func { fixErr(err) }()
 	type res struct {
 		fd  *netFD
 		err error
 	}
 	resc := make(chan res)
-	go func() {
+	go func {
 		testHookDialChannel()
 		fd, err := dialPlan9Blocking(ctx, net, laddr, raddr)
 		select {
@@ -218,7 +218,7 @@ func dialPlan9Blocking(ctx context.Context, net string, laddr, raddr Addr) (fd *
 }
 
 func listenPlan9(ctx context.Context, net string, laddr Addr) (fd *netFD, err error) {
-	defer func() { fixErr(err) }()
+	defer func { fixErr(err) }()
 	f, dest, proto, name, err := startPlan9(ctx, net, laddr)
 	if err != nil {
 		return nil, err
@@ -241,7 +241,7 @@ func (fd *netFD) netFD() (*netFD, error) {
 }
 
 func (fd *netFD) acceptPlan9() (nfd *netFD, err error) {
-	defer func() { fixErr(err) }()
+	defer func { fixErr(err) }()
 	if err := fd.pfd.ReadLock(); err != nil {
 		return nil, err
 	}

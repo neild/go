@@ -122,14 +122,14 @@ func TestSharedLibName(t *testing.T) {
 		},
 	}
 	for _, data := range testData {
-		func() {
+		func {
 			if data.rootedAt != "" {
 				tmpGopath, err := ioutil.TempDir("", "gopath")
 				if err != nil {
 					t.Fatal(err)
 				}
 				oldGopath := cfg.BuildContext.GOPATH
-				defer func() {
+				defer func {
 					cfg.BuildContext.GOPATH = oldGopath
 					os.Chdir(base.Cwd)
 					err := os.RemoveAll(tmpGopath)
@@ -190,7 +190,7 @@ func TestRespectSetgidDir(t *testing.T) {
 	// of `(*Builder).ShowCmd` afterwards as a sanity check.
 	cfg.BuildX = true
 	var cmdBuf bytes.Buffer
-	b.Print = func(a ...interface{}) (int, error) {
+	b.Print = func a {
 		return cmdBuf.WriteString(fmt.Sprint(a...))
 	}
 

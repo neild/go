@@ -350,7 +350,7 @@ func TestWindowsGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		err := os.Chdir(wd)
 		if err != nil {
 			t.Fatal(err)

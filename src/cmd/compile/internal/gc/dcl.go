@@ -1242,7 +1242,7 @@ func (c *nowritebarrierrecChecker) check() {
 
 	// Perform a BFS of the call graph from all
 	// go:nowritebarrierrec functions.
-	enqueue := func(src, target *Node, pos src.XPos) {
+	enqueue := func src, target, pos {
 		if target.Func.Pragma&Yeswritebarrierrec != 0 {
 			// Don't flow into this function.
 			return

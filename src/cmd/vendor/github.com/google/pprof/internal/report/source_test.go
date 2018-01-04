@@ -22,7 +22,7 @@ func TestWebList(t *testing.T) {
 	rpt := New(cpu, &Options{
 		OutputFormat: WebList,
 		Symbol:       regexp.MustCompile("busyLoop"),
-		SampleValue:  func(v []int64) int64 { return v[1] },
+		SampleValue:  func v { return v[1] },
 		SampleUnit:   cpu.SampleType[1].Unit,
 	})
 	buf := bytes.NewBuffer(nil)
@@ -70,7 +70,7 @@ func readProfile(fname string, t *testing.T) *profile.Profile {
 	}
 
 	// Fix file names so they do not include absolute path names.
-	fix := func(s string) string {
+	fix := func s {
 		const testdir = "/internal/report/"
 		pos := strings.Index(s, testdir)
 		if pos == -1 {

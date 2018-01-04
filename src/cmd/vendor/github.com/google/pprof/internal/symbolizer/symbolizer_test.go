@@ -99,7 +99,7 @@ var testProfile = profile.Profile{
 func TestSymbolization(t *testing.T) {
 	sSym := symbolzSymbolize
 	lSym := localSymbolize
-	defer func() {
+	defer func {
 		symbolzSymbolize = sSym
 		localSymbolize = lSym
 		demangleFunction = Demangle

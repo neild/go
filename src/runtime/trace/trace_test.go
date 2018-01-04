@@ -46,13 +46,13 @@ func TestEventBatch(t *testing.T) {
 	// and traceEvGoWaiting events (12~13bytes per goroutine).
 	for g := 4950; g < 5050; g++ {
 		n := g
-		t.Run("G="+strconv.Itoa(n), func(t *testing.T) {
+		t.Run("G="+strconv.Itoa(n), func t {
 			var wg sync.WaitGroup
 			wg.Add(n)
 
 			in := make(chan bool, 1000)
 			for i := 0; i < n; i++ {
-				go func() {
+				go func {
 					<-in
 					wg.Done()
 				}()
@@ -153,7 +153,7 @@ func testBrokenTimestamps(t *testing.T, data []byte) {
 	// not return a logical error in case of broken timestamps
 	// and (2) broken timestamps are eventually detected and reported.
 	trace.BreakTimestampsForTesting = true
-	defer func() {
+	defer func {
 		trace.BreakTimestampsForTesting = false
 	}()
 	for i := 0; i < 1e4; i++ {
@@ -173,7 +173,7 @@ func TestTraceStress(t *testing.T) {
 
 	// Create a goroutine blocked before tracing.
 	wg.Add(1)
-	go func() {
+	go func {
 		<-done
 		wg.Done()
 	}()
@@ -183,12 +183,12 @@ func TestTraceStress(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create pipe: %v", err)
 	}
-	defer func() {
+	defer func {
 		rp.Close()
 		wp.Close()
 	}()
 	wg.Add(1)
-	go func() {
+	go func {
 		var tmp [1]byte
 		rp.Read(tmp[:])
 		<-done
@@ -204,7 +204,7 @@ func TestTraceStress(t *testing.T) {
 	procs := runtime.GOMAXPROCS(10)
 	time.Sleep(50 * time.Millisecond) // test proc stop/start events
 
-	go func() {
+	go func {
 		runtime.LockOSThread()
 		for {
 			select {
@@ -231,7 +231,7 @@ func TestTraceStress(t *testing.T) {
 	// Create a bunch of busy goroutines to load all Ps.
 	for p := 0; p < 10; p++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			// Do something useful.
 			tmp := make([]byte, 1<<16)
 			for i := range tmp {
@@ -245,7 +245,7 @@ func TestTraceStress(t *testing.T) {
 
 	// Block in syscall.
 	wg.Add(1)
-	go func() {
+	go func {
 		var tmp [1]byte
 		rp.Read(tmp[:])
 		<-done
@@ -254,7 +254,7 @@ func TestTraceStress(t *testing.T) {
 
 	// Test timers.
 	timerDone := make(chan bool)
-	go func() {
+	go func {
 		time.Sleep(time.Millisecond)
 		timerDone <- true
 	}()
@@ -266,7 +266,7 @@ func TestTraceStress(t *testing.T) {
 		t.Fatalf("listen failed: %v", err)
 	}
 	defer ln.Close()
-	go func() {
+	go func {
 		c, err := ln.Accept()
 		if err != nil {
 			return
@@ -284,7 +284,7 @@ func TestTraceStress(t *testing.T) {
 	c.Read(tmp[:])
 	c.Close()
 
-	go func() {
+	go func {
 		runtime.Gosched()
 		select {}
 	}()
@@ -310,8 +310,8 @@ func TestTraceStressStartStop(t *testing.T) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(8))
 	outerDone := make(chan bool)
 
-	go func() {
-		defer func() {
+	go func {
+		defer func {
 			outerDone <- true
 		}()
 
@@ -319,7 +319,7 @@ func TestTraceStressStartStop(t *testing.T) {
 		done := make(chan bool)
 
 		wg.Add(1)
-		go func() {
+		go func {
 			<-done
 			wg.Done()
 		}()
@@ -329,12 +329,12 @@ func TestTraceStressStartStop(t *testing.T) {
 			t.Errorf("failed to create pipe: %v", err)
 			return
 		}
-		defer func() {
+		defer func {
 			rp.Close()
 			wp.Close()
 		}()
 		wg.Add(1)
-		go func() {
+		go func {
 			var tmp [1]byte
 			rp.Read(tmp[:])
 			<-done
@@ -342,7 +342,7 @@ func TestTraceStressStartStop(t *testing.T) {
 		}()
 		time.Sleep(time.Millisecond)
 
-		go func() {
+		go func {
 			runtime.LockOSThread()
 			for {
 				select {
@@ -369,7 +369,7 @@ func TestTraceStressStartStop(t *testing.T) {
 		// Create a bunch of busy goroutines to load all Ps.
 		for p := 0; p < 10; p++ {
 			wg.Add(1)
-			go func() {
+			go func {
 				// Do something useful.
 				tmp := make([]byte, 1<<16)
 				for i := range tmp {
@@ -383,7 +383,7 @@ func TestTraceStressStartStop(t *testing.T) {
 
 		// Block in syscall.
 		wg.Add(1)
-		go func() {
+		go func {
 			var tmp [1]byte
 			rp.Read(tmp[:])
 			<-done
@@ -394,7 +394,7 @@ func TestTraceStressStartStop(t *testing.T) {
 
 		// Test timers.
 		timerDone := make(chan bool)
-		go func() {
+		go func {
 			time.Sleep(time.Millisecond)
 			timerDone <- true
 		}()
@@ -407,7 +407,7 @@ func TestTraceStressStartStop(t *testing.T) {
 			return
 		}
 		defer ln.Close()
-		go func() {
+		go func {
 			c, err := ln.Accept()
 			if err != nil {
 				return
@@ -426,7 +426,7 @@ func TestTraceStressStartStop(t *testing.T) {
 		c.Read(tmp[:])
 		c.Close()
 
-		go func() {
+		go func {
 			runtime.Gosched()
 			select {}
 		}()
@@ -468,21 +468,21 @@ func TestTraceFutileWakeup(t *testing.T) {
 	done.Add(4 * procs)
 	for p := 0; p < procs; p++ {
 		const iters = 1e3
-		go func() {
+		go func {
 			for i := 0; i < iters; i++ {
 				runtime.Gosched()
 				c0 <- 0
 			}
 			done.Done()
 		}()
-		go func() {
+		go func {
 			for i := 0; i < iters; i++ {
 				runtime.Gosched()
 				<-c0
 			}
 			done.Done()
 		}()
-		go func() {
+		go func {
 			for i := 0; i < iters; i++ {
 				runtime.Gosched()
 				select {
@@ -492,7 +492,7 @@ func TestTraceFutileWakeup(t *testing.T) {
 			}
 			done.Done()
 		}()
-		go func() {
+		go func {
 			for i := 0; i < iters; i++ {
 				runtime.Gosched()
 				select {

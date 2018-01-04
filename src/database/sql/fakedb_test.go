@@ -401,7 +401,7 @@ func (c *fakeConn) ResetSession(ctx context.Context) error {
 
 func (c *fakeConn) Close() (err error) {
 	drv := fdriver.(*fakeDriver)
-	defer func() {
+	defer func {
 		if err != nil && testStrictClose != nil {
 			testStrictClose.Errorf("failed to close a test fakeConn: %v", err)
 		}

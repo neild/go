@@ -93,7 +93,7 @@ func main() {
 	if err != nil {
 		t.Fatalf("Start failed: %v", err)
 	}
-	go func() {
+	go func {
 		time.Sleep(1 * time.Second)
 		sendCtrlBreak(t, cmd.Process.Pid)
 	}()

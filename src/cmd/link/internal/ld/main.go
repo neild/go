@@ -119,9 +119,9 @@ func Main(arch *sys.Arch, theArch Arch) {
 	flag.Var(&ctxt.LinkMode, "linkmode", "set link `mode`")
 	flag.Var(&ctxt.BuildMode, "buildmode", "set build `mode`")
 	objabi.Flagfn1("B", "add an ELF NT_GNU_BUILD_ID `note` when using ELF", addbuildinfo)
-	objabi.Flagfn1("L", "add specified `directory` to library path", func(a string) { Lflag(ctxt, a) })
+	objabi.Flagfn1("L", "add specified `directory` to library path", func a { Lflag(ctxt, a) })
 	objabi.AddVersionFlag() // -V
-	objabi.Flagfn1("X", "add string value `definition` of the form importpath.name=value", func(s string) { addstrdata1(ctxt, s) })
+	objabi.Flagfn1("X", "add string value `definition` of the form importpath.name=value", func s { addstrdata1(ctxt, s) })
 	objabi.Flagcount("v", "print link trace", &ctxt.Debugvlog)
 	objabi.Flagfn1("importcfg", "read import configuration from `file`", ctxt.readImportCfg)
 
@@ -269,7 +269,7 @@ func startProfile() {
 		if err != nil {
 			log.Fatalf("%v", err)
 		}
-		AtExit(func() {
+		AtExit(func {
 			runtime.GC() // profile all outstanding allocations
 			if err := pprof.WriteHeapProfile(f); err != nil {
 				log.Fatalf("%v", err)

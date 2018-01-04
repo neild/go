@@ -163,7 +163,7 @@ func XTestParentFinishesChild(t testingT) {
 	pc.mu.Unlock()
 
 	// parent and children should all be finished.
-	check := func(ctx Context, name string) {
+	check := func ctx, name {
 		select {
 		case <-ctx.Done():
 		default:
@@ -325,7 +325,7 @@ var k2 = key2(1) // same int as k1, different type
 var k3 = key2(3) // same type as k2, different int
 
 func XTestValues(t testingT) {
-	check := func(c Context, nm, v1, v2, v3 string) {
+	check := func c, nm, v1, v2, v3 {
 		if v, ok := c.Value(k1).(string); ok == (len(v1) == 0) || v != v1 {
 			t.Errorf(`%s.Value(k1).(string) = %q, %t want %q, %t`, nm, v, ok, v1, len(v1) != 0)
 		}
@@ -382,13 +382,13 @@ func XTestAllocs(t testingT, testingShort func() bool, testingAllocsPerRun func(
 	}{
 		{
 			desc:       "Background()",
-			f:          func() { Background() },
+			f:          func { Background() },
 			limit:      0,
 			gccgoLimit: 0,
 		},
 		{
 			desc: fmt.Sprintf("WithValue(bg, %v, nil)", k1),
-			f: func() {
+			f: func {
 				c := WithValue(bg, k1, nil)
 				c.Value(k1)
 			},
@@ -397,7 +397,7 @@ func XTestAllocs(t testingT, testingShort func() bool, testingAllocsPerRun func(
 		},
 		{
 			desc: "WithTimeout(bg, 15*time.Millisecond)",
-			f: func() {
+			f: func {
 				c, _ := WithTimeout(bg, 15*time.Millisecond)
 				<-c.Done()
 			},
@@ -406,7 +406,7 @@ func XTestAllocs(t testingT, testingShort func() bool, testingAllocsPerRun func(
 		},
 		{
 			desc: "WithCancel(bg)",
-			f: func() {
+			f: func {
 				c, cancel := WithCancel(bg)
 				cancel()
 				<-c.Done()
@@ -416,7 +416,7 @@ func XTestAllocs(t testingT, testingShort func() bool, testingAllocsPerRun func(
 		},
 		{
 			desc: "WithTimeout(bg, 5*time.Millisecond)",
-			f: func() {
+			f: func {
 				c, cancel := WithTimeout(bg, 5*time.Millisecond)
 				cancel()
 				<-c.Done()
@@ -459,7 +459,7 @@ func XTestSimultaneousCancels(t testingT) {
 	var wg sync.WaitGroup
 	wg.Add(len(m))
 	for _, cancel := range m {
-		go func(cancel CancelFunc) {
+		go func cancel {
 			cancel()
 			wg.Done()
 		}(cancel)
@@ -476,7 +476,7 @@ func XTestSimultaneousCancels(t testingT) {
 	}
 	// Wait for all the cancel functions to return.
 	done := make(chan struct{})
-	go func() {
+	go func {
 		wg.Wait()
 		close(done)
 	}()
@@ -492,7 +492,7 @@ func XTestSimultaneousCancels(t testingT) {
 func XTestInterlockedCancels(t testingT) {
 	parent, cancelParent := WithCancel(Background())
 	child, cancelChild := WithCancel(parent)
-	go func() {
+	go func {
 		parent.Done()
 		cancelChild()
 	}()
@@ -516,7 +516,7 @@ func XTestLayersTimeout(t testingT) {
 
 func testLayers(t testingT, seed int64, testTimeout bool) {
 	rand.Seed(seed)
-	errorf := func(format string, a ...interface{}) {
+	errorf := func format, a {
 		t.Errorf(fmt.Sprintf("seed=%d: %s", seed, format), a...)
 	}
 	const (
@@ -547,7 +547,7 @@ func testLayers(t testingT, seed int64, testTimeout bool) {
 			numTimers++
 		}
 	}
-	checkValues := func(when string) {
+	checkValues := func when {
 		for _, key := range vals {
 			if val := ctx.Value(key).(*value); key != val {
 				errorf("%s: ctx.Value(%p) = %p want %p", when, key, val, key)
@@ -584,7 +584,7 @@ func testLayers(t testingT, seed int64, testTimeout bool) {
 }
 
 func XTestCancelRemoves(t testingT) {
-	checkChildren := func(when string, ctx Context, want int) {
+	checkChildren := func when, ctx, want {
 		if got := len(ctx.(*cancelCtx).children); got != want {
 			t.Errorf("%s: context has %d children, want %d", when, got, want)
 		}
@@ -621,18 +621,18 @@ func XTestWithCancelCanceledParent(t testingT) {
 }
 
 func XTestWithValueChecksKey(t testingT) {
-	panicVal := recoveredValue(func() { WithValue(Background(), []byte("foo"), "bar") })
+	panicVal := recoveredValue(func { WithValue(Background(), []byte("foo"), "bar") })
 	if panicVal == nil {
 		t.Error("expected panic")
 	}
-	panicVal = recoveredValue(func() { WithValue(Background(), nil, "bar") })
+	panicVal = recoveredValue(func { WithValue(Background(), nil, "bar") })
 	if got, want := fmt.Sprint(panicVal), "nil key"; got != want {
 		t.Errorf("panic = %q; want %q", got, want)
 	}
 }
 
 func recoveredValue(fn func()) (v interface{}) {
-	defer func() { v = recover() }()
+	defer func { v = recover() }()
 	fn()
 	return
 }

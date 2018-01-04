@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-var testInetaddr = func(ip IPAddr) Addr { return &TCPAddr{IP: ip.IP, Port: 5682, Zone: ip.Zone} }
+var testInetaddr = func ip { return &TCPAddr{IP: ip.IP, Port: 5682, Zone: ip.Zone} }
 
 var addrListTests = []struct {
 	filter    func(IPAddr) bool
@@ -267,7 +267,7 @@ func TestAddrListPartition(t *testing.T) {
 	for i, tt := range cases {
 		// Inverting the function's output should not affect the outcome.
 		for _, invert := range []bool{false, true} {
-			primaries, fallbacks := addrs.partition(func(a Addr) bool {
+			primaries, fallbacks := addrs.partition(func a {
 				ip := a.(*IPAddr).IP
 				return (ip[len(ip)-1] == tt.lastByte) != invert
 			})

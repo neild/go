@@ -20,7 +20,7 @@ import (
 func runtime_debug_WriteHeapDump(fd uintptr) {
 	stopTheWorld("write heap dump")
 
-	systemstack(func() {
+	systemstack(func {
 		writeheapdump_m(fd)
 	})
 

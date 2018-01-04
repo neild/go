@@ -179,7 +179,7 @@ L7 uses var z int`
 	}
 
 	// don't abort at the first error
-	conf := Config{Error: func(err error) { t.Log(err) }}
+	conf := Config{Error: func err { t.Log(err) }}
 	defs := make(map[*ast.Ident]Object)
 	uses := make(map[*ast.Ident]Object)
 	_, err = conf.Check(f.Name.Name, fset, []*ast.File{f}, &Info{Defs: defs, Uses: uses})
@@ -260,7 +260,7 @@ func main() {
 	}
 }
 `
-	f := func(test, src string) {
+	f := func test, src {
 		f, err := parser.ParseFile(fset, "", src, 0)
 		if err != nil {
 			t.Fatal(err)
@@ -301,7 +301,7 @@ func TestIssue22525(t *testing.T) {
 	}
 
 	got := "\n"
-	conf := Config{Error: func(err error) { got += err.Error() + "\n" }}
+	conf := Config{Error: func err { got += err.Error() + "\n" }}
 	conf.Check(f.Name.Name, fset, []*ast.File{f}, nil) // do not crash
 	want := `
 1:27: a declared but not used

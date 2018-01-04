@@ -73,7 +73,7 @@ func futexwakeup(addr *uint32, cnt uint32) {
 	// I don't know that futex wakeup can return
 	// EAGAIN or EINTR, but if it does, it would be
 	// safe to loop and call futex again.
-	systemstack(func() {
+	systemstack(func {
 		print("futexwakeup addr=", addr, " returned ", ret, "\n")
 	})
 

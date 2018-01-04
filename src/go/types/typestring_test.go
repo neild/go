@@ -175,7 +175,7 @@ func TestQualifiedTypeString(t *testing.T) {
 		{NewPointer(pT), p, "*T"},
 		{NewPointer(pT), q, "*p.T"},
 	} {
-		qualifier := func(pkg *Package) string {
+		qualifier := func pkg {
 			if pkg != test.this {
 				return pkg.Name()
 			}

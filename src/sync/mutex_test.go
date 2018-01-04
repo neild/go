@@ -87,14 +87,14 @@ var misuseTests = []struct {
 }{
 	{
 		"Mutex.Unlock",
-		func() {
+		func {
 			var mu Mutex
 			mu.Unlock()
 		},
 	},
 	{
 		"Mutex.Unlock2",
-		func() {
+		func {
 			var mu Mutex
 			mu.Lock()
 			mu.Unlock()
@@ -103,14 +103,14 @@ var misuseTests = []struct {
 	},
 	{
 		"RWMutex.Unlock",
-		func() {
+		func {
 			var mu RWMutex
 			mu.Unlock()
 		},
 	},
 	{
 		"RWMutex.Unlock2",
-		func() {
+		func {
 			var mu RWMutex
 			mu.RLock()
 			mu.Unlock()
@@ -118,7 +118,7 @@ var misuseTests = []struct {
 	},
 	{
 		"RWMutex.Unlock3",
-		func() {
+		func {
 			var mu RWMutex
 			mu.Lock()
 			mu.Unlock()
@@ -127,14 +127,14 @@ var misuseTests = []struct {
 	},
 	{
 		"RWMutex.RUnlock",
-		func() {
+		func {
 			var mu RWMutex
 			mu.RUnlock()
 		},
 	},
 	{
 		"RWMutex.RUnlock2",
-		func() {
+		func {
 			var mu RWMutex
 			mu.Lock()
 			mu.RUnlock()
@@ -142,7 +142,7 @@ var misuseTests = []struct {
 	},
 	{
 		"RWMutex.RUnlock3",
-		func() {
+		func {
 			var mu RWMutex
 			mu.RLock()
 			mu.RUnlock()
@@ -155,8 +155,8 @@ func init() {
 	if len(os.Args) == 3 && os.Args[1] == "TESTMISUSE" {
 		for _, test := range misuseTests {
 			if test.name == os.Args[2] {
-				func() {
-					defer func() { recover() }()
+				func {
+					defer func { recover() }()
 					test.f()
 				}()
 				fmt.Printf("test completed\n")
@@ -182,7 +182,7 @@ func TestMutexFairness(t *testing.T) {
 	var mu Mutex
 	stop := make(chan bool)
 	defer close(stop)
-	go func() {
+	go func {
 		for {
 			mu.Lock()
 			time.Sleep(100 * time.Microsecond)
@@ -195,7 +195,7 @@ func TestMutexFairness(t *testing.T) {
 		}
 	}()
 	done := make(chan bool)
-	go func() {
+	go func {
 		for i := 0; i < 10; i++ {
 			time.Sleep(100 * time.Microsecond)
 			mu.Lock()
@@ -215,7 +215,7 @@ func BenchmarkMutexUncontended(b *testing.B) {
 		Mutex
 		pad [128]uint8
 	}
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		var mu PaddedMutex
 		for pb.Next() {
 			mu.Lock()
@@ -229,7 +229,7 @@ func benchmarkMutex(b *testing.B, slack, work bool) {
 	if slack {
 		b.SetParallelism(10)
 	}
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		foo := 0
 		for pb.Next() {
 			mu.Lock()
@@ -271,7 +271,7 @@ func BenchmarkMutexNoSpin(b *testing.B) {
 	var m Mutex
 	var acc0, acc1 uint64
 	b.SetParallelism(4)
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		c := make(chan bool)
 		var data [4 << 10]uint64
 		for i := 0; pb.Next(); i++ {
@@ -286,7 +286,7 @@ func BenchmarkMutexNoSpin(b *testing.B) {
 				}
 				// Elaborate way to say runtime.Gosched
 				// that does not put the goroutine onto global runq.
-				go func() {
+				go func {
 					c <- true
 				}()
 				<-c
@@ -302,7 +302,7 @@ func BenchmarkMutexSpin(b *testing.B) {
 	// unnecessary rescheduling is penalized by cache misses.
 	var m Mutex
 	var acc0, acc1 uint64
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		var data [16 << 10]uint64
 		for i := 0; pb.Next(); i++ {
 			m.Lock()

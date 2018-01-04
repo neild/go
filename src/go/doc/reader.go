@@ -746,13 +746,13 @@ func sortedValues(m []*Value, tok token.Token) []*Value {
 	list = list[0:i]
 
 	sortBy(
-		func(i, j int) bool {
+		func i, j {
 			if ni, nj := sortingName(list[i].Decl), sortingName(list[j].Decl); ni != nj {
 				return ni < nj
 			}
 			return list[i].order < list[j].order
 		},
-		func(i, j int) { list[i], list[j] = list[j], list[i] },
+		func i, j { list[i], list[j] = list[j], list[i] },
 		len(list),
 	)
 
@@ -776,8 +776,8 @@ func sortedTypes(m map[string]*namedType, allMethods bool) []*Type {
 	}
 
 	sortBy(
-		func(i, j int) bool { return list[i].Name < list[j].Name },
-		func(i, j int) { list[i], list[j] = list[j], list[i] },
+		func i, j { return list[i].Name < list[j].Name },
+		func i, j { list[i], list[j] = list[j], list[i] },
 		len(list),
 	)
 
@@ -808,8 +808,8 @@ func sortedFuncs(m methodSet, allMethods bool) []*Func {
 	}
 	list = list[0:i]
 	sortBy(
-		func(i, j int) bool { return list[i].Name < list[j].Name },
-		func(i, j int) { list[i], list[j] = list[j], list[i] },
+		func i, j { return list[i].Name < list[j].Name },
+		func i, j { list[i], list[j] = list[j], list[i] },
 		len(list),
 	)
 	return list

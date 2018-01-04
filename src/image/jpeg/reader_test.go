@@ -248,7 +248,7 @@ func TestLargeImageWithShortData(t *testing.T) {
 		"\xde\xaf\xa4\xf0\xca\x9f\x24\xa8\xdf\x46\xa8\x24\x84\x96\xe3\x77" +
 		"\xf9\x2e\xe0\x0a\x62\x7f\xdf\xd9"
 	c := make(chan error, 1)
-	go func() {
+	go func {
 		_, err := Decode(strings.NewReader(input))
 		c <- err
 	}()

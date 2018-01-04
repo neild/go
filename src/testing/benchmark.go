@@ -204,10 +204,10 @@ func (b *B) run1() bool {
 			ctx.maxLen = n + 8 // Add additional slack to avoid too many jumps in size.
 		}
 	}
-	go func() {
+	go func {
 		// Signal that we're done whether we return normally
 		// or by FailNow's runtime.Goexit.
-		defer func() {
+		defer func {
 			b.signal <- true
 		}()
 
@@ -239,7 +239,7 @@ var labelsOnce sync.Once
 // run executes the benchmark in a separate goroutine, including all of its
 // subbenchmarks. b must not have subbenchmarks.
 func (b *B) run() {
-	labelsOnce.Do(func() {
+	labelsOnce.Do(func {
 		fmt.Fprintf(b.w, "goos: %s\n", runtime.GOOS)
 		fmt.Fprintf(b.w, "goarch: %s\n", runtime.GOARCH)
 		if b.importPath != "" {
@@ -268,7 +268,7 @@ func (b *B) doBench() BenchmarkResult {
 func (b *B) launch() {
 	// Signal that we're done whether we return normally
 	// or by FailNow's runtime.Goexit.
-	defer func() {
+	defer func {
 		b.signal <- true
 	}()
 
@@ -411,7 +411,7 @@ func runBenchmarks(importPath string, matchString func(pat, str string) (bool, e
 			chatty: *chatty,
 		},
 		importPath: importPath,
-		benchFunc: func(b *B) {
+		benchFunc: func b {
 			for _, Benchmark := range bs {
 				b.Run(Benchmark.Name, Benchmark.F)
 			}
@@ -613,7 +613,7 @@ func (b *B) RunParallel(body func(*PB)) {
 	var wg sync.WaitGroup
 	wg.Add(numProcs)
 	for p := 0; p < numProcs; p++ {
-		go func() {
+		go func {
 			defer wg.Done()
 			pb := &PB{
 				globalN: &n,

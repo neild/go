@@ -166,7 +166,7 @@ func Example_synchronization() {
 
 	// Start a goroutine to act as the transmitter.
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 
 		zw, err := flate.NewWriter(wp, flate.BestSpeed)
@@ -197,7 +197,7 @@ func Example_synchronization() {
 
 	// Start a goroutine to act as the receiver.
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 
 		zr := flate.NewReader(rp)

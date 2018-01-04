@@ -253,12 +253,12 @@ func testConcurrentReadsAfterGrowth(t *testing.T, useReflect bool) {
 			var wg sync.WaitGroup
 			wg.Add(numReader * 2)
 			for nr := 0; nr < numReader; nr++ {
-				go func() {
+				go func {
 					defer wg.Done()
 					for range m {
 					}
 				}()
-				go func() {
+				go func {
 					defer wg.Done()
 					for key := 0; key < gs; key++ {
 						_ = m[key]
@@ -266,7 +266,7 @@ func testConcurrentReadsAfterGrowth(t *testing.T, useReflect bool) {
 				}()
 				if useReflect {
 					wg.Add(1)
-					go func() {
+					go func {
 						defer wg.Done()
 						mv := reflect.ValueOf(m)
 						keys := mv.MapKeys()
@@ -437,7 +437,7 @@ func TestMapIterOrder(t *testing.T) {
 				m[i] = true
 			}
 			// Check that iterating over the map produces at least two different orderings.
-			ord := func() []int {
+			ord := func {
 				var s []int
 				for key := range m {
 					s = append(s, key)
@@ -513,7 +513,7 @@ func TestMapStringBytesLookup(t *testing.T) {
 	}
 
 	var x int
-	n := testing.AllocsPerRun(100, func() {
+	n := testing.AllocsPerRun(100, func {
 		x += m[string(buf)]
 	})
 	if n != 0 {
@@ -521,7 +521,7 @@ func TestMapStringBytesLookup(t *testing.T) {
 	}
 
 	x = 0
-	n = testing.AllocsPerRun(100, func() {
+	n = testing.AllocsPerRun(100, func {
 		y, ok := m[string(buf)]
 		if !ok {
 			panic("!ok")
@@ -621,7 +621,7 @@ func TestMapBuckets(t *testing.T) {
 	// on the stack. Escaping maps start with a non-nil bucket pointer if
 	// hint size is above bucketCnt and thereby have more than one bucket.
 	// These tests depend on bucketCnt and loadFactor* in hashmap.go.
-	t.Run("mapliteral", func(t *testing.T) {
+	t.Run("mapliteral", func t {
 		for _, tt := range mapBucketTests {
 			localMap := map[int]int{}
 			if runtime.MapBucketsPointerIsNil(localMap) {
@@ -646,7 +646,7 @@ func TestMapBuckets(t *testing.T) {
 			mapSink = escapingMap
 		}
 	})
-	t.Run("nohint", func(t *testing.T) {
+	t.Run("nohint", func t {
 		for _, tt := range mapBucketTests {
 			localMap := make(map[int]int)
 			if runtime.MapBucketsPointerIsNil(localMap) {
@@ -671,7 +671,7 @@ func TestMapBuckets(t *testing.T) {
 			mapSink = escapingMap
 		}
 	})
-	t.Run("makemap", func(t *testing.T) {
+	t.Run("makemap", func t {
 		for _, tt := range mapBucketTests {
 			localMap := make(map[int]int, tt.n)
 			if runtime.MapBucketsPointerIsNil(localMap) {
@@ -696,7 +696,7 @@ func TestMapBuckets(t *testing.T) {
 			mapSink = escapingMap
 		}
 	})
-	t.Run("makemap64", func(t *testing.T) {
+	t.Run("makemap64", func t {
 		for _, tt := range mapBucketTests {
 			localMap := make(map[int]int, int64(tt.n))
 			if runtime.MapBucketsPointerIsNil(localMap) {
@@ -748,28 +748,28 @@ func BenchmarkMapPop10000(b *testing.B) { benchmarkMapPop(b, 10000) }
 var testNonEscapingMapVariable int = 8
 
 func TestNonEscapingMap(t *testing.T) {
-	n := testing.AllocsPerRun(1000, func() {
+	n := testing.AllocsPerRun(1000, func {
 		m := map[int]int{}
 		m[0] = 0
 	})
 	if n != 0 {
 		t.Fatalf("mapliteral: want 0 allocs, got %v", n)
 	}
-	n = testing.AllocsPerRun(1000, func() {
+	n = testing.AllocsPerRun(1000, func {
 		m := make(map[int]int)
 		m[0] = 0
 	})
 	if n != 0 {
 		t.Fatalf("no hint: want 0 allocs, got %v", n)
 	}
-	n = testing.AllocsPerRun(1000, func() {
+	n = testing.AllocsPerRun(1000, func {
 		m := make(map[int]int, 8)
 		m[0] = 0
 	})
 	if n != 0 {
 		t.Fatalf("with small hint: want 0 allocs, got %v", n)
 	}
-	n = testing.AllocsPerRun(1000, func() {
+	n = testing.AllocsPerRun(1000, func {
 		m := make(map[int]int, testNonEscapingMapVariable)
 		m[0] = 0
 	})
@@ -857,9 +857,9 @@ func benchmarkMapDeleteStr(b *testing.B, n int) {
 }
 
 func runWith(f func(*testing.B, int), v ...int) func(*testing.B) {
-	return func(b *testing.B) {
+	return func b {
 		for _, n := range v {
-			b.Run(strconv.Itoa(n), func(b *testing.B) { f(b, n) })
+			b.Run(strconv.Itoa(n), func b { f(b, n) })
 		}
 	}
 }

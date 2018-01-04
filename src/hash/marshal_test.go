@@ -37,15 +37,15 @@ var marshalTests = []struct {
 	new    func() hash.Hash
 	golden []byte
 }{
-	{"adler32", func() hash.Hash { return adler32.New() }, fromHex("61646c01460a789d")},
-	{"crc32", func() hash.Hash { return crc32.NewIEEE() }, fromHex("63726301ca87914dc956d3e8")},
-	{"crc64", func() hash.Hash { return crc64.New(crc64.MakeTable(crc64.ISO)) }, fromHex("6372630273ba8484bbcd5def5d51c83c581695be")},
-	{"fnv32", func() hash.Hash { return fnv.New32() }, fromHex("666e760171ba3d77")},
-	{"fnv32a", func() hash.Hash { return fnv.New32a() }, fromHex("666e76027439f86f")},
-	{"fnv64", func() hash.Hash { return fnv.New64() }, fromHex("666e7603cc64e0e97692c637")},
-	{"fnv64a", func() hash.Hash { return fnv.New64a() }, fromHex("666e7604c522af9b0dede66f")},
-	{"fnv128", func() hash.Hash { return fnv.New128() }, fromHex("666e760561587a70a0f66d7981dc980e2cabbaf7")},
-	{"fnv128a", func() hash.Hash { return fnv.New128a() }, fromHex("666e7606a955802b0136cb67622b461d9f91e6ff")},
+	{"adler32", func { return adler32.New() }, fromHex("61646c01460a789d")},
+	{"crc32", func { return crc32.NewIEEE() }, fromHex("63726301ca87914dc956d3e8")},
+	{"crc64", func { return crc64.New(crc64.MakeTable(crc64.ISO)) }, fromHex("6372630273ba8484bbcd5def5d51c83c581695be")},
+	{"fnv32", func { return fnv.New32() }, fromHex("666e760171ba3d77")},
+	{"fnv32a", func { return fnv.New32a() }, fromHex("666e76027439f86f")},
+	{"fnv64", func { return fnv.New64() }, fromHex("666e7603cc64e0e97692c637")},
+	{"fnv64a", func { return fnv.New64a() }, fromHex("666e7604c522af9b0dede66f")},
+	{"fnv128", func { return fnv.New128() }, fromHex("666e760561587a70a0f66d7981dc980e2cabbaf7")},
+	{"fnv128a", func { return fnv.New128a() }, fromHex("666e7606a955802b0136cb67622b461d9f91e6ff")},
 	{"md5", md5.New, fromHex("6d643501a91b0023007aa14740a3979210b5f024c0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f80000000000000000000000000000f9")},
 	{"sha1", sha1.New, fromHex("736861016dad5acb4dc003952f7a0b352ee5537ec381a228c0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f80000000000000000000000000000f9")},
 	{"sha224", sha256.New224, fromHex("73686102f8b92fc047c9b4d82f01a6370841277b7a0d92108440178c83db855a8e66c2d9c0c1c2c3c4c5c6c7c8c9cacbcccdcecfd0d1d2d3d4d5d6d7d8d9dadbdcdddedfe0e1e2e3e4e5e6e7e8e9eaebecedeeeff0f1f2f3f4f5f6f7f80000000000000000000000000000f9")},
@@ -58,7 +58,7 @@ var marshalTests = []struct {
 
 func TestMarshalHash(t *testing.T) {
 	for _, tt := range marshalTests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func t {
 			buf := make([]byte, 256)
 			for i := range buf {
 				buf[i] = byte(i)

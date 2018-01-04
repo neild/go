@@ -206,7 +206,7 @@ func (h *Handler) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		cwd = "."
 	}
 
-	internalError := func(err error) {
+	internalError := func err {
 		rw.WriteHeader(http.StatusInternalServerError)
 		h.printf("CGI error: %v", err)
 	}

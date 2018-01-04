@@ -266,7 +266,7 @@ func TestAnonymousFields(t *testing.T) {
 		// it is ambiguous which one X refers to.
 		// This should not serialize either field.
 		label: "AmbiguousField",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				S1 struct{ x, X int }
 				S2 struct{ x, X int }
@@ -282,7 +282,7 @@ func TestAnonymousFields(t *testing.T) {
 		label: "DominantField",
 		// Both S1 and S2 have a field named X, but since S has an X field as
 		// well, it takes precedence over S1.X and S2.X.
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				S1 struct{ x, X int }
 				S2 struct{ x, X int }
@@ -298,7 +298,7 @@ func TestAnonymousFields(t *testing.T) {
 	}, {
 		// Unexported embedded field of non-struct type should not be serialized.
 		label: "UnexportedEmbeddedInt",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				myInt int
 				S     struct{ myInt }
@@ -309,7 +309,7 @@ func TestAnonymousFields(t *testing.T) {
 	}, {
 		// Exported embedded field of non-struct type should be serialized.
 		label: "ExportedEmbeddedInt",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				MyInt int
 				S     struct{ MyInt }
@@ -321,7 +321,7 @@ func TestAnonymousFields(t *testing.T) {
 		// Unexported embedded field of pointer to non-struct type
 		// should not be serialized.
 		label: "UnexportedEmbeddedIntPointer",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				myInt int
 				S     struct{ *myInt }
@@ -335,7 +335,7 @@ func TestAnonymousFields(t *testing.T) {
 		// Exported embedded field of pointer to non-struct type
 		// should be serialized.
 		label: "ExportedEmbeddedIntPointer",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				MyInt int
 				S     struct{ *MyInt }
@@ -350,7 +350,7 @@ func TestAnonymousFields(t *testing.T) {
 		// exported fields be serialized regardless of whether the struct types
 		// themselves are exported.
 		label: "EmbeddedStruct",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				s1 struct{ x, X int }
 				S2 struct{ y, Y int }
@@ -367,7 +367,7 @@ func TestAnonymousFields(t *testing.T) {
 		// exported fields be serialized regardless of whether the struct types
 		// themselves are exported.
 		label: "EmbeddedStructPointer",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				s1 struct{ x, X int }
 				S2 struct{ y, Y int }
@@ -383,7 +383,7 @@ func TestAnonymousFields(t *testing.T) {
 		// Exported fields on embedded unexported structs at multiple levels
 		// of nesting should still be serialized.
 		label: "NestedStructAndInts",
-		makeInput: func() interface{} {
+		makeInput: func {
 			type (
 				MyInt1 int
 				MyInt2 int
@@ -408,7 +408,7 @@ func TestAnonymousFields(t *testing.T) {
 	}}
 
 	for _, tt := range tests {
-		t.Run(tt.label, func(t *testing.T) {
+		t.Run(tt.label, func t {
 			b, err := Marshal(tt.makeInput())
 			if err != nil {
 				t.Fatalf("Marshal() = %v, want nil error", err)
@@ -804,7 +804,7 @@ var badFloatREs = []*regexp.Regexp{
 func TestMarshalFloat(t *testing.T) {
 	t.Parallel()
 	nfail := 0
-	test := func(f float64, bits int) {
+	test := func f, bits {
 		vf := interface{}(f)
 		if bits == 32 {
 			f = float64(float32(f)) // round
@@ -861,7 +861,7 @@ func TestMarshalFloat(t *testing.T) {
 					}
 					next := math.Nextafter
 					if bits == 32 {
-						next = func(g, h float64) float64 {
+						next = func g, h {
 							return float64(math.Nextafter32(float32(g), float32(h)))
 						}
 					}

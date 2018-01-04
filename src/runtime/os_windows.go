@@ -571,18 +571,18 @@ func semasleep(ns int64) int32 {
 		return -1
 
 	case _WAIT_ABANDONED:
-		systemstack(func() {
+		systemstack(func {
 			throw("runtime.semasleep wait_abandoned")
 		})
 
 	case _WAIT_FAILED:
-		systemstack(func() {
+		systemstack(func {
 			print("runtime: waitforsingleobject wait_failed; errno=", getlasterror(), "\n")
 			throw("runtime.semasleep wait_failed")
 		})
 
 	default:
-		systemstack(func() {
+		systemstack(func {
 			print("runtime: waitforsingleobject unexpected; result=", result, "\n")
 			throw("runtime.semasleep unexpected")
 		})
@@ -594,7 +594,7 @@ func semasleep(ns int64) int32 {
 //go:nosplit
 func semawakeup(mp *m) {
 	if stdcall1(_SetEvent, mp.waitsema) == 0 {
-		systemstack(func() {
+		systemstack(func {
 			print("runtime: setevent failed; errno=", getlasterror(), "\n")
 			throw("runtime.semawakeup")
 		})
@@ -608,7 +608,7 @@ func semacreate(mp *m) {
 	}
 	mp.waitsema = stdcall4(_CreateEventA, 0, 0, 0, 0)
 	if mp.waitsema == 0 {
-		systemstack(func() {
+		systemstack(func {
 			print("runtime: createevent failed; errno=", getlasterror(), "\n")
 			throw("runtime.semacreate")
 		})

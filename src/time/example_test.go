@@ -167,7 +167,7 @@ func ExampleNewTicker() {
 	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 	done := make(chan bool)
-	go func() {
+	go func {
 		time.Sleep(10 * time.Second)
 		done <- true
 	}()
@@ -217,7 +217,7 @@ func ExampleTime_Format() {
 	// as these examples show.
 
 	// Define a helper function to make the examples' output look nice.
-	do := func(name, layout, want string) {
+	do := func name, layout, want {
 		got := t.Format(layout)
 		if want != got {
 			fmt.Printf("error: for %q got %q; expected %q\n", layout, got, want)

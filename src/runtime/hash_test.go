@@ -609,7 +609,7 @@ func TestArrayHash(t *testing.T) {
 	// probability of even one or two overflows goes down rapidly.
 	// (There is always 1 allocation of the bucket array. The map
 	// header is allocated on the stack.)
-	f := func() {
+	f := func {
 		// Make the key type at most 128 bytes. Otherwise,
 		// we get an allocation per key.
 		type key [8]string
@@ -639,7 +639,7 @@ func TestArrayHash(t *testing.T) {
 }
 func TestStructHash(t *testing.T) {
 	// See the comment in TestArrayHash.
-	f := func() {
+	f := func {
 		type key struct {
 			a, b, c, d, e, f, g, h string
 		}

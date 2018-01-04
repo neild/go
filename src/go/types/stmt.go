@@ -29,7 +29,7 @@ func (check *Checker) funcBody(decl *declInfo, name string, sig *Signature, body
 
 	// save/restore current context and setup function context
 	// (and use 0 indentation at function start)
-	defer func(ctxt context, indent int) {
+	defer func ctxt, indent {
 		check.context = ctxt
 		check.indent = indent
 	}(check.context, check.indent)
@@ -64,7 +64,7 @@ func (check *Checker) usage(scope *Scope) {
 			unused = append(unused, v)
 		}
 	}
-	sort.Slice(unused, func(i, j int) bool {
+	sort.Slice(unused, func i, j {
 		return unused[i].pos < unused[j].pos
 	})
 	for _, v := range unused {
@@ -300,7 +300,7 @@ func (check *Checker) stmt(ctxt stmtContext, s ast.Stmt) {
 
 	// statements must end with the same top scope as they started with
 	if debug {
-		defer func(scope *Scope) {
+		defer func scope {
 			// don't check if code is panicking
 			if p := recover(); p != nil {
 				panic(p)

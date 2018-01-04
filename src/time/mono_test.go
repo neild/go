@@ -11,12 +11,12 @@ import (
 )
 
 func TestHasMonotonicClock(t *testing.T) {
-	yes := func(expr string, tt Time) {
+	yes := func expr, tt {
 		if GetMono(&tt) == 0 {
 			t.Errorf("%s: missing monotonic clock reading", expr)
 		}
 	}
-	no := func(expr string, tt Time) {
+	no := func expr, tt {
 		if GetMono(&tt) != 0 {
 			t.Errorf("%s: unexpected monotonic clock reading", expr)
 		}
@@ -131,8 +131,8 @@ func TestMonotonicSub(t *testing.T) {
 		t.Fatalf("AddDate didn't strip monotonic clock reading")
 	}
 
-	sub := func(txs, tys string, tx, txw, ty, tyw Time, d, dw Duration) {
-		check := func(expr string, d, want Duration) {
+	sub := func txs, tys, tx, txw, ty, tyw, d, dw {
+		check := func expr, d, want {
 			if d != want {
 				t.Errorf("%s = %v, want %v", expr, d, want)
 			}
@@ -154,8 +154,8 @@ func TestMonotonicSub(t *testing.T) {
 	sub("t3", "t2", t3, t3w, t2, t2w, 990*Millisecond, 990*Millisecond)
 	sub("t3", "t3", t3, t3w, t3, t3w, 0, 0)
 
-	cmp := func(txs, tys string, tx, txw, ty, tyw Time, c, cw int) {
-		check := func(expr string, b, want bool) {
+	cmp := func txs, tys, tx, txw, ty, tyw, c, cw {
+		check := func expr, b, want {
 			if b != want {
 				t.Errorf("%s = %v, want %v", expr, b, want)
 			}

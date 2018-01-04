@@ -16,7 +16,7 @@ import (
 func BenchmarkWithTimeout(b *testing.B) {
 	for concurrency := 40; concurrency <= 4e5; concurrency *= 100 {
 		name := fmt.Sprintf("concurrency=%d", concurrency)
-		b.Run(name, func(b *testing.B) {
+		b.Run(name, func b {
 			benchmarkWithTimeout(b, concurrency)
 		})
 	}
@@ -32,7 +32,7 @@ func benchmarkWithTimeout(b *testing.B, concurrentContexts int) {
 	ccf := make([][]CancelFunc, gomaxprocs)
 	for i := range ccf {
 		wg.Add(1)
-		go func(i int) {
+		go func i {
 			defer wg.Done()
 			cf := make([]CancelFunc, perPContexts)
 			for j := range cf {
@@ -44,7 +44,7 @@ func benchmarkWithTimeout(b *testing.B, concurrentContexts int) {
 	wg.Wait()
 
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		wcf := make([]CancelFunc, 10)
 		for pb.Next() {
 			for i := range wcf {
@@ -67,20 +67,20 @@ func benchmarkWithTimeout(b *testing.B, concurrentContexts int) {
 func BenchmarkCancelTree(b *testing.B) {
 	depths := []int{1, 10, 100, 1000}
 	for _, d := range depths {
-		b.Run(fmt.Sprintf("depth=%d", d), func(b *testing.B) {
-			b.Run("Root=Background", func(b *testing.B) {
+		b.Run(fmt.Sprintf("depth=%d", d), func b {
+			b.Run("Root=Background", func b {
 				for i := 0; i < b.N; i++ {
 					buildContextTree(Background(), d)
 				}
 			})
-			b.Run("Root=OpenCanceler", func(b *testing.B) {
+			b.Run("Root=OpenCanceler", func b {
 				for i := 0; i < b.N; i++ {
 					ctx, cancel := WithCancel(Background())
 					buildContextTree(ctx, d)
 					cancel()
 				}
 			})
-			b.Run("Root=ClosedCanceler", func(b *testing.B) {
+			b.Run("Root=ClosedCanceler", func b {
 				for i := 0; i < b.N; i++ {
 					ctx, cancel := WithCancel(Background())
 					cancel()

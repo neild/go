@@ -70,7 +70,7 @@ func (p *pipe) CloseRead(err error) error {
 		err = ErrClosedPipe
 	}
 	p.rerr.Store(err)
-	p.once.Do(func() { close(p.done) })
+	p.once.Do(func { close(p.done) })
 	return nil
 }
 
@@ -109,7 +109,7 @@ func (p *pipe) CloseWrite(err error) error {
 		err = EOF
 	}
 	p.werr.Store(err)
-	p.once.Do(func() { close(p.done) })
+	p.once.Do(func { close(p.done) })
 	return nil
 }
 

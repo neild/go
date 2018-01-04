@@ -30,7 +30,7 @@ var cftypeFix = fix{
 // and similar for other CF*Ref types.
 // This fix finds nils initializing these types and replaces the nils with 0s.
 func cftypefix(f *ast.File) bool {
-	return typefix(f, func(s string) bool {
+	return typefix(f, func s {
 		return strings.HasPrefix(s, "C.CF") && strings.HasSuffix(s, "Ref")
 	})
 }
@@ -45,7 +45,7 @@ func typefix(f *ast.File, badType func(string) bool) bool {
 	// step 1: Find all the nils with the offending types.
 	// Compute their replacement.
 	badNils := map[interface{}]ast.Expr{}
-	walk(f, func(n interface{}) {
+	walk(f, func n {
 		if i, ok := n.(*ast.Ident); ok && i.Name == "nil" && badType(typeof[n]) {
 			badNils[n] = &ast.BasicLit{ValuePos: i.NamePos, Kind: token.INT, Value: "0"}
 		}
@@ -59,7 +59,7 @@ func typefix(f *ast.File, badType func(string) bool) bool {
 	// we use reflect to find all such references.
 	exprType := reflect.TypeOf((*ast.Expr)(nil)).Elem()
 	exprSliceType := reflect.TypeOf(([]ast.Expr)(nil))
-	walk(f, func(n interface{}) {
+	walk(f, func n {
 		if n == nil {
 			return
 		}

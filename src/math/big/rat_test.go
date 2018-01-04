@@ -41,7 +41,7 @@ func TestZeroRat(t *testing.T) {
 	}
 
 	// check for division by zero
-	defer func() {
+	defer func {
 		if s := recover(); s == nil || s.(string) != "division by zero" {
 			panic(s)
 		}

@@ -947,7 +947,7 @@ func http2configureTransport(t1 *Transport) (*http2Transport, error) {
 	if !http2strSliceContains(t1.TLSClientConfig.NextProtos, "http/1.1") {
 		t1.TLSClientConfig.NextProtos = append(t1.TLSClientConfig.NextProtos, "http/1.1")
 	}
-	upgradeFn := func(authority string, c *tls.Conn) RoundTripper {
+	upgradeFn := func authority, c {
 		addr := http2authorityAddr("https", authority)
 		if used, err := connPool.addConnIfNeeded(addr, t2, c); err != nil {
 			go c.Close()
@@ -974,7 +974,7 @@ func http2configureTransport(t1 *Transport) (*http2Transport, error) {
 // registerHTTPSProtocol calls Transport.RegisterProtocol but
 // converting panics into errors.
 func http2registerHTTPSProtocol(t *Transport, rt RoundTripper) (err error) {
-	defer func() {
+	defer func {
 		if e := recover(); e != nil {
 			err = fmt.Errorf("%v", e)
 		}
@@ -1014,11 +1014,11 @@ var (
 		16 << 10,
 	}
 	http2dataChunkPools = [...]sync.Pool{
-		{New: func() interface{} { return make([]byte, 1<<10) }},
-		{New: func() interface{} { return make([]byte, 2<<10) }},
-		{New: func() interface{} { return make([]byte, 4<<10) }},
-		{New: func() interface{} { return make([]byte, 8<<10) }},
-		{New: func() interface{} { return make([]byte, 16<<10) }},
+		{New: func { return make([]byte, 1<<10) }},
+		{New: func { return make([]byte, 2<<10) }},
+		{New: func { return make([]byte, 4<<10) }},
+		{New: func { return make([]byte, 8<<10) }},
+		{New: func { return make([]byte, 16<<10) }},
 	}
 )
 
@@ -1499,7 +1499,7 @@ func (h *http2FrameHeader) invalidate() { h.valid = false }
 // frame header bytes.
 // Used only by ReadFrameHeader.
 var http2fhBytes = sync.Pool{
-	New: func() interface{} {
+	New: func {
 		buf := make([]byte, http2frameHeaderLen)
 		return &buf
 	},
@@ -1714,7 +1714,7 @@ func http2NewFramer(w io.Writer, r io.Reader) *http2Framer {
 		debugReadLoggerf:  log.Printf,
 		debugWriteLoggerf: log.Printf,
 	}
-	fr.getReadBuf = func(size uint32) []byte {
+	fr.getReadBuf = func size {
 		if cap(fr.readBuf) >= int(size) {
 			return fr.readBuf[:size]
 		}
@@ -2741,7 +2741,7 @@ func (fr *http2Framer) readMetaFrame(hf *http2HeadersFrame) (*http2MetaHeadersFr
 	hdec := fr.ReadMetaHeaders
 	hdec.SetEmitEnabled(true)
 	hdec.SetMaxStringLength(fr.maxHeaderStringLen())
-	hdec.SetEmitFunc(func(hf hpack.HeaderField) {
+	hdec.SetEmitFunc(func hf {
 		if http2VerboseLogs && fr.logReads {
 			fr.debugReadLoggerf("http2: decoded hpack field %+v", hf)
 		}
@@ -2776,7 +2776,7 @@ func (fr *http2Framer) readMetaFrame(hf *http2HeadersFrame) (*http2MetaHeadersFr
 		mh.Fields = append(mh.Fields, hf)
 	})
 	// Lose reference to MetaHeadersFrame:
-	defer hdec.SetEmitFunc(func(hf hpack.HeaderField) {})
+	defer hdec.SetEmitFunc(func hf {})
 
 	var hc http2headersOrContinuation = hf
 	for {
@@ -2824,7 +2824,7 @@ func http2summarizeFrame(f http2Frame) string {
 	switch f := f.(type) {
 	case *http2SettingsFrame:
 		n := 0
-		f.ForeachSetting(func(s http2Setting) error {
+		f.ForeachSetting(func s {
 			n++
 			if n == 1 {
 				buf.WriteString(", settings:")
@@ -3055,7 +3055,7 @@ func http2curGoroutineID() uint64 {
 }
 
 var http2littleBuf = sync.Pool{
-	New: func() interface{} {
+	New: func {
 		buf := make([]byte, 64)
 		return &buf
 	},
@@ -3464,7 +3464,7 @@ func http2newBufferedWriter(w io.Writer) *http2bufferedWriter {
 const http2bufWriterPoolBufferSize = 4 << 10
 
 var http2bufWriterPool = sync.Pool{
-	New: func() interface{} {
+	New: func {
 		return bufio.NewWriterSize(nil, http2bufWriterPoolBufferSize)
 	},
 }
@@ -3535,7 +3535,7 @@ type http2connectionStater interface {
 	ConnectionState() tls.ConnectionState
 }
 
-var http2sorterPool = sync.Pool{New: func() interface{} { return new(http2sorter) }}
+var http2sorterPool = sync.Pool{New: func { return new(http2sorter) }}
 
 type http2sorter struct {
 	v []string // owned by sorter
@@ -3754,7 +3754,7 @@ var (
 )
 
 var http2responseWriterStatePool = sync.Pool{
-	New: func() interface{} {
+	New: func {
 		rws := &http2responseWriterState{}
 		rws.bw = bufio.NewWriterSize(http2chunkWriter{rws}, http2handlerChunkWriteSize)
 		return rws
@@ -3955,7 +3955,7 @@ func http2ConfigureServer(s *Server, conf *http2Server) error {
 	if s.TLSNextProto == nil {
 		s.TLSNextProto = map[string]func(*Server, *tls.Conn, Handler){}
 	}
-	protoHandler := func(hs *Server, c *tls.Conn, h Handler) {
+	protoHandler := func hs, c, h {
 		if http2testHookOnConn != nil {
 			http2testHookOnConn()
 		}
@@ -4599,7 +4599,7 @@ var http2errPrefaceTimeout = errors.New("timeout waiting for client preface")
 // is invalid.
 func (sc *http2serverConn) readPreface() error {
 	errc := make(chan error, 1)
-	go func() {
+	go func {
 		// Read the client preface
 		buf := make([]byte, len(http2ClientPreface))
 		if _, err := io.ReadFull(sc.conn, buf); err != nil {
@@ -4626,11 +4626,11 @@ func (sc *http2serverConn) readPreface() error {
 }
 
 var http2errChanPool = sync.Pool{
-	New: func() interface{} { return make(chan error, 1) },
+	New: func { return make(chan error, 1) },
 }
 
 var http2writeDataPool = sync.Pool{
-	New: func() interface{} { return new(http2writeData) },
+	New: func { return new(http2writeData) },
 }
 
 // writeDataFromHandler writes DATA response frames from a handler on
@@ -4921,7 +4921,7 @@ func (sc *http2serverConn) scheduleFrameWrite() {
 // the connection has shut down.
 func (sc *http2serverConn) startGracefulShutdown() {
 	sc.serveG.checkNotOn() // NOT
-	sc.shutdownOnce.Do(func() { sc.sendServeMsg(http2gracefulShutdownMsg) })
+	sc.shutdownOnce.Do(func { sc.sendServeMsg(http2gracefulShutdownMsg) })
 }
 
 // After sending GOAWAY, the connection will close after goAwayTimeout.
@@ -5738,7 +5738,7 @@ func (sc *http2serverConn) newWriterAndRequestNoBody(st *http2stream, rp http2re
 // Run on its own goroutine.
 func (sc *http2serverConn) runHandler(rw *http2responseWriter, req *Request, handler func(ResponseWriter, *Request)) {
 	didPanic := true
-	defer func() {
+	defer func {
 		rw.rws.stream.cancelCtx()
 		if didPanic {
 			e := recover()
@@ -6165,7 +6165,7 @@ func (w *http2responseWriter) CloseNotify() <-chan bool {
 		ch = make(chan bool, 1)
 		rws.closeNotifierCh = ch
 		cw := rws.stream.cw
-		go func() {
+		go func {
 			cw.Wait() // wait for close
 			ch <- true
 		}()
@@ -6425,7 +6425,7 @@ func (sc *http2serverConn) startPush(msg *http2startPushRequest) {
 	// PUSH_PROMISE frames must be sent in increasing order by stream ID, so
 	// we allocate an ID for the promised stream lazily, when the PUSH_PROMISE
 	// is written. Once the ID is allocated, we start the request handler.
-	allocatePromisedID := func() (uint32, error) {
+	allocatePromisedID := func {
 		sc.serveG.check()
 
 		// Check this again, just in case. Technically, we might have received
@@ -6528,7 +6528,7 @@ func http2checkValidHTTP2RequestHeaders(h Header) error {
 }
 
 func http2new400Handler(err error) HandlerFunc {
-	return func(w ResponseWriter, r *Request) {
+	return func w, r {
 		Error(w, err.Error(), StatusBadRequest)
 	}
 }
@@ -7394,7 +7394,7 @@ func (cc *http2ClientConn) roundTrip(req *Request) (res *Response, gotErrAfterRe
 	bodyWritten := false
 	ctx := http2reqContext(req)
 
-	handleReadLoopResponse := func(re http2resAndError) (*Response, bool, error) {
+	handleReadLoopResponse := func re {
 		res := re.res
 		if re.err != nil || res.StatusCode > 299 {
 			// On error or status code 3xx, 4xx, 5xx, etc abort any
@@ -7495,7 +7495,7 @@ func (cc *http2ClientConn) awaitOpenSlotForRequest(req *Request) error {
 		// request is canceled while we wait for a slot to open in the connection.
 		if waitingForConn == nil {
 			waitingForConn = make(chan struct{})
-			go func() {
+			go func {
 				if err := http2awaitRequestCancel(req, waitingForConn); err != nil {
 					cc.mu.Lock()
 					waitingForConnErr = err
@@ -7558,7 +7558,7 @@ func (cs *http2clientStream) writeRequestBody(body io.Reader, bodyCloser io.Clos
 	buf := cc.frameScratchBuffer()
 	defer cc.putFrameScratchBuffer(buf)
 
-	defer func() {
+	defer func {
 		http2traceWroteRequest(cs.trace, err)
 		// TODO: write h12Compare test showing whether
 		// Request.Body is closed by the Transport,
@@ -7740,7 +7740,7 @@ func (cc *http2ClientConn) encodeHeaders(req *Request, addGzipHeader bool, trail
 		}
 	}
 
-	enumerateHeaders := func(f func(name, value string)) {
+	enumerateHeaders := func f {
 		// 8.1.2.3 Request Pseudo-Header Fields
 		// The :path pseudo-header field includes the path and query parts of the
 		// target URI (the path-absolute production and optionally a '?' character
@@ -7806,7 +7806,7 @@ func (cc *http2ClientConn) encodeHeaders(req *Request, addGzipHeader bool, trail
 	// separate pass before encoding the headers to prevent
 	// modifying the hpack state.
 	hlSize := uint64(0)
-	enumerateHeaders(func(name, value string) {
+	enumerateHeaders(func name, value {
 		hf := hpack.HeaderField{Name: name, Value: value}
 		hlSize += uint64(hf.Size())
 	})
@@ -7816,7 +7816,7 @@ func (cc *http2ClientConn) encodeHeaders(req *Request, addGzipHeader bool, trail
 	}
 
 	// Header list size is ok. Write the headers.
-	enumerateHeaders(func(name, value string) {
+	enumerateHeaders(func name, value {
 		cc.writeHeader(strings.ToLower(name), value)
 	})
 
@@ -8180,7 +8180,7 @@ func (rl *http2clientConnReadLoop) handleResponse(cs *http2clientStream, f *http
 				t = make(Header)
 				res.Trailer = t
 			}
-			http2foreachHeaderElement(hf.Value, func(v string) {
+			http2foreachHeaderElement(hf.Value, func v {
 				t[CanonicalHeaderKey(v)] = nil
 			})
 		} else {
@@ -8508,7 +8508,7 @@ func (rl *http2clientConnReadLoop) processSettings(f *http2SettingsFrame) error 
 		return http2ConnectionError(http2ErrCodeProtocol)
 	}
 
-	err := f.ForeachSetting(func(s http2Setting) error {
+	err := f.ForeachSetting(func s {
 		switch s.ID {
 		case http2SettingMaxFrameSize:
 			cc.maxFrameSize = s.Val
@@ -8767,7 +8767,7 @@ func (t *http2Transport) getBodyWriterState(cs *http2clientStream, body io.Reade
 	}
 	resc := make(chan error, 1)
 	s.resc = resc
-	s.fn = func() {
+	s.fn = func {
 		cs.cc.mu.Lock()
 		cs.startedWrite = true
 		cs.cc.mu.Unlock()
@@ -8788,7 +8788,7 @@ func (t *http2Transport) getBodyWriterState(cs *http2clientStream, body io.Reade
 	// s.delay value is defined to not start until after the
 	// request headers were written.
 	const hugeDuration = 365 * 24 * time.Hour
-	s.timer = time.AfterFunc(hugeDuration, func() {
+	s.timer = time.AfterFunc(hugeDuration, func {
 		s.fnonce.Do(s.fn)
 	})
 	return
@@ -8807,7 +8807,7 @@ func (s http2bodyWriterState) on100() {
 		return
 	}
 	s.timer.Stop()
-	go func() { s.fnonce.Do(s.fn) }()
+	go func { s.fnonce.Do(s.fn) }()
 }
 
 // scheduleBodyWrite starts writing the body, either immediately (in
@@ -9816,7 +9816,7 @@ func (ws *http2priorityWriteScheduler) Push(wr http2FrameWriteRequest) {
 }
 
 func (ws *http2priorityWriteScheduler) Pop() (wr http2FrameWriteRequest, ok bool) {
-	ws.root.walkReadyInOrder(false, &ws.tmp, func(n *http2priorityNode, openParent bool) bool {
+	ws.root.walkReadyInOrder(false, &ws.tmp, func n, openParent {
 		limit := int32(math.MaxInt32)
 		if openParent {
 			limit = ws.writeThrottleLimit

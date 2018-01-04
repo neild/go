@@ -58,7 +58,7 @@ func lookupUser(username string) (*User, error) {
 	buf := alloc(userBuffer)
 	defer buf.free()
 
-	err := retryWithBuffer(buf, func() syscall.Errno {
+	err := retryWithBuffer(buf, func {
 		// mygetpwnam_r is a wrapper around getpwnam_r to avoid
 		// passing a size_t to getpwnam_r, because for unknown
 		// reasons passing a size_t to getpwnam_r doesn't work on
@@ -93,7 +93,7 @@ func lookupUnixUid(uid int) (*User, error) {
 	buf := alloc(userBuffer)
 	defer buf.free()
 
-	err := retryWithBuffer(buf, func() syscall.Errno {
+	err := retryWithBuffer(buf, func {
 		// mygetpwuid_r is a wrapper around getpwuid_r to
 		// to avoid using uid_t because C.uid_t(uid) for
 		// unknown reasons doesn't work on linux.
@@ -143,7 +143,7 @@ func lookupGroup(groupname string) (*Group, error) {
 	cname := make([]byte, len(groupname)+1)
 	copy(cname, groupname)
 
-	err := retryWithBuffer(buf, func() syscall.Errno {
+	err := retryWithBuffer(buf, func {
 		return syscall.Errno(C.mygetgrnam_r((*C.char)(unsafe.Pointer(&cname[0])),
 			&grp,
 			(*C.char)(buf.ptr),
@@ -174,7 +174,7 @@ func lookupUnixGid(gid int) (*Group, error) {
 	buf := alloc(groupBuffer)
 	defer buf.free()
 
-	err := retryWithBuffer(buf, func() syscall.Errno {
+	err := retryWithBuffer(buf, func {
 		// mygetgrgid_r is a wrapper around getgrgid_r to
 		// to avoid using gid_t because C.gid_t(gid) for
 		// unknown reasons doesn't work on linux.

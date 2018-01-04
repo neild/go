@@ -199,7 +199,7 @@ func parseFiles(dir string, filenames []string) ([]*ast.File, error) {
 	var wg sync.WaitGroup
 	for i, filename := range filenames {
 		wg.Add(1)
-		go func(i int, filepath string) {
+		go func i, filepath {
 			defer wg.Done()
 			files[i], errors[i] = parse(filepath, nil)
 		}(i, filepath.Join(dir, filename))
@@ -269,7 +269,7 @@ func checkPkgFiles(files []*ast.File) {
 	// if checkPkgFiles is called multiple times, set up conf only once
 	conf := types.Config{
 		FakeImportC: true,
-		Error: func(err error) {
+		Error: func err {
 			if !*allErrors && errorCount >= 10 {
 				panic(bailout{})
 			}
@@ -279,7 +279,7 @@ func checkPkgFiles(files []*ast.File) {
 		Sizes:    types.SizesFor(build.Default.Compiler, build.Default.GOARCH),
 	}
 
-	defer func() {
+	defer func {
 		switch p := recover().(type) {
 		case nil, bailout:
 			// normal return or early exit
@@ -296,7 +296,7 @@ func checkPkgFiles(files []*ast.File) {
 func printStats(d time.Duration) {
 	fileCount := 0
 	lineCount := 0
-	fset.Iterate(func(f *token.File) bool {
+	fset.Iterate(func f {
 		fileCount++
 		lineCount += f.LineCount()
 		return true

@@ -336,7 +336,7 @@ func blocks(text string) []block {
 		lastWasHeading = false
 	)
 
-	close := func() {
+	close := func {
 		if para != nil {
 			out = append(out, block{opPara, para})
 			para = nil

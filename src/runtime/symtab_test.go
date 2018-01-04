@@ -14,13 +14,13 @@ func TestCaller(t *testing.T) {
 	procs := runtime.GOMAXPROCS(-1)
 	c := make(chan bool, procs)
 	for p := 0; p < procs; p++ {
-		go func() {
+		go func {
 			for i := 0; i < 1000; i++ {
 				testCallerFoo(t)
 			}
 			c <- true
 		}()
-		defer func() {
+		defer func {
 			<-c
 		}()
 	}
@@ -156,7 +156,7 @@ func TestLineNumber(t *testing.T) {
 }
 
 func TestNilName(t *testing.T) {
-	defer func() {
+	defer func {
 		if ex := recover(); ex != nil {
 			t.Fatalf("expected no nil panic, got=%v", ex)
 		}

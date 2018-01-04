@@ -100,7 +100,7 @@ func (ctxt *Link) LookupInit(name string, init func(s *LSym)) *LSym {
 func (ctxt *Link) Float32Sym(f float32) *LSym {
 	i := math.Float32bits(f)
 	name := fmt.Sprintf("$f32.%08x", i)
-	return ctxt.LookupInit(name, func(s *LSym) {
+	return ctxt.LookupInit(name, func s {
 		s.Size = 4
 		s.Set(AttrLocal, true)
 	})
@@ -109,7 +109,7 @@ func (ctxt *Link) Float32Sym(f float32) *LSym {
 func (ctxt *Link) Float64Sym(f float64) *LSym {
 	i := math.Float64bits(f)
 	name := fmt.Sprintf("$f64.%016x", i)
-	return ctxt.LookupInit(name, func(s *LSym) {
+	return ctxt.LookupInit(name, func s {
 		s.Size = 8
 		s.Set(AttrLocal, true)
 	})
@@ -117,7 +117,7 @@ func (ctxt *Link) Float64Sym(f float64) *LSym {
 
 func (ctxt *Link) Int64Sym(i int64) *LSym {
 	name := fmt.Sprintf("$i64.%016x", uint64(i))
-	return ctxt.LookupInit(name, func(s *LSym) {
+	return ctxt.LookupInit(name, func s {
 		s.Size = 8
 		s.Set(AttrLocal, true)
 	})

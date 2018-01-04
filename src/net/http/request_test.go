@@ -234,7 +234,7 @@ func TestRedirect_h1(t *testing.T) { testRedirect(t, h1Mode) }
 func TestRedirect_h2(t *testing.T) { testRedirect(t, h2Mode) }
 func testRedirect(t *testing.T, h2 bool) {
 	defer afterTest(t)
-	cst := newClientServerTest(t, h2, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, h2, HandlerFunc(func w, r {
 		switch r.URL.Path {
 		case "/":
 			w.Header().Set("Location", "/foo/")
@@ -287,7 +287,7 @@ func TestMultipartRequestAuto(t *testing.T) {
 	// Test that FormValue and FormFile automatically invoke
 	// ParseMultipartForm and return the right values.
 	req := newTestMultipartRequest(t)
-	defer func() {
+	defer func {
 		if req.MultipartForm != nil {
 			req.MultipartForm.RemoveAll()
 		}
@@ -486,7 +486,7 @@ func TestRequestInvalidMethod(t *testing.T) {
 }
 
 func TestNewRequestContentLength(t *testing.T) {
-	readByte := func(r io.Reader) io.Reader {
+	readByte := func r {
 		var b [1]byte
 		r.Read(b[:])
 		return r
@@ -749,7 +749,7 @@ func TestIssue10884_MaxBytesEOF(t *testing.T) {
 // Issue 14981: MaxBytesReader's return error wasn't sticky. It
 // doesn't technically need to be, but people expected it to be.
 func TestMaxBytesReaderStickyError(t *testing.T) {
-	isSticky := func(r io.Reader) error {
+	isSticky := func r {
 		var log bytes.Buffer
 		buf := make([]byte, 1000)
 		var firstErr error
@@ -884,7 +884,7 @@ func validateTestMultipartContents(t *testing.T, req *Request, allMem bool) {
 		t.Errorf("missing value = %q, want empty string", g)
 	}
 
-	assertMem := func(n string, fd multipart.File) {
+	assertMem := func n, fd {
 		if _, ok := fd.(*os.File); ok {
 			t.Error(n, " is *os.File, should not be")
 		}

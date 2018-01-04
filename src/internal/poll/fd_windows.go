@@ -481,7 +481,7 @@ func (fd *FD) Read(buf []byte) (int, error) {
 	} else {
 		o := &fd.rop
 		o.InitBuf(buf)
-		n, err = rsrv.ExecIO(o, func(o *operation) error {
+		n, err = rsrv.ExecIO(o, func o {
 			return syscall.WSARecv(o.fd.Sysfd, &o.buf, 1, &o.qty, &o.flags, &o.o, nil)
 		})
 		if race.Enabled {
@@ -614,7 +614,7 @@ func (fd *FD) ReadFrom(buf []byte) (int, syscall.Sockaddr, error) {
 	defer fd.readUnlock()
 	o := &fd.rop
 	o.InitBuf(buf)
-	n, err := rsrv.ExecIO(o, func(o *operation) error {
+	n, err := rsrv.ExecIO(o, func o {
 		if o.rsa == nil {
 			o.rsa = new(syscall.RawSockaddrAny)
 		}
@@ -655,7 +655,7 @@ func (fd *FD) Write(buf []byte) (int, error) {
 		}
 		o := &fd.wop
 		o.InitBuf(buf)
-		n, err = wsrv.ExecIO(o, func(o *operation) error {
+		n, err = wsrv.ExecIO(o, func o {
 			return syscall.WSASend(o.fd.Sysfd, &o.buf, 1, &o.qty, 0, &o.o, nil)
 		})
 	}
@@ -747,7 +747,7 @@ func (fd *FD) Writev(buf *[][]byte) (int64, error) {
 	}
 	o := &fd.wop
 	o.InitBufs(buf)
-	n, err := wsrv.ExecIO(o, func(o *operation) error {
+	n, err := wsrv.ExecIO(o, func o {
 		return syscall.WSASend(o.fd.Sysfd, &o.bufs[0], uint32(len(o.bufs)), &o.qty, 0, &o.o, nil)
 	})
 	o.ClearBufs()
@@ -768,7 +768,7 @@ func (fd *FD) WriteTo(buf []byte, sa syscall.Sockaddr) (int, error) {
 	o := &fd.wop
 	o.InitBuf(buf)
 	o.sa = sa
-	n, err := wsrv.ExecIO(o, func(o *operation) error {
+	n, err := wsrv.ExecIO(o, func o {
 		return syscall.WSASendto(o.fd.Sysfd, &o.buf, 1, &o.qty, 0, o.sa, &o.o, nil)
 	})
 	return n, err
@@ -780,7 +780,7 @@ func (fd *FD) WriteTo(buf []byte, sa syscall.Sockaddr) (int, error) {
 func (fd *FD) ConnectEx(ra syscall.Sockaddr) error {
 	o := &fd.wop
 	o.sa = ra
-	_, err := wsrv.ExecIO(o, func(o *operation) error {
+	_, err := wsrv.ExecIO(o, func o {
 		return ConnectExFunc(o.fd.Sysfd, o.sa, nil, 0, nil, &o.o)
 	})
 	return err
@@ -790,7 +790,7 @@ func (fd *FD) acceptOne(s syscall.Handle, rawsa []syscall.RawSockaddrAny, o *ope
 	// Submit accept request.
 	o.handle = s
 	o.rsan = int32(unsafe.Sizeof(rawsa[0]))
-	_, err := rsrv.ExecIO(o, func(o *operation) error {
+	_, err := rsrv.ExecIO(o, func o {
 		return AcceptFunc(o.fd.Sysfd, o.handle, (*byte)(unsafe.Pointer(&rawsa[0])), 0, uint32(o.rsan), uint32(o.rsan), &o.qty, &o.o)
 	})
 	if err != nil {
@@ -957,7 +957,7 @@ func (fd *FD) ReadMsg(p []byte, oob []byte) (int, int, int, syscall.Sockaddr, er
 	o.rsa = new(syscall.RawSockaddrAny)
 	o.msg.Name = o.rsa
 	o.msg.Namelen = int32(unsafe.Sizeof(*o.rsa))
-	n, err := rsrv.ExecIO(o, func(o *operation) error {
+	n, err := rsrv.ExecIO(o, func o {
 		return windows.WSARecvMsg(o.fd.Sysfd, &o.msg, &o.qty, &o.o, nil)
 	})
 	err = fd.eofError(n, err)
@@ -985,7 +985,7 @@ func (fd *FD) WriteMsg(p []byte, oob []byte, sa syscall.Sockaddr) (int, int, err
 		o.msg.Name = (*syscall.RawSockaddrAny)(rsa)
 		o.msg.Namelen = len
 	}
-	n, err := wsrv.ExecIO(o, func(o *operation) error {
+	n, err := wsrv.ExecIO(o, func o {
 		return windows.WSASendMsg(o.fd.Sysfd, &o.msg, 0, &o.qty, &o.o, nil)
 	})
 	return n, int(o.msg.Control.Len), err

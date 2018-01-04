@@ -91,7 +91,7 @@ type localServer struct {
 }
 
 func (ls *localServer) buildup(handler func(*localServer, Listener)) error {
-	go func() {
+	go func {
 		handler(ls, ls.Listener)
 		close(ls.done)
 	}()
@@ -144,7 +144,7 @@ type dualStackServer struct {
 
 func (dss *dualStackServer) buildup(handler func(*dualStackServer, Listener)) error {
 	for i := range dss.lns {
-		go func(i int) {
+		go func i {
 			handler(dss, dss.lns[i].Listener)
 			close(dss.lns[i].done)
 		}(i)
@@ -284,7 +284,7 @@ func transceiver(c Conn, wb []byte, ch chan<- error) {
 
 func timeoutReceiver(c Conn, d, min, max time.Duration, ch chan<- error) {
 	var err error
-	defer func() { ch <- err }()
+	defer func { ch <- err }()
 
 	t0 := time.Now()
 	if err = c.SetReadDeadline(time.Now().Add(d)); err != nil {
@@ -306,7 +306,7 @@ func timeoutReceiver(c Conn, d, min, max time.Duration, ch chan<- error) {
 
 func timeoutTransmitter(c Conn, d, min, max time.Duration, ch chan<- error) {
 	var err error
-	defer func() { ch <- err }()
+	defer func { ch <- err }()
 
 	t0 := time.Now()
 	if err = c.SetWriteDeadline(time.Now().Add(d)); err != nil {
@@ -391,7 +391,7 @@ type localPacketServer struct {
 }
 
 func (ls *localPacketServer) buildup(handler func(*localPacketServer, PacketConn)) error {
-	go func() {
+	go func {
 		handler(ls, ls.PacketConn)
 		close(ls.done)
 	}()
@@ -502,7 +502,7 @@ func packetTransceiver(c PacketConn, wb []byte, dst Addr, ch chan<- error) {
 
 func timeoutPacketReceiver(c PacketConn, d, min, max time.Duration, ch chan<- error) {
 	var err error
-	defer func() { ch <- err }()
+	defer func { ch <- err }()
 
 	t0 := time.Now()
 	if err = c.SetReadDeadline(time.Now().Add(d)); err != nil {

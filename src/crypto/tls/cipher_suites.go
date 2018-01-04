@@ -298,7 +298,7 @@ func (c *cthWrapper) Write(p []byte) (int, error) { return c.h.Write(p) }
 func (c *cthWrapper) Sum(b []byte) []byte         { return c.h.ConstantTimeSum(b) }
 
 func newConstantTimeHash(h func() hash.Hash) func() hash.Hash {
-	return func() hash.Hash {
+	return func {
 		return &cthWrapper{h().(constantTimeHash)}
 	}
 }

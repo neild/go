@@ -560,7 +560,7 @@ func TestEncodedDecodedLen(t *testing.T) {
 			{11, 18, 11},
 		}},
 	} {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.name, func t {
 			for _, tc := range test.cases {
 				encLen := test.enc.EncodedLen(tc.in)
 				decLen := test.enc.DecodedLen(encLen)

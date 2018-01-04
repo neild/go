@@ -72,7 +72,7 @@ func TestDictDecoder(t *testing.T) {
 	var dd dictDecoder
 	dd.init(1<<11, nil)
 
-	var writeCopy = func(dist, length int) {
+	var writeCopy = func dist, length {
 		for length > 0 {
 			cnt := dd.tryWriteCopy(dist, length)
 			if cnt == 0 {
@@ -85,7 +85,7 @@ func TestDictDecoder(t *testing.T) {
 			}
 		}
 	}
-	var writeString = func(str string) {
+	var writeString = func str {
 		for len(str) > 0 {
 			cnt := copy(dd.writeSlice(), str)
 			str = str[cnt:]

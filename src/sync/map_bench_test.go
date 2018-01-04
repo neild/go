@@ -19,7 +19,7 @@ type bench struct {
 
 func benchMap(b *testing.B, bench bench) {
 	for _, m := range [...]mapInterface{&DeepCopyMap{}, &RWMutexMap{}, &sync.Map{}} {
-		b.Run(fmt.Sprintf("%T", m), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%T", m), func b {
 			m = reflect.New(reflect.TypeOf(m).Elem()).Interface().(mapInterface)
 			if bench.setup != nil {
 				bench.setup(b, m)
@@ -28,7 +28,7 @@ func benchMap(b *testing.B, bench bench) {
 			b.ResetTimer()
 
 			var i int64
-			b.RunParallel(func(pb *testing.PB) {
+			b.RunParallel(func pb {
 				id := int(atomic.AddInt64(&i, 1) - 1)
 				bench.perG(b, pb, id*b.N, m)
 			})
@@ -40,7 +40,7 @@ func BenchmarkLoadMostlyHits(b *testing.B) {
 	const hits, misses = 1023, 1
 
 	benchMap(b, bench{
-		setup: func(_ *testing.B, m mapInterface) {
+		setup: func _, m {
 			for i := 0; i < hits; i++ {
 				m.LoadOrStore(i, i)
 			}
@@ -50,7 +50,7 @@ func BenchmarkLoadMostlyHits(b *testing.B) {
 			}
 		},
 
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			for ; pb.Next(); i++ {
 				m.Load(i % (hits + misses))
 			}
@@ -62,7 +62,7 @@ func BenchmarkLoadMostlyMisses(b *testing.B) {
 	const hits, misses = 1, 1023
 
 	benchMap(b, bench{
-		setup: func(_ *testing.B, m mapInterface) {
+		setup: func _, m {
 			for i := 0; i < hits; i++ {
 				m.LoadOrStore(i, i)
 			}
@@ -72,7 +72,7 @@ func BenchmarkLoadMostlyMisses(b *testing.B) {
 			}
 		},
 
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			for ; pb.Next(); i++ {
 				m.Load(i % (hits + misses))
 			}
@@ -84,7 +84,7 @@ func BenchmarkLoadOrStoreBalanced(b *testing.B) {
 	const hits, misses = 128, 128
 
 	benchMap(b, bench{
-		setup: func(b *testing.B, m mapInterface) {
+		setup: func b, m {
 			if _, ok := m.(*DeepCopyMap); ok {
 				b.Skip("DeepCopyMap has quadratic running time.")
 			}
@@ -97,7 +97,7 @@ func BenchmarkLoadOrStoreBalanced(b *testing.B) {
 			}
 		},
 
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			for ; pb.Next(); i++ {
 				j := i % (hits + misses)
 				if j < hits {
@@ -116,13 +116,13 @@ func BenchmarkLoadOrStoreBalanced(b *testing.B) {
 
 func BenchmarkLoadOrStoreUnique(b *testing.B) {
 	benchMap(b, bench{
-		setup: func(b *testing.B, m mapInterface) {
+		setup: func b, m {
 			if _, ok := m.(*DeepCopyMap); ok {
 				b.Skip("DeepCopyMap has quadratic running time.")
 			}
 		},
 
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			for ; pb.Next(); i++ {
 				m.LoadOrStore(i, i)
 			}
@@ -132,11 +132,11 @@ func BenchmarkLoadOrStoreUnique(b *testing.B) {
 
 func BenchmarkLoadOrStoreCollision(b *testing.B) {
 	benchMap(b, bench{
-		setup: func(_ *testing.B, m mapInterface) {
+		setup: func _, m {
 			m.LoadOrStore(0, 0)
 		},
 
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			for ; pb.Next(); i++ {
 				m.LoadOrStore(0, 0)
 			}
@@ -148,15 +148,15 @@ func BenchmarkRange(b *testing.B) {
 	const mapSize = 1 << 10
 
 	benchMap(b, bench{
-		setup: func(_ *testing.B, m mapInterface) {
+		setup: func _, m {
 			for i := 0; i < mapSize; i++ {
 				m.Store(i, i)
 			}
 		},
 
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			for ; pb.Next(); i++ {
-				m.Range(func(_, _ interface{}) bool { return true })
+				m.Range(func _, _ { return true })
 			}
 		},
 	})
@@ -169,7 +169,7 @@ func BenchmarkRange(b *testing.B) {
 // This forces the Load calls to always acquire the map's mutex.
 func BenchmarkAdversarialAlloc(b *testing.B) {
 	benchMap(b, bench{
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			var stores, loadsSinceStore int64
 			for ; pb.Next(); i++ {
 				m.Load(i)
@@ -192,18 +192,18 @@ func BenchmarkAdversarialDelete(b *testing.B) {
 	const mapSize = 1 << 10
 
 	benchMap(b, bench{
-		setup: func(_ *testing.B, m mapInterface) {
+		setup: func _, m {
 			for i := 0; i < mapSize; i++ {
 				m.Store(i, i)
 			}
 		},
 
-		perG: func(b *testing.B, pb *testing.PB, i int, m mapInterface) {
+		perG: func b, pb, i, m {
 			for ; pb.Next(); i++ {
 				m.Load(i)
 
 				if i%mapSize == 0 {
-					m.Range(func(k, _ interface{}) bool {
+					m.Range(func k, _ {
 						m.Delete(k)
 						return false
 					})

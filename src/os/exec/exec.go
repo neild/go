@@ -180,7 +180,7 @@ func CommandContext(ctx context.Context, name string, arg ...string) *Cmd {
 // interfaceEqual protects against panics from doing equality tests on
 // two interfaces with non-comparable underlying types.
 func interfaceEqual(a, b interface{}) bool {
-	defer func() {
+	defer func {
 		recover()
 	}()
 	return a == b
@@ -226,7 +226,7 @@ func (c *Cmd) stdin() (f *os.File, err error) {
 
 	c.closeAfterStart = append(c.closeAfterStart, pr)
 	c.closeAfterWait = append(c.closeAfterWait, pw)
-	c.goroutine = append(c.goroutine, func() error {
+	c.goroutine = append(c.goroutine, func {
 		_, err := io.Copy(pw, c.Stdin)
 		if skip := skipStdinCopyError; skip != nil && skip(err) {
 			err = nil
@@ -271,7 +271,7 @@ func (c *Cmd) writerDescriptor(w io.Writer) (f *os.File, err error) {
 
 	c.closeAfterStart = append(c.closeAfterStart, pw)
 	c.closeAfterWait = append(c.closeAfterWait, pr)
-	c.goroutine = append(c.goroutine, func() error {
+	c.goroutine = append(c.goroutine, func {
 		_, err := io.Copy(w, pr)
 		pr.Close() // in case io.Copy stopped due to write error
 		return err
@@ -387,14 +387,14 @@ func (c *Cmd) Start() error {
 
 	c.errch = make(chan error, len(c.goroutine))
 	for _, fn := range c.goroutine {
-		go func(fn func() error) {
+		go func fn {
 			c.errch <- fn()
 		}(fn)
 	}
 
 	if c.ctx != nil {
 		c.waitDone = make(chan struct{})
-		go func() {
+		go func {
 			select {
 			case <-c.ctx.Done():
 				c.Process.Kill()

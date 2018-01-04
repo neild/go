@@ -35,15 +35,15 @@ func TestReadUnixgramWithUnnamedSocket(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		c.Close()
 		os.Remove(addr)
 	}()
 
 	off := make(chan bool)
 	data := [5]byte{1, 2, 3, 4, 5}
-	go func() {
-		defer func() { off <- true }()
+	go func {
+		defer func { off <- true }()
 		s, err := syscall.Socket(syscall.AF_UNIX, syscall.SOCK_DGRAM, 0)
 		if err != nil {
 			t.Error(err)
@@ -248,7 +248,7 @@ func TestUnixConnLocalAndRemoteNames(t *testing.T) {
 		t.Skip("unix test")
 	}
 
-	handler := func(ls *localServer, ln Listener) {}
+	handler := func ls, ln {}
 	for _, laddr := range []string{"", testUnixAddr()} {
 		laddr := laddr
 		taddr := testUnixAddr()
@@ -277,7 +277,7 @@ func TestUnixConnLocalAndRemoteNames(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer func() {
+		defer func {
 			c.Close()
 			if la != nil {
 				defer os.Remove(laddr)
@@ -322,7 +322,7 @@ func TestUnixgramConnLocalAndRemoteNames(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer func() {
+		defer func {
 			c1.Close()
 			os.Remove(taddr)
 		}()
@@ -337,7 +337,7 @@ func TestUnixgramConnLocalAndRemoteNames(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		defer func() {
+		defer func {
 			c2.Close()
 			if la != nil {
 				defer os.Remove(laddr)
@@ -371,26 +371,26 @@ func TestUnixUnlink(t *testing.T) {
 	}
 	name := testUnixAddr()
 
-	listen := func(t *testing.T) *UnixListener {
+	listen := func t {
 		l, err := Listen("unix", name)
 		if err != nil {
 			t.Fatal(err)
 		}
 		return l.(*UnixListener)
 	}
-	checkExists := func(t *testing.T, desc string) {
+	checkExists := func t, desc {
 		if _, err := os.Stat(name); err != nil {
 			t.Fatalf("unix socket does not exist %s: %v", desc, err)
 		}
 	}
-	checkNotExists := func(t *testing.T, desc string) {
+	checkNotExists := func t, desc {
 		if _, err := os.Stat(name); err == nil {
 			t.Fatalf("unix socket does exist %s: %v", desc, err)
 		}
 	}
 
 	// Listener should remove on close.
-	t.Run("Listen", func(t *testing.T) {
+	t.Run("Listen", func t {
 		l := listen(t)
 		checkExists(t, "after Listen")
 		l.Close()
@@ -398,7 +398,7 @@ func TestUnixUnlink(t *testing.T) {
 	})
 
 	// FileListener should not.
-	t.Run("FileListener", func(t *testing.T) {
+	t.Run("FileListener", func t {
 		l := listen(t)
 		f, _ := l.File()
 		l1, _ := FileListener(f)
@@ -412,7 +412,7 @@ func TestUnixUnlink(t *testing.T) {
 	})
 
 	// Only first call to l.Close should remove.
-	t.Run("SecondClose", func(t *testing.T) {
+	t.Run("SecondClose", func t {
 		l := listen(t)
 		checkExists(t, "after Listen")
 		l.Close()
@@ -428,7 +428,7 @@ func TestUnixUnlink(t *testing.T) {
 
 	// SetUnlinkOnClose should do what it says.
 
-	t.Run("Listen/SetUnlinkOnClose(true)", func(t *testing.T) {
+	t.Run("Listen/SetUnlinkOnClose(true)", func t {
 		l := listen(t)
 		checkExists(t, "after Listen")
 		l.SetUnlinkOnClose(true)
@@ -436,7 +436,7 @@ func TestUnixUnlink(t *testing.T) {
 		checkNotExists(t, "after Listener close")
 	})
 
-	t.Run("Listen/SetUnlinkOnClose(false)", func(t *testing.T) {
+	t.Run("Listen/SetUnlinkOnClose(false)", func t {
 		l := listen(t)
 		checkExists(t, "after Listen")
 		l.SetUnlinkOnClose(false)
@@ -445,7 +445,7 @@ func TestUnixUnlink(t *testing.T) {
 		os.Remove(name)
 	})
 
-	t.Run("FileListener/SetUnlinkOnClose(true)", func(t *testing.T) {
+	t.Run("FileListener/SetUnlinkOnClose(true)", func t {
 		l := listen(t)
 		f, _ := l.File()
 		l1, _ := FileListener(f)
@@ -458,7 +458,7 @@ func TestUnixUnlink(t *testing.T) {
 		l.Close()
 	})
 
-	t.Run("FileListener/SetUnlinkOnClose(false)", func(t *testing.T) {
+	t.Run("FileListener/SetUnlinkOnClose(false)", func t {
 		l := listen(t)
 		f, _ := l.File()
 		l1, _ := FileListener(f)

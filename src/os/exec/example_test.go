@@ -104,7 +104,7 @@ func ExampleCmd_StdinPipe() {
 		log.Fatal(err)
 	}
 
-	go func() {
+	go func {
 		defer stdin.Close()
 		io.WriteString(stdin, "values written to stdin are passed to cmd's standard input")
 	}()

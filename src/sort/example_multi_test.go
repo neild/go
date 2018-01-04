@@ -92,16 +92,16 @@ var changes = []Change{
 // which compares a single field.
 func Example_sortMultiKeys() {
 	// Closures that order the Change structure.
-	user := func(c1, c2 *Change) bool {
+	user := func c1, c2 {
 		return c1.user < c2.user
 	}
-	language := func(c1, c2 *Change) bool {
+	language := func c1, c2 {
 		return c1.language < c2.language
 	}
-	increasingLines := func(c1, c2 *Change) bool {
+	increasingLines := func c1, c2 {
 		return c1.lines < c2.lines
 	}
-	decreasingLines := func(c1, c2 *Change) bool {
+	decreasingLines := func c1, c2 {
 		return c1.lines > c2.lines // Note: > orders downwards.
 	}
 

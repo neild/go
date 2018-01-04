@@ -14,7 +14,7 @@ import (
 func TestHash(t *testing.T) {
 	oldSalt := hashSalt
 	hashSalt = nil
-	defer func() {
+	defer func {
 		hashSalt = oldSalt
 	}()
 

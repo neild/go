@@ -46,9 +46,9 @@ func timeoutWrapper(t *testing.T, mp MakePipe, f connTester) {
 		t.Fatalf("unable to make pipe: %v", err)
 	}
 	var once sync.Once
-	defer once.Do(func() { stop() })
-	timer := time.AfterFunc(time.Minute, func() {
-		once.Do(func() {
+	defer once.Do(func { stop() })
+	timer := time.AfterFunc(time.Minute, func {
+		once.Do(func {
 			t.Error("test timed out; terminating pipe")
 			stop()
 		})
@@ -63,7 +63,7 @@ func testBasicIO(t *testing.T, c1, c2 net.Conn) {
 	rand.New(rand.NewSource(0)).Read(want)
 
 	dataCh := make(chan []byte)
-	go func() {
+	go func {
 		rd := bytes.NewReader(want)
 		if err := chunkedCopy(c1, rd); err != nil {
 			t.Errorf("unexpected c1.Write error: %v", err)
@@ -73,7 +73,7 @@ func testBasicIO(t *testing.T, c1, c2 net.Conn) {
 		}
 	}()
 
-	go func() {
+	go func {
 		wr := new(bytes.Buffer)
 		if err := chunkedCopy(wr, c2); err != nil {
 			t.Errorf("unexpected c2.Read error: %v", err)
@@ -95,7 +95,7 @@ func testPingPong(t *testing.T, c1, c2 net.Conn) {
 	var wg sync.WaitGroup
 	defer wg.Wait()
 
-	pingPonger := func(c net.Conn) {
+	pingPonger := func c {
 		defer wg.Done()
 		buf := make([]byte, 8)
 		var prev uint64
@@ -148,7 +148,7 @@ func testRacyRead(t *testing.T, c1, c2 net.Conn) {
 	c1.SetReadDeadline(time.Now().Add(time.Millisecond))
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 
 			b1 := make([]byte, 1024)
@@ -176,7 +176,7 @@ func testRacyWrite(t *testing.T, c1, c2 net.Conn) {
 	c1.SetWriteDeadline(time.Now().Add(time.Millisecond))
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 
 			b1 := make([]byte, 1024)
@@ -247,14 +247,14 @@ func testPresentTimeout(t *testing.T, c1, c2 net.Conn) {
 	wg.Add(3)
 
 	deadlineSet := make(chan bool, 1)
-	go func() {
+	go func {
 		defer wg.Done()
 		time.Sleep(100 * time.Millisecond)
 		deadlineSet <- true
 		c1.SetReadDeadline(aLongTimeAgo)
 		c1.SetWriteDeadline(aLongTimeAgo)
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		n, err := c1.Read(make([]byte, 1024))
 		if n != 0 {
@@ -265,7 +265,7 @@ func testPresentTimeout(t *testing.T, c1, c2 net.Conn) {
 			t.Error("Read timed out before deadline is set")
 		}
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var err error
 		for err == nil {
@@ -285,12 +285,12 @@ func testFutureTimeout(t *testing.T, c1, c2 net.Conn) {
 	wg.Add(2)
 
 	c1.SetDeadline(time.Now().Add(100 * time.Millisecond))
-	go func() {
+	go func {
 		defer wg.Done()
 		_, err := c1.Read(make([]byte, 1024))
 		checkForTimeoutError(t, err)
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var err error
 		for err == nil {
@@ -316,12 +316,12 @@ func testCloseTimeout(t *testing.T, c1, c2 net.Conn) {
 
 	// Test for cancelation upon connection closure.
 	c1.SetDeadline(neverTimeout)
-	go func() {
+	go func {
 		defer wg.Done()
 		time.Sleep(100 * time.Millisecond)
 		c1.Close()
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var err error
 		buf := make([]byte, 1024)
@@ -329,7 +329,7 @@ func testCloseTimeout(t *testing.T, c1, c2 net.Conn) {
 			_, err = c1.Read(buf)
 		}
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var err error
 		buf := make([]byte, 1024)
@@ -352,31 +352,31 @@ func testConcurrentMethods(t *testing.T, c1, c2 net.Conn) {
 	var wg sync.WaitGroup
 	for i := 0; i < 100; i++ {
 		wg.Add(7)
-		go func() {
+		go func {
 			defer wg.Done()
 			c1.Read(make([]byte, 1024))
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			c1.Write(make([]byte, 1024))
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			c1.SetDeadline(time.Now().Add(10 * time.Millisecond))
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			c1.SetReadDeadline(aLongTimeAgo)
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			c1.SetWriteDeadline(aLongTimeAgo)
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			c1.LocalAddr()
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			c1.RemoteAddr()
 		}()
@@ -425,7 +425,7 @@ func testRoundtrip(t *testing.T, c net.Conn) {
 func resyncConn(t *testing.T, c net.Conn) {
 	c.SetDeadline(neverTimeout)
 	errCh := make(chan error)
-	go func() {
+	go func {
 		_, err := c.Write([]byte{0xff})
 		errCh <- err
 	}()

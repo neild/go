@@ -113,7 +113,7 @@ func testExtDis(
 	}
 	ext.Size = size
 	ext.File = f
-	defer func() {
+	defer func {
 		f.Close()
 		if !*keep {
 			os.Remove(file)
@@ -128,10 +128,10 @@ func testExtDis(
 
 		errors = make([]string, 0, 100) // sampled errors, at most cap
 	)
-	go func() {
+	go func {
 		errc <- extdis(ext)
 	}()
-	generate(func(enc []byte) {
+	generate(func enc {
 		dec, ok := <-ext.Dec
 		if !ok {
 			t.Errorf("decoding stream ended early")
@@ -198,7 +198,7 @@ func writeInst(generate func(func([]byte))) (file string, f *os.File, size int, 
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	size = 0
-	generate(func(x []byte) {
+	generate(func x {
 		if len(x) > 16 {
 			x = x[:16]
 		}
@@ -503,7 +503,7 @@ var (
 // hexCases generates the cases written in hexadecimal in the encoded string.
 // Spaces in 'encoded' separate entire test cases, not individual bytes.
 func hexCases(t *testing.T, encoded string) func(func([]byte)) {
-	return func(try func([]byte)) {
+	return func try {
 		for _, x := range strings.Fields(encoded) {
 			src, err := hex.DecodeString(x)
 			if err != nil {
@@ -544,7 +544,7 @@ func testdataCases(t *testing.T) func(func([]byte)) {
 		codes = append(codes, code)
 	}
 
-	return func(try func([]byte)) {
+	return func try {
 		for _, code := range codes {
 			try(code)
 		}
@@ -590,9 +590,9 @@ func rexPrefixes(try func([]byte)) {
 // concat takes two generators and returns a generator for the
 // cross product of the two, concatenating the results from each.
 func concat(gen1, gen2 func(func([]byte))) func(func([]byte)) {
-	return func(try func([]byte)) {
-		gen1(func(enc1 []byte) {
-			gen2(func(enc2 []byte) {
+	return func try {
+		gen1(func enc1 {
+			gen2(func enc2 {
 				try(append(enc1[:len(enc1):len(enc1)], enc2...))
 			})
 		})
@@ -602,10 +602,10 @@ func concat(gen1, gen2 func(func([]byte))) func(func([]byte)) {
 // concat3 takes three generators and returns a generator for the
 // cross product of the three, concatenating the results from each.
 func concat3(gen1, gen2, gen3 func(func([]byte))) func(func([]byte)) {
-	return func(try func([]byte)) {
-		gen1(func(enc1 []byte) {
-			gen2(func(enc2 []byte) {
-				gen3(func(enc3 []byte) {
+	return func try {
+		gen1(func enc1 {
+			gen2(func enc2 {
+				gen3(func enc3 {
 					try(append(append(enc1[:len(enc1):len(enc1)], enc2...), enc3...))
 				})
 			})
@@ -616,11 +616,11 @@ func concat3(gen1, gen2, gen3 func(func([]byte))) func(func([]byte)) {
 // concat4 takes four generators and returns a generator for the
 // cross product of the four, concatenating the results from each.
 func concat4(gen1, gen2, gen3, gen4 func(func([]byte))) func(func([]byte)) {
-	return func(try func([]byte)) {
-		gen1(func(enc1 []byte) {
-			gen2(func(enc2 []byte) {
-				gen3(func(enc3 []byte) {
-					gen4(func(enc4 []byte) {
+	return func try {
+		gen1(func enc1 {
+			gen2(func enc2 {
+				gen3(func enc3 {
+					gen4(func enc4 {
 						try(append(append(append(enc1[:len(enc1):len(enc1)], enc2...), enc3...), enc4...))
 					})
 				})
@@ -631,8 +631,8 @@ func concat4(gen1, gen2, gen3, gen4 func(func([]byte))) func(func([]byte)) {
 
 // filter generates the sequences from gen that satisfy ok.
 func filter(gen func(func([]byte)), ok func([]byte) bool) func(func([]byte)) {
-	return func(try func([]byte)) {
-		gen(func(enc []byte) {
+	return func try {
+		gen(func enc {
 			if ok(enc) {
 				try(enc)
 			}
@@ -680,7 +680,7 @@ func enumModRM(try func([]byte)) {
 // fixed generates the single case b.
 // It's mainly useful to prepare an argument for concat or concat3.
 func fixed(b ...byte) func(func([]byte)) {
-	return func(try func([]byte)) {
+	return func try {
 		try(b)
 	}
 }

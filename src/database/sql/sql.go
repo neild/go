@@ -439,7 +439,7 @@ func (dc *driverConn) closeDBLocked() func() error {
 	dc.Lock()
 	defer dc.Unlock()
 	if dc.closed {
-		return func() error { return errors.New("sql: duplicate driverConn close") }
+		return func { return errors.New("sql: duplicate driverConn close") }
 	}
 	dc.closed = true
 	return dc.db.removeDepLocked(dc, dc)
@@ -468,7 +468,7 @@ func (dc *driverConn) finalClose() error {
 	// Each *driverStmt has a lock to the dc. Copy the list out of the dc
 	// before calling close on each stmt.
 	var openStmt []*driverStmt
-	withLock(dc, func() {
+	withLock(dc, func {
 		openStmt = make([]*driverStmt, 0, len(dc.openStmt))
 		for ds := range dc.openStmt {
 			openStmt = append(openStmt, ds)
@@ -478,7 +478,7 @@ func (dc *driverConn) finalClose() error {
 	for _, ds := range openStmt {
 		ds.Close()
 	}
-	withLock(dc, func() {
+	withLock(dc, func {
 		dc.finalClosed = true
 		err = dc.ci.Close()
 		dc.ci = nil
@@ -580,7 +580,7 @@ func (db *DB) removeDepLocked(x finalCloser, dep interface{}) func() error {
 		return x.finalClose
 	default:
 		// Dependencies remain.
-		return func() error { return nil }
+		return func { return nil }
 	}
 }
 
@@ -676,7 +676,7 @@ func Open(driverName, dataSourceName string) (*DB, error) {
 func (db *DB) pingDC(ctx context.Context, dc *driverConn, release func(error)) error {
 	var err error
 	if pinger, ok := dc.ci.(driver.Pinger); ok {
-		withLock(dc, func() {
+		withLock(dc, func {
 			err = pinger.Ping(ctx)
 		})
 	}
@@ -1130,7 +1130,7 @@ func (db *DB) noteUnusedDriverStatement(c *driverConn, ds *driverStmt) {
 	db.mu.Lock()
 	defer db.mu.Unlock()
 	if c.inUse {
-		c.onPut = append(c.onPut, func() {
+		c.onPut = append(c.onPut, func {
 			ds.Close()
 		})
 	} else {
@@ -1313,10 +1313,10 @@ func (db *DB) prepare(ctx context.Context, query string, strategy connReuseStrat
 func (db *DB) prepareDC(ctx context.Context, dc *driverConn, release func(error), cg stmtConnGrabber, query string) (*Stmt, error) {
 	var ds *driverStmt
 	var err error
-	defer func() {
+	defer func {
 		release(err)
 	}()
-	withLock(dc, func() {
+	withLock(dc, func {
 		ds, err = dc.prepareLocked(ctx, cg, query)
 	})
 	if err != nil {
@@ -1372,7 +1372,7 @@ func (db *DB) exec(ctx context.Context, query string, args []interface{}, strate
 }
 
 func (db *DB) execDC(ctx context.Context, dc *driverConn, release func(error), query string, args []interface{}) (res Result, err error) {
-	defer func() {
+	defer func {
 		release(err)
 	}()
 	execerCtx, ok := dc.ci.(driver.ExecerContext)
@@ -1383,7 +1383,7 @@ func (db *DB) execDC(ctx context.Context, dc *driverConn, release func(error), q
 	if ok {
 		var nvdargs []driver.NamedValue
 		var resi driver.Result
-		withLock(dc, func() {
+		withLock(dc, func {
 			nvdargs, err = driverArgsConnLocked(dc.ci, nil, args)
 			if err != nil {
 				return
@@ -1399,7 +1399,7 @@ func (db *DB) execDC(ctx context.Context, dc *driverConn, release func(error), q
 	}
 
 	var si driver.Stmt
-	withLock(dc, func() {
+	withLock(dc, func {
 		si, err = ctxDriverPrepare(ctx, dc.ci, query)
 	})
 	if err != nil {
@@ -1456,7 +1456,7 @@ func (db *DB) queryDC(ctx, txctx context.Context, dc *driverConn, releaseConn fu
 		var nvdargs []driver.NamedValue
 		var rowsi driver.Rows
 		var err error
-		withLock(dc, func() {
+		withLock(dc, func {
 			nvdargs, err = driverArgsConnLocked(dc.ci, nil, args)
 			if err != nil {
 				return
@@ -1482,7 +1482,7 @@ func (db *DB) queryDC(ctx, txctx context.Context, dc *driverConn, releaseConn fu
 
 	var si driver.Stmt
 	var err error
-	withLock(dc, func() {
+	withLock(dc, func {
 		si, err = ctxDriverPrepare(ctx, dc.ci, query)
 	})
 	if err != nil {
@@ -1573,7 +1573,7 @@ func (db *DB) begin(ctx context.Context, opts *TxOptions, strategy connReuseStra
 // beginDC starts a transaction. The provided dc must be valid and ready to use.
 func (db *DB) beginDC(ctx context.Context, dc *driverConn, release func(error), opts *TxOptions) (tx *Tx, err error) {
 	var txi driver.Tx
-	withLock(dc, func() {
+	withLock(dc, func {
 		txi, err = ctxDriverBegin(ctx, opts, dc.ci)
 	})
 	if err != nil {
@@ -1928,7 +1928,7 @@ func (tx *Tx) Commit() error {
 		return ErrTxDone
 	}
 	var err error
-	withLock(tx.dc, func() {
+	withLock(tx.dc, func {
 		err = tx.txi.Commit()
 	})
 	if err != driver.ErrBadConn {
@@ -1945,7 +1945,7 @@ func (tx *Tx) rollback(discardConn bool) error {
 		return ErrTxDone
 	}
 	var err error
-	withLock(tx.dc, func() {
+	withLock(tx.dc, func {
 		err = tx.txi.Rollback()
 	})
 	if err != driver.ErrBadConn {
@@ -2035,7 +2035,7 @@ func (tx *Tx) StmtContext(ctx context.Context, stmt *Stmt) *Stmt {
 		// re-prepare the statement in this case. No need to add
 		// code-complexity for this.
 		stmt.mu.Unlock()
-		withLock(dc, func() {
+		withLock(dc, func {
 			si, err = ctxDriverPrepare(ctx, dc.ci, stmt.query)
 		})
 		if err != nil {
@@ -2056,7 +2056,7 @@ func (tx *Tx) StmtContext(ctx context.Context, stmt *Stmt) *Stmt {
 
 		if si == nil {
 			var ds *driverStmt
-			withLock(dc, func() {
+			withLock(dc, func {
 				ds, err = stmt.prepareOnConnLocked(ctx, dc)
 			})
 			if err != nil {
@@ -2345,7 +2345,7 @@ func (s *Stmt) connStmt(ctx context.Context, strategy connReuseStrategy) (dc *dr
 	s.mu.Unlock()
 
 	// No luck; we need to prepare the statement on this connection
-	withLock(dc, func() {
+	withLock(dc, func {
 		ds, err = s.prepareOnConnLocked(ctx, dc)
 	})
 	if err != nil {
@@ -2405,7 +2405,7 @@ func (s *Stmt) QueryContext(ctx context.Context, args ...interface{}) (*Rows, er
 
 			// releaseConn must be set before initContextClose or it could
 			// release the connection before it is set.
-			rows.releaseConn = func(err error) {
+			rows.releaseConn = func err {
 				releaseConn(err)
 				s.db.removeDep(s, rows)
 			}
@@ -2596,7 +2596,7 @@ func (rs *Rows) awaitDone(ctx, txctx context.Context) {
 // Every call to Scan, even the first one, must be preceded by a call to Next.
 func (rs *Rows) Next() bool {
 	var doClose, ok bool
-	withLock(rs.closemu.RLocker(), func() {
+	withLock(rs.closemu.RLocker(), func {
 		doClose, ok = rs.nextLocked()
 	})
 	if doClose {
@@ -2650,7 +2650,7 @@ func (rs *Rows) nextLocked() (doClose, ok bool) {
 // set.
 func (rs *Rows) NextResultSet() bool {
 	var doClose bool
-	defer func() {
+	defer func {
 		if doClose {
 			rs.Close()
 		}
@@ -2893,7 +2893,7 @@ func (rs *Rows) Scan(dest ...interface{}) error {
 
 // rowsCloseHook returns a function so tests may install the
 // hook through a test only mutex.
-var rowsCloseHook = func() func(*Rows, *error) { return nil }
+var rowsCloseHook = func { return nil }
 
 // Close closes the Rows, preventing further enumeration. If Next is called
 // and returns false and there are no further result sets,
@@ -2916,7 +2916,7 @@ func (rs *Rows) close(err error) error {
 		rs.lasterr = err
 	}
 
-	withLock(rs.dc, func() {
+	withLock(rs.dc, func {
 		err = rs.rowsi.Close()
 	})
 	if fn := rowsCloseHook(); fn != nil {

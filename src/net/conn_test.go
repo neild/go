@@ -30,7 +30,7 @@ func TestConnAndListener(t *testing.T) {
 		}
 		defer ls.teardown()
 		ch := make(chan error, 1)
-		handler := func(ls *localServer, ln Listener) { transponder(ln, ch) }
+		handler := func ls, ln { transponder(ln, ch) }
 		if err := ls.buildup(handler); err != nil {
 			t.Fatal(err)
 		}

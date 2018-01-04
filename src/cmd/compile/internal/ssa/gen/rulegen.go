@@ -670,7 +670,7 @@ func parseValue(val string, arch arch, loc string) (op opData, oparch string, ty
 	// but we're trying to generate a useful error.
 	// Doing strict=true then strict=false allows
 	// precise op matching while retaining good error messages.
-	match := func(x opData, strict bool, archname string) bool {
+	match := func x, strict, archname {
 		if x.name != s {
 			return false
 		}

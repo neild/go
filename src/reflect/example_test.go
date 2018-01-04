@@ -18,7 +18,7 @@ func ExampleMakeFunc() {
 	// It must work in terms of reflect.Values so that it is possible
 	// to write code without knowing beforehand what the types
 	// will be.
-	swap := func(in []reflect.Value) []reflect.Value {
+	swap := func in {
 		return []reflect.Value{in[1], in[0]}
 	}
 
@@ -27,7 +27,7 @@ func ExampleMakeFunc() {
 	// When the function is invoked, reflect turns the arguments
 	// into Values, calls swap, and then turns swap's result slice
 	// into the values returned by the new function.
-	makeSwap := func(fptr interface{}) {
+	makeSwap := func fptr {
 		// fptr is a pointer to a function.
 		// Obtain the function value itself (likely nil) as a reflect.Value
 		// so that we can query its type and then set the value.

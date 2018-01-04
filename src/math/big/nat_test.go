@@ -183,7 +183,7 @@ func TestMulUnbalanced(t *testing.T) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(1))
 	x := rndNat(50000)
 	y := rndNat(40)
-	allocSize := allocBytes(func() {
+	allocSize := allocBytes(func {
 		nat(nil).mul(x, y)
 	})
 	inputSize := uint64(len(x)+len(y)) * _S
@@ -485,7 +485,7 @@ func BenchmarkExp3Power(b *testing.B) {
 	for _, y := range []Word{
 		0x10, 0x40, 0x100, 0x400, 0x1000, 0x4000, 0x10000, 0x40000, 0x100000, 0x400000,
 	} {
-		b.Run(fmt.Sprintf("%#x", y), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%#x", y), func b {
 			var z nat
 			for i := 0; i < b.N; i++ {
 				z.expWW(x, y)
@@ -660,7 +660,7 @@ func BenchmarkNatSqr(b *testing.B) {
 		if isRaceBuilder && n > 1e3 {
 			continue
 		}
-		b.Run(fmt.Sprintf("%d", n), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%d", n), func b {
 			benchmarkNatSqr(b, n)
 		})
 	}

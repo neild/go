@@ -272,7 +272,7 @@ func (t *tester) registerStdTest(pkg string) {
 	t.tests = append(t.tests, distTest{
 		name:    testName,
 		heading: "Testing packages.",
-		fn: func(dt *distTest) error {
+		fn: func dt {
 			if ranGoTest {
 				return nil
 			}
@@ -310,7 +310,7 @@ func (t *tester) registerRaceBenchTest(pkg string) {
 	t.tests = append(t.tests, distTest{
 		name:    testName,
 		heading: "Running benchmarks briefly.",
-		fn: func(dt *distTest) error {
+		fn: func dt {
 			if ranGoBench {
 				return nil
 			}
@@ -350,7 +350,7 @@ func (t *tester) registerTests() {
 			t.tests = append(t.tests, distTest{
 				name:    "vet/" + osarch,
 				heading: "cmd/vet/all",
-				fn: func(dt *distTest) error {
+				fn: func dt {
 					t.addCmd(dt, "src/cmd/vet/all", "go", "run", "main.go", "-p="+osarch)
 					return nil
 				},
@@ -409,7 +409,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    testName,
 			heading: "GOMAXPROCS=2 runtime -cpu=1,2,4 -quick",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				cmd := t.addCmd(dt, "src", t.goTest(), t.timeout(300), "runtime", "-cpu=1,2,4", "-quick")
 				// We set GOMAXPROCS=2 in addition to -cpu=1,2,4 in order to test runtime bootstrap code,
 				// creation of first goroutines and first garbage collections in the parallel setting.
@@ -425,7 +425,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    "cmd_go_test_terminal",
 			heading: "cmd/go terminal test",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				t.runPending(dt)
 				timelog("start", dt.name)
 				defer timelog("end", dt.name)
@@ -451,7 +451,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    "moved_goroot",
 			heading: "moved GOROOT",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				t.runPending(dt)
 				timelog("start", dt.name)
 				defer timelog("end", dt.name)
@@ -515,7 +515,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    "nolibgcc:" + pkg,
 			heading: "Testing without libgcc.",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				t.addCmd(dt, "src", t.goTest(), "-ldflags=-linkmode=internal -libgcc=none", pkg, t.runFlag(run))
 				return nil
 			},
@@ -530,7 +530,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    "pie_internal",
 			heading: "internal linking of -buildmode=pie",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				t.addCmd(dt, "src", t.goTest(), "reflect", "-buildmode=pie", "-ldflags=-linkmode=internal", t.timeout(60))
 				return nil
 			},
@@ -541,7 +541,7 @@ func (t *tester) registerTests() {
 	t.tests = append(t.tests, distTest{
 		name:    "sync_cpu",
 		heading: "sync -cpu=10",
-		fn: func(dt *distTest) error {
+		fn: func dt {
 			t.addCmd(dt, "src", t.goTest(), "sync", t.timeout(120), "-cpu=10", t.runFlag(""))
 			return nil
 		},
@@ -560,7 +560,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    "cgo_stdio",
 			heading: "../misc/cgo/stdio",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				t.addCmd(dt, "misc/cgo/stdio", "go", "run", filepath.Join(os.Getenv("GOROOT"), "test/run.go"), "-", ".")
 				return nil
 			},
@@ -568,7 +568,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    "cgo_life",
 			heading: "../misc/cgo/life",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				t.addCmd(dt, "misc/cgo/life", "go", "run", filepath.Join(os.Getenv("GOROOT"), "test/run.go"), "-", ".")
 				return nil
 			},
@@ -581,7 +581,7 @@ func (t *tester) registerTests() {
 			t.tests = append(t.tests, distTest{
 				name:    "cgo_fortran",
 				heading: "../misc/cgo/fortran",
-				fn: func(dt *distTest) error {
+				fn: func dt {
 					t.addCmd(dt, "misc/cgo/fortran", "./test.bash", fortran)
 					return nil
 				},
@@ -591,7 +591,7 @@ func (t *tester) registerTests() {
 			t.tests = append(t.tests, distTest{
 				name:    "swig_stdio",
 				heading: "../misc/swig/stdio",
-				fn: func(dt *distTest) error {
+				fn: func dt {
 					t.addCmd(dt, "misc/swig/stdio", t.goTest())
 					return nil
 				},
@@ -600,7 +600,7 @@ func (t *tester) registerTests() {
 				t.tests = append(t.tests, distTest{
 					name:    "swig_callback",
 					heading: "../misc/swig/callback",
-					fn: func(dt *distTest) error {
+					fn: func dt {
 						t.addCmd(dt, "misc/swig/callback", t.goTest())
 						return nil
 					},
@@ -629,14 +629,14 @@ func (t *tester) registerTests() {
 			t.tests = append(t.tests, distTest{
 				name:    "testso",
 				heading: "../misc/cgo/testso",
-				fn: func(dt *distTest) error {
+				fn: func dt {
 					return t.cgoTestSO(dt, "misc/cgo/testso")
 				},
 			})
 			t.tests = append(t.tests, distTest{
 				name:    "testsovar",
 				heading: "../misc/cgo/testsovar",
-				fn: func(dt *distTest) error {
+				fn: func dt {
 					return t.cgoTestSO(dt, "misc/cgo/testsovar")
 				},
 			})
@@ -691,7 +691,7 @@ func (t *tester) registerTests() {
 			t.tests = append(t.tests, distTest{
 				name:    fmt.Sprintf("test:%d_%d", shard, nShards),
 				heading: "../test",
-				fn:      func(dt *distTest) error { return t.testDirTest(dt, shard, nShards) },
+				fn:      func dt { return t.testDirTest(dt, shard, nShards) },
 			})
 		}
 	}
@@ -699,7 +699,7 @@ func (t *tester) registerTests() {
 		t.tests = append(t.tests, distTest{
 			name:    "api",
 			heading: "API check",
-			fn: func(dt *distTest) error {
+			fn: func dt {
 				if t.compileOnly {
 					t.addCmd(dt, "src", "go", "build", filepath.Join(goroot, "src/cmd/api/run.go"))
 					return nil
@@ -733,7 +733,7 @@ func (t *tester) registerTest1(seq bool, name, dirBanner string, cmdline ...inte
 	t.tests = append(t.tests, distTest{
 		name:    name,
 		heading: dirBanner,
-		fn: func(dt *distTest) error {
+		fn: func dt {
 			if seq {
 				t.runPending(dt)
 				timelog("start", name)
@@ -953,7 +953,7 @@ func (t *tester) registerHostTest(name, heading, dir, pkg string) {
 	t.tests = append(t.tests, distTest{
 		name:    name,
 		heading: heading,
-		fn: func(dt *distTest) error {
+		fn: func dt {
 			t.runPending(dt)
 			timelog("start", name)
 			defer timelog("end", name)
@@ -1050,7 +1050,7 @@ func (t *tester) runPending(nextTest *distTest) {
 	for _, w := range worklist {
 		w.start = make(chan bool)
 		w.end = make(chan bool)
-		go func(w *work) {
+		go func w {
 			if !<-w.start {
 				timelog("skip", w.dt.name)
 				w.out = []byte(fmt.Sprintf("skipped due to earlier error\n"))
@@ -1310,7 +1310,7 @@ var runtest struct {
 }
 
 func (t *tester) testDirTest(dt *distTest, shard, shards int) error {
-	runtest.Do(func() {
+	runtest.Do(func {
 		const exe = "runtest.exe" // named exe for Windows, but harmless elsewhere
 		cmd := t.dirCmd("test", "go", "build", "-o", exe, "run.go")
 		cmd.Env = append(os.Environ(), "GOOS="+gohostos, "GOARCH="+gohostarch)
@@ -1319,7 +1319,7 @@ func (t *tester) testDirTest(dt *distTest, shard, shards int) error {
 			runtest.err = err
 			return
 		}
-		xatexit(func() {
+		xatexit(func {
 			os.Remove(runtest.exe)
 		})
 	})

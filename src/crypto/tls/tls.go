@@ -112,7 +112,7 @@ func DialWithDialer(dialer *net.Dialer, network, addr string, config *Config) (*
 
 	if timeout != 0 {
 		errChannel = make(chan error, 2)
-		time.AfterFunc(timeout, func() {
+		time.AfterFunc(timeout, func {
 			errChannel <- timeoutError{}
 		})
 	}
@@ -145,7 +145,7 @@ func DialWithDialer(dialer *net.Dialer, network, addr string, config *Config) (*
 	if timeout == 0 {
 		err = conn.Handshake()
 	} else {
-		go func() {
+		go func {
 			errChannel <- conn.Handshake()
 		}()
 
@@ -191,7 +191,7 @@ func LoadX509KeyPair(certFile, keyFile string) (Certificate, error) {
 // PEM encoded data. On successful return, Certificate.Leaf will be nil because
 // the parsed form of the certificate is not retained.
 func X509KeyPair(certPEMBlock, keyPEMBlock []byte) (Certificate, error) {
-	fail := func(err error) (Certificate, error) { return Certificate{}, err }
+	fail := func err { return Certificate{}, err }
 
 	var cert Certificate
 	var skippedBlockTypes []string

@@ -39,7 +39,7 @@ var unusedFuncs = make(map[string]bool)
 var unusedStringMethods = make(map[string]bool)
 
 func initUnusedFlags() {
-	commaSplit := func(s string, m map[string]bool) {
+	commaSplit := func s, m {
 		if s != "" {
 			for _, name := range strings.Split(s, ",") {
 				if len(name) == 0 {

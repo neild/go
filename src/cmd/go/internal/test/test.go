@@ -1170,7 +1170,7 @@ func recompileForTest(pmain, preal, ptest, pxtest *load.Package) {
 		}
 		// Copy on write.
 		didSplit := p == pmain || p == pxtest
-		split := func() {
+		split := func {
 			if didSplit {
 				return
 			}
@@ -1374,7 +1374,7 @@ func (c *runCache) builderRunTest(b *work.Builder, a *work.Action) error {
 		tick := time.NewTimer(testKillTimeout)
 		base.StartSigHandlers()
 		done := make(chan error)
-		go func() {
+		go func {
 			done <- cmd.Wait()
 		}()
 	Outer:
@@ -2005,7 +2005,7 @@ func (t *testFuncs) load(filename, pkg string, doImport, seen *bool) error {
 		}
 	}
 	ex := doc.Examples(f)
-	sort.Slice(ex, func(i, j int) bool { return ex[i].Order < ex[j].Order })
+	sort.Slice(ex, func i, j { return ex[i].Order < ex[j].Order })
 	for _, e := range ex {
 		*doImport = true // import test file whether executed or not
 		if e.Output == "" && !e.EmptyOutput {

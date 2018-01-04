@@ -19,7 +19,7 @@ func TestTransportPersistConnReadLoopEOF(t *testing.T) {
 	defer ln.Close()
 
 	connc := make(chan net.Conn, 1)
-	go func() {
+	go func {
 		defer close(connc)
 		c, err := ln.Accept()
 		if err != nil {

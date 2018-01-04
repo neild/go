@@ -31,7 +31,7 @@ func Compile(f *Func) {
 
 	// hook to print function & phase if panic happens
 	phaseName := "init"
-	defer func() {
+	defer func {
 		if phaseName != "" {
 			err := recover()
 			stack := make([]byte, 16384)

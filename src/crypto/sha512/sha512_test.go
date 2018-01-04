@@ -685,25 +685,25 @@ func TestGolden(t *testing.T) {
 	}{
 		{
 			"SHA512/224",
-			func(in []byte) []byte { a := Sum512_224(in); return a[:] },
+			func in { a := Sum512_224(in); return a[:] },
 			New512_224(),
 			golden224,
 		},
 		{
 			"SHA512/256",
-			func(in []byte) []byte { a := Sum512_256(in); return a[:] },
+			func in { a := Sum512_256(in); return a[:] },
 			New512_256(),
 			golden256,
 		},
 		{
 			"SHA384",
-			func(in []byte) []byte { a := Sum384(in); return a[:] },
+			func in { a := Sum384(in); return a[:] },
 			New384(),
 			golden384,
 		},
 		{
 			"SHA512",
-			func(in []byte) []byte { a := Sum512(in); return a[:] },
+			func in { a := Sum512(in); return a[:] },
 			New(),
 			golden512,
 		},
@@ -729,7 +729,7 @@ func TestGoldenMarshal(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func t {
 			for _, test := range tt.golden {
 				h := tt.newHash()
 				h2 := tt.newHash()

@@ -281,7 +281,7 @@ func ExampleQuoteToASCII() {
 }
 
 func ExampleUnquote() {
-	test := func(s string) {
+	test := func s {
 		t, err := strconv.Unquote(s)
 		if err != nil {
 			fmt.Printf("Unquote(%#v): %v\n", s, err)

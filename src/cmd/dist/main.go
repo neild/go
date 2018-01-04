@@ -169,7 +169,7 @@ func xmain() {
 	}
 	cmd := os.Args[1]
 	os.Args = os.Args[1:] // for flag parsing during cmd
-	flag.Usage = func() {
+	flag.Usage = func {
 		fmt.Fprintf(os.Stderr, "usage: go tool dist %s [options]\n", cmd)
 		flag.PrintDefaults()
 		os.Exit(2)

@@ -46,7 +46,7 @@ func Start(w io.Writer) error {
 	if err := runtime.StartTrace(); err != nil {
 		return err
 	}
-	go func() {
+	go func {
 		for {
 			data := runtime.ReadTrace()
 			if data == nil {

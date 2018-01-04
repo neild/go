@@ -155,7 +155,7 @@ func bghelper() {
 // bgrun adds 1 to wg immediately, and calls Done when the work completes.
 func bgrun(wg *sync.WaitGroup, dir string, cmd ...string) {
 	wg.Add(1)
-	bgwork <- func() {
+	bgwork <- func {
 		defer wg.Done()
 		run(dir, CheckExit|ShowOutput|Background, cmd...)
 	}
@@ -165,7 +165,7 @@ func bgrun(wg *sync.WaitGroup, dir string, cmd ...string) {
 // bgwait must be called from only a single goroutine at a time.
 func bgwait(wg *sync.WaitGroup) {
 	done := make(chan struct{})
-	go func() {
+	go func {
 		wg.Wait()
 		close(done)
 	}()
@@ -337,7 +337,7 @@ func xworkdir() string {
 func fatalf(format string, args ...interface{}) {
 	fmt.Fprintf(os.Stderr, "go tool dist: %s\n", fmt.Sprintf(format, args...))
 
-	dieOnce.Do(func() { close(dying) })
+	dieOnce.Do(func { close(dying) })
 
 	// Wait for background goroutines to finish,
 	// so that exit handler that removes the work directory

@@ -178,7 +178,7 @@ func TestCharsetDecoder(t *testing.T) {
 	for _, test := range tests {
 		i := 0
 		dec := &WordDecoder{
-			CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
+			CharsetReader: func charset, input {
 				if charset != test.charsets[i] {
 					t.Errorf("DecodeHeader(%q), got charset %q, want %q", test.src, charset, test.charsets[i])
 				}
@@ -207,7 +207,7 @@ func TestCharsetDecoder(t *testing.T) {
 
 func TestCharsetDecoderError(t *testing.T) {
 	dec := &WordDecoder{
-		CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
+		CharsetReader: func charset, input {
 			return nil, errors.New("Test error")
 		},
 	}

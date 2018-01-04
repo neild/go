@@ -77,7 +77,7 @@ func benchmarkTCP(b *testing.B, persistent, timeout bool, laddr string) {
 			conns = b.N
 		}
 	}
-	sendMsg := func(c Conn, buf []byte) bool {
+	sendMsg := func c, buf {
 		n, err := c.Write(buf)
 		if n != len(buf) || err != nil {
 			b.Log(err)
@@ -85,7 +85,7 @@ func benchmarkTCP(b *testing.B, persistent, timeout bool, laddr string) {
 		}
 		return true
 	}
-	recvMsg := func(c Conn, buf []byte) bool {
+	recvMsg := func c, buf {
 		for read := 0; read != len(buf); {
 			n, err := c.Read(buf)
 			read += n
@@ -103,7 +103,7 @@ func benchmarkTCP(b *testing.B, persistent, timeout bool, laddr string) {
 	defer ln.Close()
 	serverSem := make(chan bool, numConcurrent)
 	// Acceptor.
-	go func() {
+	go func {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -111,8 +111,8 @@ func benchmarkTCP(b *testing.B, persistent, timeout bool, laddr string) {
 			}
 			serverSem <- true
 			// Server connection.
-			go func(c Conn) {
-				defer func() {
+			go func c {
+				defer func {
 					c.Close()
 					<-serverSem
 				}()
@@ -132,8 +132,8 @@ func benchmarkTCP(b *testing.B, persistent, timeout bool, laddr string) {
 	for i := 0; i < conns; i++ {
 		clientSem <- true
 		// Client connection.
-		go func() {
-			defer func() {
+		go func {
+			defer func {
 				<-clientSem
 			}()
 			c, err := Dial("tcp", ln.Addr().String())
@@ -193,7 +193,7 @@ func benchmarkTCPConcurrentReadWrite(b *testing.B, laddr string) {
 	}
 	defer ln.Close()
 	done := make(chan bool)
-	go func() {
+	go func {
 		for p := 0; p < P; p++ {
 			s, err := ln.Accept()
 			if err != nil {
@@ -219,7 +219,7 @@ func benchmarkTCPConcurrentReadWrite(b *testing.B, laddr string) {
 	wg.Add(4 * P)
 	for p := 0; p < P; p++ {
 		// Client writer.
-		go func(c Conn) {
+		go func c {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {
@@ -240,7 +240,7 @@ func benchmarkTCPConcurrentReadWrite(b *testing.B, laddr string) {
 		pipe := make(chan byte, 128)
 
 		// Server reader.
-		go func(s Conn) {
+		go func s {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {
@@ -254,7 +254,7 @@ func benchmarkTCPConcurrentReadWrite(b *testing.B, laddr string) {
 		}(servers[p])
 
 		// Server writer.
-		go func(s Conn) {
+		go func s {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {
@@ -273,7 +273,7 @@ func benchmarkTCPConcurrentReadWrite(b *testing.B, laddr string) {
 		}(servers[p])
 
 		// Client reader.
-		go func(c Conn) {
+		go func c {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {
@@ -327,7 +327,7 @@ var resolveTCPAddrTests = []resolveTCPAddrTest{
 
 func TestResolveTCPAddr(t *testing.T) {
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
+	defer func { testHookLookupIP = origTestHookLookupIP }()
 	testHookLookupIP = lookupLocalhost
 
 	for _, tt := range resolveTCPAddrTests {
@@ -391,7 +391,7 @@ func TestIPv6LinkLocalUnicastTCP(t *testing.T) {
 		}
 		defer ls.teardown()
 		ch := make(chan error, 1)
-		handler := func(ls *localServer, ln Listener) { transponder(ln, ch) }
+		handler := func ls, ln { transponder(ln, ch) }
 		if err := ls.buildup(handler); err != nil {
 			t.Fatal(err)
 		}
@@ -435,7 +435,7 @@ func TestTCPConcurrentAccept(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(N)
 	for i := 0; i < N; i++ {
-		go func() {
+		go func {
 			for {
 				c, err := ln.Accept()
 				if err != nil {
@@ -487,7 +487,7 @@ func TestTCPReadWriteAllocs(t *testing.T) {
 	defer ln.Close()
 	var server Conn
 	errc := make(chan error, 1)
-	go func() {
+	go func {
 		var err error
 		server, err = ln.Accept()
 		errc <- err
@@ -503,7 +503,7 @@ func TestTCPReadWriteAllocs(t *testing.T) {
 	defer server.Close()
 
 	var buf [128]byte
-	allocs := testing.AllocsPerRun(1000, func() {
+	allocs := testing.AllocsPerRun(1000, func {
 		_, err := server.Write(buf[:])
 		if err != nil {
 			t.Fatal(err)
@@ -520,13 +520,13 @@ func TestTCPReadWriteAllocs(t *testing.T) {
 	var bufwrt [128]byte
 	ch := make(chan bool)
 	defer close(ch)
-	go func() {
+	go func {
 		for <-ch {
 			_, err := server.Write(bufwrt[:])
 			errc <- err
 		}
 	}()
-	allocs = testing.AllocsPerRun(1000, func() {
+	allocs = testing.AllocsPerRun(1000, func {
 		ch <- true
 		if _, err = io.ReadFull(client, buf[:]); err != nil {
 			t.Fatal(err)
@@ -548,7 +548,7 @@ func TestTCPStress(t *testing.T) {
 		msgs = 1e2
 	}
 
-	sendMsg := func(c Conn, buf []byte) bool {
+	sendMsg := func c, buf {
 		n, err := c.Write(buf)
 		if n != len(buf) || err != nil {
 			t.Log(err)
@@ -556,7 +556,7 @@ func TestTCPStress(t *testing.T) {
 		}
 		return true
 	}
-	recvMsg := func(c Conn, buf []byte) bool {
+	recvMsg := func c, buf {
 		for read := 0; read != len(buf); {
 			n, err := c.Read(buf)
 			read += n
@@ -574,8 +574,8 @@ func TestTCPStress(t *testing.T) {
 	}
 	done := make(chan bool)
 	// Acceptor.
-	go func() {
-		defer func() {
+	go func {
+		defer func {
 			done <- true
 		}()
 		for {
@@ -584,7 +584,7 @@ func TestTCPStress(t *testing.T) {
 				break
 			}
 			// Server connection.
-			go func(c Conn) {
+			go func c {
 				defer c.Close()
 				var buf [msgLen]byte
 				for m := 0; m < msgs; m++ {
@@ -597,8 +597,8 @@ func TestTCPStress(t *testing.T) {
 	}()
 	for i := 0; i < conns; i++ {
 		// Client connection.
-		go func() {
-			defer func() {
+		go func {
+			defer func {
 				done <- true
 			}()
 			c, err := Dial("tcp", ln.Addr().String())
@@ -677,7 +677,7 @@ func TestTCPBig(t *testing.T) {
 	}
 
 	for _, writev := range []bool{false, true} {
-		t.Run(fmt.Sprintf("writev=%v", writev), func(t *testing.T) {
+		t.Run(fmt.Sprintf("writev=%v", writev), func t {
 			ln, err := newLocalListener("tcp")
 			if err != nil {
 				t.Fatal(err)
@@ -687,7 +687,7 @@ func TestTCPBig(t *testing.T) {
 			x := int(1 << 30)
 			x = x*5 + 1<<20 // just over 5 GB on 64-bit, just over 1GB on 32-bit
 			done := make(chan int)
-			go func() {
+			go func {
 				defer close(done)
 				c, err := ln.Accept()
 				if err != nil {
@@ -732,12 +732,12 @@ func TestCopyPipeIntoTCP(t *testing.T) {
 	defer ln.Close()
 
 	errc := make(chan error, 1)
-	defer func() {
+	defer func {
 		if err := <-errc; err != nil {
 			t.Error(err)
 		}
 	}()
-	go func() {
+	go func {
 		c, err := ln.Accept()
 		if err != nil {
 			errc <- err
@@ -768,7 +768,7 @@ func TestCopyPipeIntoTCP(t *testing.T) {
 	defer r.Close()
 
 	errc2 := make(chan error, 1)
-	defer func() {
+	defer func {
 		if err := <-errc2; err != nil {
 			t.Error(err)
 		}
@@ -776,7 +776,7 @@ func TestCopyPipeIntoTCP(t *testing.T) {
 
 	defer w.Close()
 
-	go func() {
+	go func {
 		_, err := io.Copy(c, r)
 		errc2 <- err
 	}()

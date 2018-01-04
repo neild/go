@@ -35,7 +35,7 @@ func testHelper(t *T) {
 	helperCallingHelper(t, "3")
 
 	// Check a function literal closing over t that uses Helper.
-	fn := func(msg string) {
+	fn := func msg {
 		t.Helper()
 		t.Error(msg)
 	}
@@ -46,7 +46,7 @@ func testHelper(t *T) {
 	t.Helper()
 	t.Error("5")
 
-	t.Run("sub", func(t *T) {
+	t.Run("sub", func t {
 		helper(t, "6")
 		notHelperCallingHelper(t, "7")
 		t.Helper()
@@ -58,7 +58,7 @@ func parallelTestHelper(t *T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			notHelperCallingHelper(t, "parallel")
 			wg.Done()
 		}()

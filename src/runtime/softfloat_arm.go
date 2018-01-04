@@ -616,7 +616,7 @@ execute:
 
 //go:nosplit
 func _sfloat2(pc uint32, regs [15]uint32) (newpc uint32) {
-	systemstack(func() {
+	systemstack(func {
 		newpc = sfloat2(pc, &regs)
 	})
 	return

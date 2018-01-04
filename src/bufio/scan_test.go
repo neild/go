@@ -466,7 +466,7 @@ func TestDontLoopForever(t *testing.T) {
 	s := NewScanner(strings.NewReader("abc"))
 	s.Split(loopAtEOFSplit)
 	// Expect a panic
-	defer func() {
+	defer func {
 		err := recover()
 		if err == nil {
 			t.Fatal("should have panicked")

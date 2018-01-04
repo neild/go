@@ -59,7 +59,7 @@ func TestMemoryProfiler(t *testing.T) {
 	// Disable sampling, otherwise it's difficult to assert anything.
 	oldRate := runtime.MemProfileRate
 	runtime.MemProfileRate = 1
-	defer func() {
+	defer func {
 		runtime.MemProfileRate = oldRate
 	}()
 

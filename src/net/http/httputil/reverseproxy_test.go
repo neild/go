@@ -34,7 +34,7 @@ func init() {
 func TestReverseProxy(t *testing.T) {
 	const backendResponse = "I am the backend"
 	const backendStatus = 404
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		if r.Method == "GET" && r.FormValue("mode") == "hangup" {
 			c, _, _ := w.(http.Hijacker).Hijack()
 			c.Close()
@@ -147,7 +147,7 @@ func TestReverseProxy(t *testing.T) {
 func TestReverseProxyStripHeadersPresentInConnection(t *testing.T) {
 	const fakeConnectionToken = "X-Fake-Connection-Token"
 	const backendResponse = "I am the backend"
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		if c := r.Header.Get(fakeConnectionToken); c != "" {
 			t.Errorf("handler got header %q = %q; want empty", fakeConnectionToken, c)
 		}
@@ -165,7 +165,7 @@ func TestReverseProxyStripHeadersPresentInConnection(t *testing.T) {
 		t.Fatal(err)
 	}
 	proxyHandler := NewSingleHostReverseProxy(backendURL)
-	frontend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	frontend := httptest.NewServer(http.HandlerFunc(func w, r {
 		proxyHandler.ServeHTTP(w, r)
 		if c := r.Header.Get("Upgrade"); c != "original value" {
 			t.Errorf("handler modified header %q = %q; want %q", "Upgrade", c, "original value")
@@ -201,7 +201,7 @@ func TestXForwardedFor(t *testing.T) {
 	const prevForwardedFor = "client ip"
 	const backendResponse = "I am the backend"
 	const backendStatus = 404
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		if r.Header.Get("X-Forwarded-For") == "" {
 			t.Errorf("didn't get X-Forwarded-For header")
 		}
@@ -250,7 +250,7 @@ var proxyQueryTests = []struct {
 }
 
 func TestReverseProxyQuery(t *testing.T) {
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		w.Header().Set("X-Got-Query", r.URL.RawQuery)
 		w.Write([]byte("hi"))
 	}))
@@ -278,7 +278,7 @@ func TestReverseProxyQuery(t *testing.T) {
 
 func TestReverseProxyFlushInterval(t *testing.T) {
 	const expected = "hi"
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		w.Write([]byte(expected))
 	}))
 	defer backend.Close()
@@ -292,8 +292,8 @@ func TestReverseProxyFlushInterval(t *testing.T) {
 	proxyHandler.FlushInterval = time.Microsecond
 
 	done := make(chan bool)
-	onExitFlushLoop = func() { done <- true }
-	defer func() { onExitFlushLoop = nil }()
+	onExitFlushLoop = func { done <- true }
+	defer func { onExitFlushLoop = nil }()
 
 	frontend := httptest.NewServer(proxyHandler)
 	defer frontend.Close()
@@ -321,7 +321,7 @@ func TestReverseProxyCancelation(t *testing.T) {
 	const backendResponse = "I am the backend"
 
 	reqInFlight := make(chan struct{})
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		close(reqInFlight) // cause the client to cancel its request
 
 		select {
@@ -357,7 +357,7 @@ func TestReverseProxyCancelation(t *testing.T) {
 	frontendClient := frontend.Client()
 
 	getReq, _ := http.NewRequest("GET", frontend.URL, nil)
-	go func() {
+	go func {
 		<-reqInFlight
 		frontendClient.Transport.(*http.Transport).CancelRequest(getReq)
 	}()
@@ -383,12 +383,12 @@ func req(t *testing.T, v string) *http.Request {
 
 // Issue 12344
 func TestNilBody(t *testing.T) {
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		w.Write([]byte("hi"))
 	}))
 	defer backend.Close()
 
-	frontend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	frontend := httptest.NewServer(http.HandlerFunc(func w, _ {
 		backURL, _ := url.Parse(backend.URL)
 		rp := NewSingleHostReverseProxy(backURL)
 		r := req(t, "GET / HTTP/1.0\r\n\r\n")
@@ -414,7 +414,7 @@ func TestNilBody(t *testing.T) {
 // Issue 15524
 func TestUserAgentHeader(t *testing.T) {
 	const explicitUA = "explicit UA"
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		if r.URL.Path == "/noua" {
 			if c := r.Header.Get("User-Agent"); c != "" {
 				t.Errorf("handler got non-empty User-Agent header %q", c)
@@ -465,7 +465,7 @@ func (bp bufferPool) Put(v []byte) { bp.put(v) }
 
 func TestReverseProxyGetPutBuffer(t *testing.T) {
 	const msg = "hi"
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		io.WriteString(w, msg)
 	}))
 	defer backend.Close()
@@ -479,7 +479,7 @@ func TestReverseProxyGetPutBuffer(t *testing.T) {
 		mu  sync.Mutex
 		log []string
 	)
-	addLog := func(event string) {
+	addLog := func event {
 		mu.Lock()
 		defer mu.Unlock()
 		log = append(log, event)
@@ -487,11 +487,11 @@ func TestReverseProxyGetPutBuffer(t *testing.T) {
 	rp := NewSingleHostReverseProxy(backendURL)
 	const size = 1234
 	rp.BufferPool = bufferPool{
-		get: func() []byte {
+		get: func {
 			addLog("getBuf")
 			return make([]byte, size)
 		},
-		put: func(p []byte) {
+		put: func p {
 			addLog("putBuf-" + strconv.Itoa(len(p)))
 		},
 	}
@@ -524,7 +524,7 @@ func TestReverseProxy_Post(t *testing.T) {
 	const backendResponse = "I am the backend"
 	const backendStatus = 200
 	var requestBody = bytes.Repeat([]byte("a"), 1<<20)
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		slurp, err := ioutil.ReadAll(r.Body)
 		if err != nil {
 			t.Errorf("Backend body read = %v", err)
@@ -571,7 +571,7 @@ func TestReverseProxy_NilBody(t *testing.T) {
 	backendURL, _ := url.Parse("http://fake.tld/")
 	proxyHandler := NewSingleHostReverseProxy(backendURL)
 	proxyHandler.ErrorLog = log.New(ioutil.Discard, "", 0) // quiet for tests
-	proxyHandler.Transport = RoundTripperFunc(func(req *http.Request) (*http.Response, error) {
+	proxyHandler.Transport = RoundTripperFunc(func req {
 		if req.Body != nil {
 			t.Error("Body != nil; want a nil Body")
 		}
@@ -593,7 +593,7 @@ func TestReverseProxy_NilBody(t *testing.T) {
 // Issue 14237. Test ModifyResponse and that an error from it
 // causes the proxy to return StatusBadGateway, or StatusOK otherwise.
 func TestReverseProxyModifyResponse(t *testing.T) {
-	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backendServer := httptest.NewServer(http.HandlerFunc(func w, r {
 		w.Header().Add("X-Hit-Mod", fmt.Sprintf("%v", r.URL.Path == "/mod"))
 	}))
 	defer backendServer.Close()
@@ -601,7 +601,7 @@ func TestReverseProxyModifyResponse(t *testing.T) {
 	rpURL, _ := url.Parse(backendServer.URL)
 	rproxy := NewSingleHostReverseProxy(rpURL)
 	rproxy.ErrorLog = log.New(ioutil.Discard, "", 0) // quiet for tests
-	rproxy.ModifyResponse = func(resp *http.Response) error {
+	rproxy.ModifyResponse = func resp {
 		if resp.Header.Get("X-Hit-Mod") != "true" {
 			return fmt.Errorf("tried to by-pass proxy")
 		}
@@ -641,7 +641,7 @@ func TestReverseProxyModifyResponse_OnError(t *testing.T) {
 
 	rpURL, _ := url.Parse(errBackend.URL)
 	rproxy := NewSingleHostReverseProxy(rpURL)
-	rproxy.ModifyResponse = func(resp *http.Response) error {
+	rproxy.ModifyResponse = func resp {
 		// Will be set for a non-nil error
 		resp.StatusCode = http.StatusOK
 		return nil
@@ -662,7 +662,7 @@ func TestReverseProxyModifyResponse_OnError(t *testing.T) {
 
 // Issue 16659: log errors from short read
 func TestReverseProxy_CopyBuffer(t *testing.T) {
-	backendServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backendServer := httptest.NewServer(http.HandlerFunc(func w, r {
 		out := "this call was relayed by the reverse proxy"
 		// Coerce a wrong content length to induce io.UnexpectedEOF
 		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(out)*2))
@@ -715,7 +715,7 @@ func BenchmarkServeHTTP(b *testing.B) {
 		Body:       ioutil.NopCloser(strings.NewReader("")),
 	}
 	proxy := &ReverseProxy{
-		Director:  func(*http.Request) {},
+		Director:  func {},
 		Transport: &staticTransport{res},
 	}
 
@@ -729,7 +729,7 @@ func BenchmarkServeHTTP(b *testing.B) {
 }
 
 func TestServeHTTPDeepCopy(t *testing.T) {
-	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	backend := httptest.NewServer(http.HandlerFunc(func w, r {
 		w.Write([]byte("Hello Gopher!"))
 	}))
 	defer backend.Close()
@@ -744,7 +744,7 @@ func TestServeHTTPDeepCopy(t *testing.T) {
 
 	resultChan := make(chan result, 1)
 	proxyHandler := NewSingleHostReverseProxy(backendURL)
-	frontend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	frontend := httptest.NewServer(http.HandlerFunc(func w, r {
 		before := r.URL.String()
 		proxyHandler.ServeHTTP(w, r)
 		after := r.URL.String()
@@ -772,10 +772,10 @@ func TestClonesRequestHeaders(t *testing.T) {
 	req, _ := http.NewRequest("GET", "http://foo.tld/", nil)
 	req.RemoteAddr = "1.2.3.4:56789"
 	rp := &ReverseProxy{
-		Director: func(req *http.Request) {
+		Director: func req {
 			req.Header.Set("From-Director", "1")
 		},
-		Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+		Transport: roundTripperFunc(func req {
 			if v := req.Header.Get("From-Director"); v != "1" {
 				t.Errorf("From-Directory value = %q; want 1", v)
 			}
@@ -806,13 +806,13 @@ func TestModifyResponseClosesBody(t *testing.T) {
 	logBuf := new(bytes.Buffer)
 	outErr := errors.New("ModifyResponse error")
 	rp := &ReverseProxy{
-		Director: func(req *http.Request) {},
+		Director: func req {},
 		Transport: &staticTransport{&http.Response{
 			StatusCode: 200,
 			Body:       closeCheck,
 		}},
 		ErrorLog: log.New(logBuf, "", 0),
-		ModifyResponse: func(*http.Response) error {
+		ModifyResponse: func {
 			return outErr
 		},
 	}

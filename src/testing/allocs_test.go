@@ -13,11 +13,11 @@ var allocsPerRunTests = []struct {
 	fn     func()
 	allocs float64
 }{
-	{"alloc *byte", func() { global = new(*byte) }, 1},
-	{"alloc complex128", func() { global = new(complex128) }, 1},
-	{"alloc float64", func() { global = new(float64) }, 1},
-	{"alloc int32", func() { global = new(int32) }, 1},
-	{"alloc byte", func() { global = new(byte) }, 1},
+	{"alloc *byte", func { global = new(*byte) }, 1},
+	{"alloc complex128", func { global = new(complex128) }, 1},
+	{"alloc float64", func { global = new(float64) }, 1},
+	{"alloc int32", func { global = new(int32) }, 1},
+	{"alloc byte", func { global = new(byte) }, 1},
 }
 
 func TestAllocsPerRun(t *testing.T) {

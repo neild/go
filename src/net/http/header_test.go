@@ -202,7 +202,7 @@ func TestHeaderWriteSubsetAllocs(t *testing.T) {
 	if runtime.GOMAXPROCS(0) > 1 {
 		t.Skip("skipping; GOMAXPROCS>1")
 	}
-	n := testing.AllocsPerRun(100, func() {
+	n := testing.AllocsPerRun(100, func {
 		buf.Reset()
 		testHeader.WriteSubset(&buf, nil)
 	})

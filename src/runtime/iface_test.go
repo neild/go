@@ -60,7 +60,7 @@ func TestCmpIfaceConcreteAlloc(t *testing.T) {
 		t.Skip("skipping on non-gc compiler")
 	}
 
-	n := testing.AllocsPerRun(1, func() {
+	n := testing.AllocsPerRun(1, func {
 		_ = e == ts
 		_ = i1 == ts
 		_ = e == 1
@@ -246,7 +246,7 @@ func TestNonEscapingConvT2E(t *testing.T) {
 		t.Fatalf("0 is present in the map")
 	}
 
-	n := testing.AllocsPerRun(1000, func() {
+	n := testing.AllocsPerRun(1000, func {
 		if m[0] {
 			t.Fatalf("0 is present in the map")
 		}
@@ -266,7 +266,7 @@ func TestNonEscapingConvT2I(t *testing.T) {
 		t.Fatalf("0 is present in the map")
 	}
 
-	n := testing.AllocsPerRun(1000, func() {
+	n := testing.AllocsPerRun(1000, func {
 		if m[TM(0)] {
 			t.Fatalf("0 is present in the map")
 		}
@@ -281,24 +281,24 @@ func TestZeroConvT2x(t *testing.T) {
 		name string
 		fn   func()
 	}{
-		{name: "E8", fn: func() { e = eight8 }},  // any byte-sized value does not allocate
-		{name: "E16", fn: func() { e = zero16 }}, // zero values do not allocate
-		{name: "E32", fn: func() { e = zero32 }},
-		{name: "E64", fn: func() { e = zero64 }},
-		{name: "Estr", fn: func() { e = zerostr }},
-		{name: "Eslice", fn: func() { e = zeroslice }},
-		{name: "Econstflt", fn: func() { e = 99.0 }}, // constants do not allocate
-		{name: "Econststr", fn: func() { e = "change" }},
-		{name: "I8", fn: func() { i1 = eight8I }},
-		{name: "I16", fn: func() { i1 = zero16I }},
-		{name: "I32", fn: func() { i1 = zero32I }},
-		{name: "I64", fn: func() { i1 = zero64I }},
-		{name: "Istr", fn: func() { i1 = zerostrI }},
-		{name: "Islice", fn: func() { i1 = zerosliceI }},
+		{name: "E8", fn: func { e = eight8 }},  // any byte-sized value does not allocate
+		{name: "E16", fn: func { e = zero16 }}, // zero values do not allocate
+		{name: "E32", fn: func { e = zero32 }},
+		{name: "E64", fn: func { e = zero64 }},
+		{name: "Estr", fn: func { e = zerostr }},
+		{name: "Eslice", fn: func { e = zeroslice }},
+		{name: "Econstflt", fn: func { e = 99.0 }}, // constants do not allocate
+		{name: "Econststr", fn: func { e = "change" }},
+		{name: "I8", fn: func { i1 = eight8I }},
+		{name: "I16", fn: func { i1 = zero16I }},
+		{name: "I32", fn: func { i1 = zero32I }},
+		{name: "I64", fn: func { i1 = zero64I }},
+		{name: "Istr", fn: func { i1 = zerostrI }},
+		{name: "Islice", fn: func { i1 = zerosliceI }},
 	}
 
 	for _, test := range tests {
-		t.Run(test.name, func(t *testing.T) {
+		t.Run(test.name, func t {
 			n := testing.AllocsPerRun(1000, test.fn)
 			if n != 0 {
 				t.Errorf("want zero allocs, got %v", n)
@@ -336,65 +336,65 @@ var (
 )
 
 func BenchmarkConvT2Ezero(b *testing.B) {
-	b.Run("zero", func(b *testing.B) {
-		b.Run("16", func(b *testing.B) {
+	b.Run("zero", func b {
+		b.Run("16", func b {
 			for i := 0; i < b.N; i++ {
 				e = zero16
 			}
 		})
-		b.Run("32", func(b *testing.B) {
+		b.Run("32", func b {
 			for i := 0; i < b.N; i++ {
 				e = zero32
 			}
 		})
-		b.Run("64", func(b *testing.B) {
+		b.Run("64", func b {
 			for i := 0; i < b.N; i++ {
 				e = zero64
 			}
 		})
-		b.Run("str", func(b *testing.B) {
+		b.Run("str", func b {
 			for i := 0; i < b.N; i++ {
 				e = zerostr
 			}
 		})
-		b.Run("slice", func(b *testing.B) {
+		b.Run("slice", func b {
 			for i := 0; i < b.N; i++ {
 				e = zeroslice
 			}
 		})
-		b.Run("big", func(b *testing.B) {
+		b.Run("big", func b {
 			for i := 0; i < b.N; i++ {
 				e = zerobig
 			}
 		})
 	})
-	b.Run("nonzero", func(b *testing.B) {
-		b.Run("16", func(b *testing.B) {
+	b.Run("nonzero", func b {
+		b.Run("16", func b {
 			for i := 0; i < b.N; i++ {
 				e = one16
 			}
 		})
-		b.Run("32", func(b *testing.B) {
+		b.Run("32", func b {
 			for i := 0; i < b.N; i++ {
 				e = one32
 			}
 		})
-		b.Run("64", func(b *testing.B) {
+		b.Run("64", func b {
 			for i := 0; i < b.N; i++ {
 				e = one64
 			}
 		})
-		b.Run("str", func(b *testing.B) {
+		b.Run("str", func b {
 			for i := 0; i < b.N; i++ {
 				e = nzstr
 			}
 		})
-		b.Run("slice", func(b *testing.B) {
+		b.Run("slice", func b {
 			for i := 0; i < b.N; i++ {
 				e = nzslice
 			}
 		})
-		b.Run("big", func(b *testing.B) {
+		b.Run("big", func b {
 			for i := 0; i < b.N; i++ {
 				e = nzbig
 			}

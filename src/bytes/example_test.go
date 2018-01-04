@@ -68,7 +68,7 @@ func ExampleCompare_search() {
 	// Binary search to find a matching byte slice.
 	var needle []byte
 	var haystack [][]byte // Assume sorted
-	i := sort.Search(len(haystack), func(i int) bool {
+	i := sort.Search(len(haystack), func i {
 		// Return haystack[i] >= needle.
 		return bytes.Compare(haystack[i], needle) >= 0
 	})
@@ -100,7 +100,7 @@ func ExampleFields() {
 }
 
 func ExampleFieldsFunc() {
-	f := func(c rune) bool {
+	f := func c {
 		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
 	}
 	fmt.Printf("Fields are: %q", bytes.FieldsFunc([]byte("  foo1;bar2,baz3..."), f))
@@ -205,7 +205,7 @@ func ExampleIndexByte() {
 }
 
 func ExampleIndexFunc() {
-	f := func(c rune) bool {
+	f := func c {
 		return unicode.Is(unicode.Han, c)
 	}
 	fmt.Println(bytes.IndexFunc([]byte("Hello, 世界"), f))
@@ -369,7 +369,7 @@ func ExampleTrimFunc() {
 }
 
 func ExampleMap() {
-	rot13 := func(r rune) rune {
+	rot13 := func r {
 		switch {
 		case r >= 'A' && r <= 'Z':
 			return 'A' + (r-'A'+13)%26

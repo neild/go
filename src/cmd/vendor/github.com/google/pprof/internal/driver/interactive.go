@@ -344,7 +344,7 @@ func commandHelp(args string, ui plugin.UI) {
 
 // newCompleter creates an autocompletion function for a set of commands.
 func newCompleter(fns []string) func(string) string {
-	return func(line string) string {
+	return func line {
 		v := pprofVariables
 		switch tokens := strings.Fields(line); len(tokens) {
 		case 0:

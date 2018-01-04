@@ -361,7 +361,7 @@ func BenchmarkAllocation(b *testing.B) {
 		work <- false
 	}
 	for i := 0; i < ngo; i++ {
-		go func() {
+		go func {
 			var x *T
 			for <-work {
 				for i := 0; i < 1000; i++ {
@@ -382,7 +382,7 @@ func TestPrintGC(t *testing.T) {
 	}
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(2))
 	done := make(chan bool)
-	go func() {
+	go func {
 		for {
 			select {
 			case <-done:
@@ -393,7 +393,7 @@ func TestPrintGC(t *testing.T) {
 		}
 	}()
 	for i := 0; i < 1e4; i++ {
-		func() {
+		func {
 			defer print("")
 		}()
 	}
@@ -527,13 +527,13 @@ func writeBarrierBenchmark(b *testing.B, f func()) {
 	// turn keeps the write barrier on continuously.
 	var stop uint32
 	done := make(chan bool)
-	go func() {
+	go func {
 		for atomic.LoadUint32(&stop) == 0 {
 			runtime.GC()
 		}
 		close(done)
 	}()
-	defer func() {
+	defer func {
 		atomic.StoreUint32(&stop, 1)
 		<-done
 	}()
@@ -556,7 +556,7 @@ func BenchmarkWriteBarrier(b *testing.B) {
 	}
 	var wbRoots []*node
 	var mkTree func(level int) *node
-	mkTree = func(level int) *node {
+	mkTree = func level {
 		if level == 0 {
 			return nil
 		}
@@ -572,7 +572,7 @@ func BenchmarkWriteBarrier(b *testing.B) {
 	const depth = 22 // 64 MB
 	root := mkTree(22)
 
-	writeBarrierBenchmark(b, func() {
+	writeBarrierBenchmark(b, func {
 		var stack [depth]*node
 		tos := -1
 
@@ -618,7 +618,7 @@ func BenchmarkBulkWriteBarrier(b *testing.B) {
 		ptrs[i] = new(obj)
 	}
 
-	writeBarrierBenchmark(b, func() {
+	writeBarrierBenchmark(b, func {
 		const blockSize = 1024
 		var pos int
 		for i := 0; i < b.N; i += blockSize {

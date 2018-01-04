@@ -77,7 +77,7 @@ func parseFlags(o *plugin.Options) (*source, []string, error) {
 		}
 	}
 
-	args := flag.Parse(func() {
+	args := flag.Parse(func {
 		o.UI.Print(usageMsgHdr +
 			usage(true) +
 			usageMsgSrc +

@@ -575,7 +575,7 @@ func walkKey(t *testing.T, k registry.Key, kname string) {
 		t.Fatalf("reading sub-keys of %s failed: %v", kname, err)
 	}
 	for _, name := range names {
-		func() {
+		func {
 			subk, err := registry.OpenKey(k, name, registry.ENUMERATE_SUB_KEYS|registry.QUERY_VALUE)
 			if err != nil {
 				if err == syscall.ERROR_ACCESS_DENIED {

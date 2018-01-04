@@ -213,7 +213,7 @@ func BenchmarkSyncLeak(b *testing.B) {
 	var wg sync.WaitGroup
 	wg.Add(G)
 	for g := 0; g < G; g++ {
-		go func() {
+		go func {
 			defer wg.Done()
 			hold := make([][]uint32, H)
 			for i := 0; i < b.N; i++ {
@@ -230,7 +230,7 @@ func BenchmarkSyncLeak(b *testing.B) {
 func BenchmarkStackLeak(b *testing.B) {
 	done := make(chan bool, 1)
 	for i := 0; i < b.N; i++ {
-		go func() {
+		go func {
 			growStack(rand.Intn(100))
 			done <- true
 		}()

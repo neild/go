@@ -182,7 +182,7 @@ var tokens = [...]elt{
 
 const whitespace = "  \t  \n\n\n" // to separate tokens
 
-var source = func() []byte {
+var source = func {
 	var src []byte
 	for _, t := range tokens {
 		src = append(src, t.lit...)
@@ -222,7 +222,7 @@ func TestScan(t *testing.T) {
 	whitespace_linecount := newlineCount(whitespace)
 
 	// error handler
-	eh := func(_ token.Position, msg string) {
+	eh := func _, msg {
 		t.Errorf("error handler called (msg = %s)", msg)
 	}
 
@@ -593,7 +593,7 @@ func TestStdErrorHander(t *testing.T) {
 		"@ @ @" // original file, line 1 again
 
 	var list ErrorList
-	eh := func(pos token.Position, msg string) { list.Add(pos, msg) }
+	eh := func pos, msg { list.Add(pos, msg) }
 
 	var s Scanner
 	s.Init(fset.AddFile("File1", fset.Base(), len(src)), []byte(src), eh, dontInsertSemis)
@@ -634,7 +634,7 @@ type errorCollector struct {
 func checkError(t *testing.T, src string, tok token.Token, pos int, lit, err string) {
 	var s Scanner
 	var h errorCollector
-	eh := func(pos token.Position, msg string) {
+	eh := func pos, msg {
 		h.cnt++
 		h.msg = msg
 		h.pos = pos

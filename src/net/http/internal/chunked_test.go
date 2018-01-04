@@ -121,7 +121,7 @@ func TestChunkReaderAllocs(t *testing.T) {
 	readBuf := make([]byte, len(a)+len(b)+len(c)+1)
 	byter := bytes.NewReader(buf.Bytes())
 	bufr := bufio.NewReader(byter)
-	mallocs := testing.AllocsPerRun(100, func() {
+	mallocs := testing.AllocsPerRun(100, func {
 		byter.Seek(0, io.SeekStart)
 		bufr.Reset(byter)
 		r := NewChunkedReader(bufr)
@@ -190,7 +190,7 @@ func TestChunkReadingIgnoresExtensions(t *testing.T) {
 // if it can return something.
 func TestChunkReadPartial(t *testing.T) {
 	pr, pw := io.Pipe()
-	go func() {
+	go func {
 		pw.Write([]byte("7\r\n1234567"))
 	}()
 	cr := NewChunkedReader(pr)
@@ -203,7 +203,7 @@ func TestChunkReadPartial(t *testing.T) {
 	if n != 7 || string(readBuf) != want {
 		t.Fatalf("Read: %v %q; want %d, %q", n, readBuf[:n], len(want), want)
 	}
-	go func() {
+	go func {
 		pw.Write([]byte("xx"))
 	}()
 	_, err = cr.Read(readBuf)

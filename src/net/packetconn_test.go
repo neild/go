@@ -21,7 +21,7 @@ import (
 
 func packetConnTestData(t *testing.T, network string) ([]byte, func()) {
 	if !testableNetwork(network) {
-		return nil, func() { t.Logf("skipping %s test", network) }
+		return nil, func { t.Logf("skipping %s test", network) }
 	}
 	return []byte("PACKETCONN TEST"), nil
 }
@@ -36,7 +36,7 @@ var packetConnTests = []struct {
 }
 
 func TestPacketConn(t *testing.T) {
-	closer := func(c PacketConn, net, addr1, addr2 string) {
+	closer := func c, net, addr1, addr2 {
 		c.Close()
 		switch net {
 		case "unixgram":
@@ -90,7 +90,7 @@ func TestPacketConn(t *testing.T) {
 }
 
 func TestConnAndPacketConn(t *testing.T) {
-	closer := func(c PacketConn, net, addr1, addr2 string) {
+	closer := func c, net, addr1, addr2 {
 		c.Close()
 		switch net {
 		case "unixgram":

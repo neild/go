@@ -35,7 +35,7 @@ type testcase struct {
 func TestSource(t *testing.T) {
 	const path = "testdata/"
 
-	sampleValue1 := func(v []int64) int64 {
+	sampleValue1 := func v {
 		return v[1]
 	}
 

@@ -225,7 +225,7 @@ func cgocallbackg1(ctxt uintptr) {
 		p.cap = cap(s)
 		p.len = len(s)
 
-		defer func(gp *g) {
+		defer func gp {
 			// Decrease the length of the slice by one, safely.
 			p := (*slice)(unsafe.Pointer(&gp.cgoCtxt))
 			p.len--

@@ -47,7 +47,7 @@ func TestDecode(t *testing.T) {
 		t.Errorf("#1 got:%#v want:%#v", result, privateKey)
 	}
 
-	isEmpty := func(block *Block) bool {
+	isEmpty := func block {
 		return block != nil && block.Type == "EMPTY" && len(block.Headers) == 0 && len(block.Bytes) == 0
 	}
 	result, remainder = Decode(remainder)
@@ -208,11 +208,11 @@ func TestLineBreaker(t *testing.T) {
 func TestFuzz(t *testing.T) {
 	// PEM is a text-based format. Assume header fields with leading/trailing spaces
 	// or embedded newlines will not round trip correctly and don't need to be tested.
-	isBad := func(s string) bool {
+	isBad := func s {
 		return strings.ContainsAny(s, "\r\n") || strings.TrimSpace(s) != s
 	}
 
-	testRoundtrip := func(block Block) bool {
+	testRoundtrip := func block {
 		if isBad(block.Type) {
 			return true
 		}

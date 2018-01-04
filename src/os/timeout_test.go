@@ -113,7 +113,7 @@ func TestReadTimeoutMustNotReturn(t *testing.T) {
 	max := time.NewTimer(100 * time.Millisecond)
 	defer max.Stop()
 	ch := make(chan error)
-	go func() {
+	go func {
 		if err := r.SetDeadline(time.Now().Add(-5 * time.Second)); err != nil {
 			t.Error(err)
 		}
@@ -155,7 +155,7 @@ func TestWriteTimeout(t *testing.T) {
 	t.Parallel()
 
 	for i, tt := range writeTimeoutTests {
-		t.Run(fmt.Sprintf("#%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("#%d", i), func t {
 			r, w, err := os.Pipe()
 			if err != nil {
 				t.Fatal(err)
@@ -201,7 +201,7 @@ func TestWriteTimeoutMustNotReturn(t *testing.T) {
 	max := time.NewTimer(100 * time.Millisecond)
 	defer max.Stop()
 	ch := make(chan error)
-	go func() {
+	go func {
 		if err := w.SetDeadline(time.Now().Add(-5 * time.Second)); err != nil {
 			t.Error(err)
 		}
@@ -234,7 +234,7 @@ func TestWriteTimeoutMustNotReturn(t *testing.T) {
 
 func timeoutReader(r *os.File, d, min, max time.Duration, ch chan<- error) {
 	var err error
-	defer func() { ch <- err }()
+	defer func { ch <- err }()
 
 	t0 := time.Now()
 	if err = r.SetReadDeadline(time.Now().Add(d)); err != nil {
@@ -281,7 +281,7 @@ func TestReadTimeoutFluctuation(t *testing.T) {
 
 func timeoutWriter(w *os.File, d, min, max time.Duration, ch chan<- error) {
 	var err error
-	defer func() { ch <- err }()
+	defer func { ch <- err }()
 
 	t0 := time.Now()
 	if err = w.SetWriteDeadline(time.Now().Add(d)); err != nil {
@@ -370,7 +370,7 @@ func testVariousDeadlines(t *testing.T) {
 		d   time.Duration
 	}
 
-	handler := func(w *os.File, pasvch chan result) {
+	handler := func w, pasvch {
 		// The writer, with no timeouts of its own,
 		// sending bytes to clients as fast as it can.
 		t0 := time.Now()
@@ -408,7 +408,7 @@ func testVariousDeadlines(t *testing.T) {
 			}
 		}
 		for run := 0; run < numRuns; run++ {
-			t.Run(fmt.Sprintf("%v-%d", timeout, run+1), func(t *testing.T) {
+			t.Run(fmt.Sprintf("%v-%d", timeout, run+1), func t {
 				r, w, err := os.Pipe()
 				if err != nil {
 					t.Fatal(err)
@@ -423,7 +423,7 @@ func testVariousDeadlines(t *testing.T) {
 				max := time.NewTimer(tooLong)
 				defer max.Stop()
 				actvch := make(chan result)
-				go func() {
+				go func {
 					t0 := time.Now()
 					if err := r.SetDeadline(t0.Add(timeout)); err != nil {
 						t.Error(err)
@@ -473,7 +473,7 @@ func TestReadWriteDeadlineRace(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(3)
-	go func() {
+	go func {
 		defer wg.Done()
 		tic := time.NewTicker(2 * time.Microsecond)
 		defer tic.Stop()
@@ -487,7 +487,7 @@ func TestReadWriteDeadlineRace(t *testing.T) {
 			<-tic.C
 		}
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var b [1]byte
 		for i := 0; i < N; i++ {
@@ -497,7 +497,7 @@ func TestReadWriteDeadlineRace(t *testing.T) {
 			}
 		}
 	}()
-	go func() {
+	go func {
 		defer wg.Done()
 		var b [1]byte
 		for i := 0; i < N; i++ {
@@ -530,7 +530,7 @@ func TestRacyRead(t *testing.T) {
 	r.SetReadDeadline(time.Now().Add(time.Millisecond))
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 
 			b1 := make([]byte, 1024)
@@ -569,7 +569,7 @@ func TestRacyWrite(t *testing.T) {
 	w.SetWriteDeadline(time.Now().Add(time.Millisecond))
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 
 			b1 := make([]byte, 1024)

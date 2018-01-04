@@ -76,7 +76,7 @@ func TestFormats(t *testing.T) {
 	testenv.MustHaveGoBuild(t) // more restrictive than necessary, but that's ok
 
 	// process all directories
-	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+	filepath.Walk(".", func path, info, err {
 		if info.IsDir() {
 			if info.Name() == "testdata" {
 				return filepath.SkipDir
@@ -103,7 +103,7 @@ func TestFormats(t *testing.T) {
 	updatedFiles := make(map[string]File) // files that were rewritten
 	for _, p := range callSites {
 		// test current format literal and determine updated one
-		out := formatReplace(p.str, func(index int, in string) string {
+		out := formatReplace(p.str, func index, in {
 			if in == "*" {
 				return in // cannot rewrite '*' (as in "%*d")
 			}
@@ -309,7 +309,7 @@ func collectPkgFormats(t *testing.T, pkg *build.Package) {
 
 	// collect all potential format strings (for extra verification later)
 	for _, file := range files {
-		ast.Inspect(file, func(n ast.Node) bool {
+		ast.Inspect(file, func n {
 			if s, ok := stringLit(n); ok && isFormat(s) {
 				formatStrings[n.(*ast.BasicLit)] = true
 			}
@@ -319,7 +319,7 @@ func collectPkgFormats(t *testing.T, pkg *build.Package) {
 
 	// collect all formats/arguments of calls with format strings
 	for index, file := range files {
-		ast.Inspect(file, func(n ast.Node) bool {
+		ast.Inspect(file, func n {
 			if call, ok := n.(*ast.CallExpr); ok {
 				// ignore blacklisted functions
 				if blacklistedFunctions[nodeString(call.Fun)] {
@@ -427,7 +427,7 @@ func formatIter(s string, f func(i, j int) int) {
 	i := 0     // index after current rune
 	var r rune // current rune
 
-	next := func() {
+	next := func {
 		r1, w := utf8.DecodeRuneInString(s[i:])
 		if w == 0 {
 			r1 = -1 // signal end-of-string
@@ -436,19 +436,19 @@ func formatIter(s string, f func(i, j int) int) {
 		i += w
 	}
 
-	flags := func() {
+	flags := func {
 		for r == ' ' || r == '#' || r == '+' || r == '-' || r == '0' {
 			next()
 		}
 	}
 
-	index := func() {
+	index := func {
 		if r == '[' {
 			log.Fatalf("cannot handle indexed arguments: %s", s)
 		}
 	}
 
-	digits := func() {
+	digits := func {
 		index()
 		if r == '*' {
 			i = f(i-1, i)
@@ -482,7 +482,7 @@ func formatIter(s string, f func(i, j int) int) {
 
 // isFormat reports whether s contains format specifiers.
 func isFormat(s string) (yes bool) {
-	formatIter(s, func(i, j int) int {
+	formatIter(s, func i, j {
 		yes = true
 		return len(s) // stop iteration
 	})
@@ -491,7 +491,7 @@ func isFormat(s string) (yes bool) {
 
 // oneFormat reports whether s is exactly one format specifier.
 func oneFormat(s string) (yes bool) {
-	formatIter(s, func(i, j int) int {
+	formatIter(s, func i, j {
 		yes = i == 0 && j == len(s)
 		return j
 	})
@@ -501,7 +501,7 @@ func oneFormat(s string) (yes bool) {
 // numFormatArgs returns the number of format specifiers in s.
 func numFormatArgs(s string) int {
 	count := 0
-	formatIter(s, func(i, j int) int {
+	formatIter(s, func i, j {
 		count++
 		return j
 	})
@@ -514,7 +514,7 @@ func formatReplace(in string, f func(i int, s string) string) string {
 	var buf []byte
 	i0 := 0
 	index := 0
-	formatIter(in, func(i, j int) int {
+	formatIter(in, func i, j {
 		if sub := in[i:j]; sub != "*" { // ignore calls for "*" width/length specifiers
 			buf = append(buf, in[i0:i]...)
 			buf = append(buf, f(index, sub)...)

@@ -57,7 +57,7 @@ func (a byInterval) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 //
 func nodeList(n Node) []Node {
 	var list []Node
-	Inspect(n, func(n Node) bool {
+	Inspect(n, func n {
 		// don't collect comments
 		switch n.(type) {
 		case nil, *CommentGroup, *Comment:
@@ -257,7 +257,7 @@ func (cmap CommentMap) Update(old, new Node) Node {
 //
 func (cmap CommentMap) Filter(node Node) CommentMap {
 	umap := make(CommentMap)
-	Inspect(node, func(n Node) bool {
+	Inspect(node, func n {
 		if g := cmap[n]; len(g) > 0 {
 			umap[n] = g
 		}

@@ -54,7 +54,7 @@ func Example_rand() {
 	// The tabwriter here helps us generate aligned output.
 	w := tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 	defer w.Flush()
-	show := func(name string, v1, v2, v3 interface{}) {
+	show := func name, v1, v2, v3 {
 		fmt.Fprintf(w, "%s\t%v\t%v\t%v\n", name, v1, v2, v3)
 	}
 
@@ -109,7 +109,7 @@ func ExamplePerm() {
 
 func ExampleShuffle() {
 	words := strings.Fields("ink runs from the corners of my mouth")
-	rand.Shuffle(len(words), func(i, j int) {
+	rand.Shuffle(len(words), func i, j {
 		words[i], words[j] = words[j], words[i]
 	})
 	fmt.Println(words)
@@ -122,7 +122,7 @@ func ExampleShuffle_slicesInUnison() {
 	numbers := []byte("12345")
 	letters := []byte("ABCDE")
 	// Shuffle numbers, swapping corresponding entries in letters at the same time.
-	rand.Shuffle(len(numbers), func(i, j int) {
+	rand.Shuffle(len(numbers), func i, j {
 		numbers[i], numbers[j] = numbers[j], numbers[i]
 		letters[i], letters[j] = letters[j], letters[i]
 	})

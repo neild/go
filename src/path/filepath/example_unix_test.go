@@ -84,7 +84,7 @@ func ExampleWalk() {
 	dir := "dir/to/walk"
 	subDirToSkip := "skip" // dir/to/walk/skip
 
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err := filepath.Walk(dir, func path, info, err {
 		if err != nil {
 			fmt.Printf("prevent panic by handling failure accessing a path %q: %v\n", dir, err)
 			return err

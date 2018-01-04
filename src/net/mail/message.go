@@ -392,7 +392,7 @@ func (p *addrParser) consumeAddrSpec() (spec string, err error) {
 	debug.Printf("consumeAddrSpec: %q", p.s)
 
 	orig := *p
-	defer func() {
+	defer func {
 		if err != nil {
 			*p = orig
 		}
@@ -590,7 +590,7 @@ func (p *addrParser) consumeDisplayNameComment() (string, error) {
 	}
 
 	// TODO(stapelberg): parse quoted-string within comment
-	words := strings.FieldsFunc(comment, func(r rune) bool { return r == ' ' || r == '\t' })
+	words := strings.FieldsFunc(comment, func r { return r == ' ' || r == '\t' })
 	for idx, word := range words {
 		decoded, isEncoded, err := p.decodeRFC2047Word(word)
 		if err != nil {
@@ -694,7 +694,7 @@ func (p *addrParser) decodeRFC2047Word(s string) (word string, isEncoded bool, e
 }
 
 var rfc2047Decoder = mime.WordDecoder{
-	CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
+	CharsetReader: func charset, input {
 		return nil, charsetError(charset)
 	},
 }

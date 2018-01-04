@@ -289,7 +289,7 @@ func TestIndexRune(t *testing.T) {
 	}
 
 	haystack := "test世界"
-	allocs := testing.AllocsPerRun(1000, func() {
+	allocs := testing.AllocsPerRun(1000, func {
 		if i := IndexRune(haystack, 's'); i != 2 {
 			t.Fatalf("'s' at %d; want 2", i)
 		}
@@ -494,7 +494,7 @@ func TestFieldsFunc(t *testing.T) {
 			continue
 		}
 	}
-	pred := func(c rune) bool { return c == 'X' }
+	pred := func c { return c == 'X' }
 	for _, tt := range FieldsFuncTests {
 		a := FieldsFunc(tt.s, pred)
 		if !eq(a, tt.a) {
@@ -585,7 +585,7 @@ func TestMap(t *testing.T) {
 	// Run a couple of awful growth/shrinkage tests
 	a := tenRunes('a')
 	// 1.  Grow. This triggers two reallocations in Map.
-	maxRune := func(rune) rune { return unicode.MaxRune }
+	maxRune := func { return unicode.MaxRune }
 	m := Map(maxRune, a)
 	expect := tenRunes(unicode.MaxRune)
 	if m != expect {
@@ -593,7 +593,7 @@ func TestMap(t *testing.T) {
 	}
 
 	// 2. Shrink
-	minRune := func(rune) rune { return 'a' }
+	minRune := func { return 'a' }
 	m = Map(minRune, tenRunes(unicode.MaxRune))
 	expect = a
 	if m != expect {
@@ -615,7 +615,7 @@ func TestMap(t *testing.T) {
 	}
 
 	// 5. Drop
-	dropNotLatin := func(r rune) rune {
+	dropNotLatin := func r {
 		if unicode.Is(unicode.Latin, r) {
 			return r
 		}
@@ -628,7 +628,7 @@ func TestMap(t *testing.T) {
 	}
 
 	// 6. Identity
-	identity := func(r rune) rune {
+	identity := func r {
 		return r
 	}
 	orig := "Input string that we expect not to be copied."
@@ -639,7 +639,7 @@ func TestMap(t *testing.T) {
 	}
 
 	// 7. Handle invalid UTF-8 sequence
-	replaceNotLatin := func(r rune) rune {
+	replaceNotLatin := func r {
 		if unicode.Is(unicode.Latin, r) {
 			return r
 		}
@@ -658,7 +658,7 @@ func TestToLower(t *testing.T) { runStringTests(t, ToLower, "ToLower", lowerTest
 
 func BenchmarkToUpper(b *testing.B) {
 	for _, tc := range upperTests {
-		b.Run(tc.in, func(b *testing.B) {
+		b.Run(tc.in, func b {
 			for i := 0; i < b.N; i++ {
 				actual := ToUpper(tc.in)
 				if actual != tc.out {
@@ -671,7 +671,7 @@ func BenchmarkToUpper(b *testing.B) {
 
 func BenchmarkToLower(b *testing.B) {
 	for _, tc := range lowerTests {
-		b.Run(tc.in, func(b *testing.B) {
+		b.Run(tc.in, func b {
 			for i := 0; i < b.N; i++ {
 				actual := ToLower(tc.in)
 				if actual != tc.out {
@@ -683,7 +683,7 @@ func BenchmarkToLower(b *testing.B) {
 }
 
 func BenchmarkMapNoChanges(b *testing.B) {
-	identity := func(r rune) rune {
+	identity := func r {
 		return r
 	}
 	for i := 0; i < b.N; i++ {
@@ -811,7 +811,7 @@ var isSpace = predicate{unicode.IsSpace, "IsSpace"}
 var isDigit = predicate{unicode.IsDigit, "IsDigit"}
 var isUpper = predicate{unicode.IsUpper, "IsUpper"}
 var isValidRune = predicate{
-	func(r rune) bool {
+	func r {
 		return r != utf8.RuneError
 	},
 	"IsValidRune",
@@ -819,7 +819,7 @@ var isValidRune = predicate{
 
 func not(p predicate) predicate {
 	return predicate{
-		func(r rune) bool {
+		func r {
 			return !p.f(r)
 		},
 		"not " + p.name,
@@ -974,7 +974,7 @@ func TestRepeat(t *testing.T) {
 }
 
 func repeat(s string, count int) (err error) {
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			switch v := r.(type) {
 			case error:
@@ -1152,11 +1152,11 @@ var UnreadRuneErrorTests = []struct {
 	name string
 	f    func(*Reader)
 }{
-	{"Read", func(r *Reader) { r.Read([]byte{0}) }},
-	{"ReadByte", func(r *Reader) { r.ReadByte() }},
-	{"UnreadRune", func(r *Reader) { r.UnreadRune() }},
-	{"Seek", func(r *Reader) { r.Seek(0, io.SeekCurrent) }},
-	{"WriteTo", func(r *Reader) { r.WriteTo(&bytes.Buffer{}) }},
+	{"Read", func r { r.Read([]byte{0}) }},
+	{"ReadByte", func r { r.ReadByte() }},
+	{"UnreadRune", func r { r.UnreadRune() }},
+	{"Seek", func r { r.Seek(0, io.SeekCurrent) }},
+	{"WriteTo", func r { r.WriteTo(&bytes.Buffer{}) }},
 }
 
 func TestUnreadRuneError(t *testing.T) {
@@ -1495,21 +1495,21 @@ func BenchmarkCountByte(b *testing.B) {
 	indexSizes := []int{10, 32, 4 << 10, 4 << 20, 64 << 20}
 	benchStr := Repeat(benchmarkString,
 		(indexSizes[len(indexSizes)-1]+len(benchmarkString)-1)/len(benchmarkString))
-	benchFunc := func(b *testing.B, benchStr string) {
+	benchFunc := func b, benchStr {
 		b.SetBytes(int64(len(benchStr)))
 		for i := 0; i < b.N; i++ {
 			Count(benchStr, "=")
 		}
 	}
 	for _, size := range indexSizes {
-		b.Run(fmt.Sprintf("%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%d", size), func b {
 			benchFunc(b, benchStr[:size])
 		})
 	}
 
 }
 
-var makeFieldsInput = func() string {
+var makeFieldsInput = func {
 	x := make([]byte, 1<<20)
 	// Input is ~10% space, ~10% 2-byte UTF-8, rest ASCII non-space.
 	for i := range x {
@@ -1529,7 +1529,7 @@ var makeFieldsInput = func() string {
 	return string(x)
 }
 
-var makeFieldsInputASCII = func() string {
+var makeFieldsInputASCII = func {
 	x := make([]byte, 1<<20)
 	// Input is ~10% space, rest ASCII non-space.
 	for i := range x {
@@ -1549,9 +1549,9 @@ var stringdata = []struct{ name, data string }{
 
 func BenchmarkFields(b *testing.B) {
 	for _, sd := range stringdata {
-		b.Run(sd.name, func(b *testing.B) {
+		b.Run(sd.name, func b {
 			for j := 1 << 4; j <= 1<<20; j <<= 4 {
-				b.Run(fmt.Sprintf("%d", j), func(b *testing.B) {
+				b.Run(fmt.Sprintf("%d", j), func b {
 					b.ReportAllocs()
 					b.SetBytes(int64(j))
 					data := sd.data[:j]
@@ -1566,9 +1566,9 @@ func BenchmarkFields(b *testing.B) {
 
 func BenchmarkFieldsFunc(b *testing.B) {
 	for _, sd := range stringdata {
-		b.Run(sd.name, func(b *testing.B) {
+		b.Run(sd.name, func b {
 			for j := 1 << 4; j <= 1<<20; j <<= 4 {
-				b.Run(fmt.Sprintf("%d", j), func(b *testing.B) {
+				b.Run(fmt.Sprintf("%d", j), func b {
 					b.ReportAllocs()
 					b.SetBytes(int64(j))
 					data := sd.data[:j]
@@ -1622,7 +1622,7 @@ func BenchmarkIndexAnyASCII(b *testing.B) {
 	cs := "0123456789abcdef"
 	for k := 1; k <= 4096; k <<= 4 {
 		for j := 1; j <= 16; j <<= 1 {
-			b.Run(fmt.Sprintf("%d:%d", k, j), func(b *testing.B) {
+			b.Run(fmt.Sprintf("%d:%d", k, j), func b {
 				for i := 0; i < b.N; i++ {
 					IndexAny(x[:k], cs[:j])
 				}
@@ -1635,7 +1635,7 @@ func BenchmarkTrimASCII(b *testing.B) {
 	cs := "0123456789abcdef"
 	for k := 1; k <= 4096; k <<= 4 {
 		for j := 1; j <= 16; j <<= 1 {
-			b.Run(fmt.Sprintf("%d:%d", k, j), func(b *testing.B) {
+			b.Run(fmt.Sprintf("%d:%d", k, j), func b {
 				x := Repeat(cs[:j], k) // Always matches set
 				for i := 0; i < b.N; i++ {
 					Trim(x[:k], cs[:j])
@@ -1648,7 +1648,7 @@ func BenchmarkTrimASCII(b *testing.B) {
 func BenchmarkIndexPeriodic(b *testing.B) {
 	key := "aa"
 	for _, skip := range [...]int{2, 4, 8, 16, 32, 64} {
-		b.Run(fmt.Sprintf("IndexPeriodic%d", skip), func(b *testing.B) {
+		b.Run(fmt.Sprintf("IndexPeriodic%d", skip), func b {
 			s := Repeat("a"+Repeat(" ", skip-1), 1<<16/skip)
 			for i := 0; i < b.N; i++ {
 				Index(s, key)

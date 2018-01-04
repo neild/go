@@ -12,7 +12,7 @@ func forceGoDNS() func() {
 	c := systemConf()
 	oldGo := c.netGo
 	oldCgo := c.netCgo
-	fixup := func() {
+	fixup := func {
 		c.netGo = oldGo
 		c.netCgo = oldCgo
 	}
@@ -28,7 +28,7 @@ func forceCgoDNS() func() {
 	c := systemConf()
 	oldGo := c.netGo
 	oldCgo := c.netCgo
-	fixup := func() {
+	fixup := func {
 		c.netGo = oldGo
 		c.netCgo = oldCgo
 	}

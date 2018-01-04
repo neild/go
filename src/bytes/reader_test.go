@@ -106,7 +106,7 @@ func TestReaderAtConcurrent(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(1)
-		go func(i int) {
+		go func i {
 			defer wg.Done()
 			var buf [1]byte
 			r.ReadAt(buf[:], int64(i))
@@ -123,12 +123,12 @@ func TestEmptyReaderConcurrent(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 5; i++ {
 		wg.Add(2)
-		go func() {
+		go func {
 			defer wg.Done()
 			var buf [1]byte
 			r.Read(buf[:])
 		}()
-		go func() {
+		go func {
 			defer wg.Done()
 			r.Read(nil)
 		}()
@@ -185,11 +185,11 @@ var UnreadRuneErrorTests = []struct {
 	name string
 	f    func(*Reader)
 }{
-	{"Read", func(r *Reader) { r.Read([]byte{0}) }},
-	{"ReadByte", func(r *Reader) { r.ReadByte() }},
-	{"UnreadRune", func(r *Reader) { r.UnreadRune() }},
-	{"Seek", func(r *Reader) { r.Seek(0, io.SeekCurrent) }},
-	{"WriteTo", func(r *Reader) { r.WriteTo(&Buffer{}) }},
+	{"Read", func r { r.Read([]byte{0}) }},
+	{"ReadByte", func r { r.ReadByte() }},
+	{"UnreadRune", func r { r.UnreadRune() }},
+	{"Seek", func r { r.Seek(0, io.SeekCurrent) }},
+	{"WriteTo", func r { r.WriteTo(&Buffer{}) }},
 }
 
 func TestUnreadRuneError(t *testing.T) {

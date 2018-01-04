@@ -212,7 +212,7 @@ func BenchmarkEncode(b *testing.B) {
 		src := bytes.Repeat([]byte{2, 3, 5, 7, 9, 11, 13, 17}, size/8)
 		sink = make([]byte, 2*size)
 
-		b.Run(fmt.Sprintf("%v", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%v", size), func b {
 			for i := 0; i < b.N; i++ {
 				Encode(sink, src)
 			}

@@ -61,7 +61,7 @@ func (check *Checker) call(x *operand, e *ast.CallExpr) exprKind {
 			return statement
 		}
 
-		arg, n, _ := unpack(func(x *operand, i int) { check.multiExpr(x, e.Args[i]) }, len(e.Args), false)
+		arg, n, _ := unpack(func x, i { check.multiExpr(x, e.Args[i]) }, len(e.Args), false)
 		if arg != nil {
 			check.arguments(x, e, sig, arg, n)
 		} else {
@@ -147,7 +147,7 @@ func unpack(get getter, n int, allowCommaOk bool) (getter, int, bool) {
 
 	if t, ok := x0.typ.(*Tuple); ok {
 		// result of an n-valued function call
-		return func(x *operand, i int) {
+		return func x, i {
 			x.mode = value
 			x.expr = x0.expr
 			x.typ = t.At(i).typ
@@ -158,7 +158,7 @@ func unpack(get getter, n int, allowCommaOk bool) (getter, int, bool) {
 		// comma-ok value
 		if allowCommaOk {
 			a := [2]Type{x0.typ, Typ[UntypedBool]}
-			return func(x *operand, i int) {
+			return func x, i {
 				x.mode = value
 				x.expr = x0.expr
 				x.typ = a[i]
@@ -168,7 +168,7 @@ func unpack(get getter, n int, allowCommaOk bool) (getter, int, bool) {
 	}
 
 	// single value
-	return func(x *operand, i int) {
+	return func x, i {
 		if i != 0 {
 			unreachable()
 		}

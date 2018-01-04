@@ -259,7 +259,7 @@ func (r *Resolver) internetAddrList(ctx context.Context, net, addr string) (addr
 	default:
 		return nil, UnknownNetworkError(net)
 	}
-	inetaddr := func(ip IPAddr) Addr {
+	inetaddr := func ip {
 		switch net {
 		case "tcp", "tcp4", "tcp6":
 			return &TCPAddr{IP: ip.IP, Port: portnum, Zone: ip.Zone}

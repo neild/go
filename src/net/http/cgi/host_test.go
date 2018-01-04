@@ -260,7 +260,7 @@ func TestDropProxyHeader(t *testing.T) {
 		"Proxy: should_be_stripped\n"+
 		"Host: example.com\n\n",
 		expectedMap,
-		func(reqInfo map[string]string) {
+		func reqInfo {
 			if v, ok := reqInfo["env-HTTP_PROXY"]; ok {
 				t.Errorf("HTTP_PROXY = %q; should be absent", v)
 			}
@@ -348,7 +348,7 @@ func TestRedirect(t *testing.T) {
 
 func TestInternalRedirect(t *testing.T) {
 	check(t)
-	baseHandler := http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+	baseHandler := http.HandlerFunc(func rw, req {
 		fmt.Fprintf(rw, "basepath=%s\n", req.URL.Path)
 		fmt.Fprintf(rw, "remoteaddr=%s\n", req.RemoteAddr)
 	})
@@ -408,7 +408,7 @@ func TestCopyError(t *testing.T) {
 		t.Fatalf("ReadFull: %d bytes, %v", n, err)
 	}
 
-	childRunning := func() bool {
+	childRunning := func {
 		return isProcessRunning(pid)
 	}
 

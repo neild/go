@@ -392,7 +392,7 @@ func (ctxt *Link) symtab() {
 		symtyperel = s
 	}
 
-	groupSym := func(name string, t sym.SymKind) *sym.Symbol {
+	groupSym := func name, t {
 		s := ctxt.Syms.Lookup(name, 0)
 		s.Type = t
 		s.Size = 0

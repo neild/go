@@ -1184,7 +1184,7 @@ func freeStackSpans() {
 
 //go:nosplit
 func morestackc() {
-	systemstack(func() {
+	systemstack(func {
 		throw("attempt to execute system stack code on user stack")
 	})
 }

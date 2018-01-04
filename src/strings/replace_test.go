@@ -48,7 +48,7 @@ func TestReplacer(t *testing.T) {
 	var testCases []testCase
 
 	// str converts 0xff to "\xff". This isn't just string(b) since that converts to UTF-8.
-	str := func(b byte) string {
+	str := func b {
 		return string([]byte{b})
 	}
 	var s []string
@@ -527,7 +527,7 @@ func BenchmarkByteByteReplaces(b *testing.B) {
 // BenchmarkByteByteMap compares byteByteImpl against Map.
 func BenchmarkByteByteMap(b *testing.B) {
 	str := Repeat("a", 100) + Repeat("b", 100)
-	fn := func(r rune) rune {
+	fn := func r {
 		switch r {
 		case 'a':
 			return 'A'
@@ -547,13 +547,13 @@ var mapdata = []struct{ name, data string }{
 }
 
 func BenchmarkMap(b *testing.B) {
-	mapidentity := func(r rune) rune {
+	mapidentity := func r {
 		return r
 	}
 
-	b.Run("identity", func(b *testing.B) {
+	b.Run("identity", func b {
 		for _, md := range mapdata {
-			b.Run(md.name, func(b *testing.B) {
+			b.Run(md.name, func b {
 				for i := 0; i < b.N; i++ {
 					Map(mapidentity, md.data)
 				}
@@ -561,7 +561,7 @@ func BenchmarkMap(b *testing.B) {
 		}
 	})
 
-	mapchange := func(r rune) rune {
+	mapchange := func r {
 		if 'a' <= r && r <= 'z' {
 			return r + 'A' - 'a'
 		}
@@ -571,9 +571,9 @@ func BenchmarkMap(b *testing.B) {
 		return r
 	}
 
-	b.Run("change", func(b *testing.B) {
+	b.Run("change", func b {
 		for _, md := range mapdata {
-			b.Run(md.name, func(b *testing.B) {
+			b.Run(md.name, func b {
 				for i := 0; i < b.N; i++ {
 					Map(mapchange, md.data)
 				}

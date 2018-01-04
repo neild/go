@@ -65,7 +65,7 @@ func TestTick(t *testing.T) {
 
 // Test that NewTicker panics when given a duration less than zero.
 func TestNewTickerLtZeroDuration(t *testing.T) {
-	defer func() {
+	defer func {
 		if err := recover(); err == nil {
 			t.Errorf("NewTicker(-1) should have panicked")
 		}
@@ -74,7 +74,7 @@ func TestNewTickerLtZeroDuration(t *testing.T) {
 }
 
 func BenchmarkTicker(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		ticker := NewTicker(Nanosecond)
 		for i := 0; i < n; i++ {
 			<-ticker.C

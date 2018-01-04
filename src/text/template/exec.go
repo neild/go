@@ -338,7 +338,7 @@ func (s *state) walkRange(dot reflect.Value, r *parse.RangeNode) rangeControl {
 	// mark top of stack before any variables in the body are pushed.
 	mark := s.mark()
 	s.rangeDepth++
-	oneIteration := func(index, elem reflect.Value) rangeControl {
+	oneIteration := func index, elem {
 		// Set top var (lexically the second if there are two) to the element.
 		if len(r.Pipe.Decl) > 0 {
 			s.setVar(1, elem)
@@ -970,19 +970,19 @@ func sortKeys(v []reflect.Value) []reflect.Value {
 	}
 	switch v[0].Kind() {
 	case reflect.Float32, reflect.Float64:
-		sort.Slice(v, func(i, j int) bool {
+		sort.Slice(v, func i, j {
 			return v[i].Float() < v[j].Float()
 		})
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		sort.Slice(v, func(i, j int) bool {
+		sort.Slice(v, func i, j {
 			return v[i].Int() < v[j].Int()
 		})
 	case reflect.String:
-		sort.Slice(v, func(i, j int) bool {
+		sort.Slice(v, func i, j {
 			return v[i].String() < v[j].String()
 		})
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		sort.Slice(v, func(i, j int) bool {
+		sort.Slice(v, func i, j {
 			return v[i].Uint() < v[j].Uint()
 		})
 	}

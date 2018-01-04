@@ -65,7 +65,7 @@ func prf10(result, secret, label, seed []byte) {
 
 // prf12 implements the TLS 1.2 pseudo-random function, as defined in RFC 5246, section 5.
 func prf12(hashFunc func() hash.Hash) func(result, secret, label, seed []byte) {
-	return func(result, secret, label, seed []byte) {
+	return func result, secret, label, seed {
 		labelAndSeed := make([]byte, len(label)+len(seed))
 		copy(labelAndSeed, label)
 		copy(labelAndSeed[len(label):], seed)

@@ -135,42 +135,42 @@ func (p *Profile) encode(b *buffer) {
 var profileDecoder = []decoder{
 	nil, // 0
 	// repeated ValueType sample_type = 1
-	func(b *buffer, m message) error {
+	func b, m {
 		x := new(ValueType)
 		pp := m.(*Profile)
 		pp.SampleType = append(pp.SampleType, x)
 		return decodeMessage(b, x)
 	},
 	// repeated Sample sample = 2
-	func(b *buffer, m message) error {
+	func b, m {
 		x := new(Sample)
 		pp := m.(*Profile)
 		pp.Sample = append(pp.Sample, x)
 		return decodeMessage(b, x)
 	},
 	// repeated Mapping mapping = 3
-	func(b *buffer, m message) error {
+	func b, m {
 		x := new(Mapping)
 		pp := m.(*Profile)
 		pp.Mapping = append(pp.Mapping, x)
 		return decodeMessage(b, x)
 	},
 	// repeated Location location = 4
-	func(b *buffer, m message) error {
+	func b, m {
 		x := new(Location)
 		pp := m.(*Profile)
 		pp.Location = append(pp.Location, x)
 		return decodeMessage(b, x)
 	},
 	// repeated Function function = 5
-	func(b *buffer, m message) error {
+	func b, m {
 		x := new(Function)
 		pp := m.(*Profile)
 		pp.Function = append(pp.Function, x)
 		return decodeMessage(b, x)
 	},
 	// repeated string string_table = 6
-	func(b *buffer, m message) error {
+	func b, m {
 		err := decodeStrings(b, &m.(*Profile).stringTable)
 		if err != nil {
 			return err
@@ -181,22 +181,22 @@ var profileDecoder = []decoder{
 		return nil
 	},
 	// repeated int64 drop_frames = 7
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Profile).dropFramesX) },
+	func b, m { return decodeInt64(b, &m.(*Profile).dropFramesX) },
 	// repeated int64 keep_frames = 8
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Profile).keepFramesX) },
+	func b, m { return decodeInt64(b, &m.(*Profile).keepFramesX) },
 	// repeated int64 time_nanos = 9
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Profile).TimeNanos) },
+	func b, m { return decodeInt64(b, &m.(*Profile).TimeNanos) },
 	// repeated int64 duration_nanos = 10
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Profile).DurationNanos) },
+	func b, m { return decodeInt64(b, &m.(*Profile).DurationNanos) },
 	// optional string period_type = 11
-	func(b *buffer, m message) error {
+	func b, m {
 		x := new(ValueType)
 		pp := m.(*Profile)
 		pp.PeriodType = x
 		return decodeMessage(b, x)
 	},
 	// repeated int64 period = 12
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Profile).Period) },
+	func b, m { return decodeInt64(b, &m.(*Profile).Period) },
 }
 
 // postDecode takes the unexported fields populated by decode (with
@@ -294,9 +294,9 @@ func (p *ValueType) encode(b *buffer) {
 var valueTypeDecoder = []decoder{
 	nil, // 0
 	// optional int64 type = 1
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*ValueType).typeX) },
+	func b, m { return decodeInt64(b, &m.(*ValueType).typeX) },
 	// optional int64 unit = 2
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*ValueType).unitX) },
+	func b, m { return decodeInt64(b, &m.(*ValueType).unitX) },
 }
 
 func (p *Sample) decoder() []decoder {
@@ -316,11 +316,11 @@ func (p *Sample) encode(b *buffer) {
 var sampleDecoder = []decoder{
 	nil, // 0
 	// repeated uint64 location = 1
-	func(b *buffer, m message) error { return decodeUint64s(b, &m.(*Sample).locationIDX) },
+	func b, m { return decodeUint64s(b, &m.(*Sample).locationIDX) },
 	// repeated int64 value = 2
-	func(b *buffer, m message) error { return decodeInt64s(b, &m.(*Sample).Value) },
+	func b, m { return decodeInt64s(b, &m.(*Sample).Value) },
 	// repeated Label label = 3
-	func(b *buffer, m message) error {
+	func b, m {
 		s := m.(*Sample)
 		n := len(s.labelX)
 		s.labelX = append(s.labelX, Label{})
@@ -341,11 +341,11 @@ func (p Label) encode(b *buffer) {
 var labelDecoder = []decoder{
 	nil, // 0
 	// optional int64 key = 1
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Label).keyX) },
+	func b, m { return decodeInt64(b, &m.(*Label).keyX) },
 	// optional int64 str = 2
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Label).strX) },
+	func b, m { return decodeInt64(b, &m.(*Label).strX) },
 	// optional int64 num = 3
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Label).numX) },
+	func b, m { return decodeInt64(b, &m.(*Label).numX) },
 }
 
 func (p *Mapping) decoder() []decoder {
@@ -367,16 +367,16 @@ func (p *Mapping) encode(b *buffer) {
 
 var mappingDecoder = []decoder{
 	nil, // 0
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Mapping).ID) },            // optional uint64 id = 1
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Mapping).Start) },         // optional uint64 memory_offset = 2
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Mapping).Limit) },         // optional uint64 memory_limit = 3
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Mapping).Offset) },        // optional uint64 file_offset = 4
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Mapping).fileX) },          // optional int64 filename = 5
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Mapping).buildIDX) },       // optional int64 build_id = 6
-	func(b *buffer, m message) error { return decodeBool(b, &m.(*Mapping).HasFunctions) },    // optional bool has_functions = 7
-	func(b *buffer, m message) error { return decodeBool(b, &m.(*Mapping).HasFilenames) },    // optional bool has_filenames = 8
-	func(b *buffer, m message) error { return decodeBool(b, &m.(*Mapping).HasLineNumbers) },  // optional bool has_line_numbers = 9
-	func(b *buffer, m message) error { return decodeBool(b, &m.(*Mapping).HasInlineFrames) }, // optional bool has_inline_frames = 10
+	func b, m { return decodeUint64(b, &m.(*Mapping).ID) },            // optional uint64 id = 1
+	func b, m { return decodeUint64(b, &m.(*Mapping).Start) },         // optional uint64 memory_offset = 2
+	func b, m { return decodeUint64(b, &m.(*Mapping).Limit) },         // optional uint64 memory_limit = 3
+	func b, m { return decodeUint64(b, &m.(*Mapping).Offset) },        // optional uint64 file_offset = 4
+	func b, m { return decodeInt64(b, &m.(*Mapping).fileX) },          // optional int64 filename = 5
+	func b, m { return decodeInt64(b, &m.(*Mapping).buildIDX) },       // optional int64 build_id = 6
+	func b, m { return decodeBool(b, &m.(*Mapping).HasFunctions) },    // optional bool has_functions = 7
+	func b, m { return decodeBool(b, &m.(*Mapping).HasFilenames) },    // optional bool has_filenames = 8
+	func b, m { return decodeBool(b, &m.(*Mapping).HasLineNumbers) },  // optional bool has_line_numbers = 9
+	func b, m { return decodeBool(b, &m.(*Mapping).HasInlineFrames) }, // optional bool has_inline_frames = 10
 }
 
 func (p *Location) decoder() []decoder {
@@ -394,10 +394,10 @@ func (p *Location) encode(b *buffer) {
 
 var locationDecoder = []decoder{
 	nil, // 0
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Location).ID) },         // optional uint64 id = 1;
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Location).mappingIDX) }, // optional uint64 mapping_id = 2;
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Location).Address) },    // optional uint64 address = 3;
-	func(b *buffer, m message) error { // repeated Line line = 4
+	func b, m { return decodeUint64(b, &m.(*Location).ID) },         // optional uint64 id = 1;
+	func b, m { return decodeUint64(b, &m.(*Location).mappingIDX) }, // optional uint64 mapping_id = 2;
+	func b, m { return decodeUint64(b, &m.(*Location).Address) },    // optional uint64 address = 3;
+	func b, m { // repeated Line line = 4
 		pp := m.(*Location)
 		n := len(pp.Line)
 		pp.Line = append(pp.Line, Line{})
@@ -417,9 +417,9 @@ func (p *Line) encode(b *buffer) {
 var lineDecoder = []decoder{
 	nil, // 0
 	// optional uint64 function_id = 1
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Line).functionIDX) },
+	func b, m { return decodeUint64(b, &m.(*Line).functionIDX) },
 	// optional int64 line = 2
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Line).Line) },
+	func b, m { return decodeInt64(b, &m.(*Line).Line) },
 }
 
 func (p *Function) decoder() []decoder {
@@ -437,15 +437,15 @@ func (p *Function) encode(b *buffer) {
 var functionDecoder = []decoder{
 	nil, // 0
 	// optional uint64 id = 1
-	func(b *buffer, m message) error { return decodeUint64(b, &m.(*Function).ID) },
+	func b, m { return decodeUint64(b, &m.(*Function).ID) },
 	// optional int64 function_name = 2
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Function).nameX) },
+	func b, m { return decodeInt64(b, &m.(*Function).nameX) },
 	// optional int64 function_system_name = 3
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Function).systemNameX) },
+	func b, m { return decodeInt64(b, &m.(*Function).systemNameX) },
 	// repeated int64 filename = 4
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Function).filenameX) },
+	func b, m { return decodeInt64(b, &m.(*Function).filenameX) },
 	// optional int64 start_line = 5
-	func(b *buffer, m message) error { return decodeInt64(b, &m.(*Function).StartLine) },
+	func b, m { return decodeInt64(b, &m.(*Function).StartLine) },
 }
 
 func addString(strings map[string]int, s string) int64 {

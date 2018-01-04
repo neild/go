@@ -20,7 +20,7 @@ func TestGenericPath(t *testing.T) {
 		t.Skipf("assembly implementation unavailable")
 	}
 	useAsm = false
-	defer func() { useAsm = true }()
+	defer func { useAsm = true }()
 	c := New()
 	in := "ΑΒΓΔΕϜΖΗΘΙΚΛΜΝΞΟΠϺϘΡΣΤΥΦΧΨΩ"
 	gold := "e93d84ec2b22383123be9f713697fb25" +

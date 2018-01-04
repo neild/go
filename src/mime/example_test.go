@@ -32,7 +32,7 @@ func ExampleWordDecoder_Decode() {
 	}
 	fmt.Println(header)
 
-	dec.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+	dec.CharsetReader = func charset, input {
 		switch charset {
 		case "x-case":
 			// Fake character set for example.
@@ -71,7 +71,7 @@ func ExampleWordDecoder_DecodeHeader() {
 	}
 	fmt.Println(header)
 
-	dec.CharsetReader = func(charset string, input io.Reader) (io.Reader, error) {
+	dec.CharsetReader = func charset, input {
 		switch charset {
 		case "x-case":
 			// Fake character set for example.

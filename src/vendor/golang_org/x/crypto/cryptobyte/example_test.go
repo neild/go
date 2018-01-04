@@ -79,9 +79,9 @@ func ExampleBuilder_aSN1() {
 	const defaultVersion = 0
 
 	var b cryptobyte.Builder
-	b.AddASN1(asn1.SEQUENCE, func(b *cryptobyte.Builder) {
+	b.AddASN1(asn1.SEQUENCE, func b {
 		if version != defaultVersion {
-			b.AddASN1(asn1.Tag(6).Constructed().ContextSpecific(), func(b *cryptobyte.Builder) {
+			b.AddASN1(asn1.Tag(6).Constructed().ContextSpecific(), func b {
 				b.AddASN1Int64(version)
 			})
 		}
@@ -104,9 +104,9 @@ func ExampleBuilder_lengthPrefixed() {
 	input := []string{"hello", "world"}
 
 	var b cryptobyte.Builder
-	b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+	b.AddUint16LengthPrefixed(func b {
 		for _, value := range input {
-			b.AddUint8LengthPrefixed(func(b *cryptobyte.Builder) {
+			b.AddUint8LengthPrefixed(func b {
 				b.AddBytes([]byte(value))
 			})
 		}
@@ -128,7 +128,7 @@ func ExampleBuilder_lengthPrefixOverflow() {
 	tooLarge := make([]byte, 256)
 
 	var b cryptobyte.Builder
-	b.AddUint8LengthPrefixed(func(b *cryptobyte.Builder) {
+	b.AddUint8LengthPrefixed(func b {
 		b.AddBytes(tooLarge)
 	})
 
@@ -142,7 +142,7 @@ func ExampleBuilderContinuation_errorHandling() {
 	var b cryptobyte.Builder
 	// Continuations that panic with a BuildError will cause Bytes to
 	// return the inner error.
-	b.AddUint16LengthPrefixed(func(b *cryptobyte.Builder) {
+	b.AddUint16LengthPrefixed(func b {
 		b.AddUint32(0)
 		panic(cryptobyte.BuildError{Err: errors.New("example error")})
 	})

@@ -254,7 +254,7 @@ func checkFiles(t *testing.T, testfiles []string) {
 		conf.FakeImportC = true
 	}
 	conf.Importer = importer.Default()
-	conf.Error = func(err error) {
+	conf.Error = func err {
 		if *listErrors {
 			t.Error(err)
 			return

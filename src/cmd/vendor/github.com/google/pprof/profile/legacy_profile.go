@@ -590,7 +590,7 @@ func parseHeapSample(line string, rate int64, sampling string, includeAlloc bool
 
 	// This is a local-scoped helper function to avoid needing to pass
 	// around rate, sampling and many return parameters.
-	addValues := func(countString, sizeString string, label string) error {
+	addValues := func countString, sizeString, label {
 		count, err := strconv.ParseInt(countString, 10, 64)
 		if err != nil {
 			return fmt.Errorf("malformed sample: %s: %v", line, err)

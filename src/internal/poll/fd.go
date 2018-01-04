@@ -58,4 +58,4 @@ func consume(v *[][]byte, n int64) {
 }
 
 // TestHookDidWritev is a hook for testing writev.
-var TestHookDidWritev = func(wrote int) {}
+var TestHookDidWritev = func wrote {}

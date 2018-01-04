@@ -174,7 +174,7 @@ func checkTestFunctions(f *File, node ast.Node) {
 		return
 	}
 
-	report := func(format string, args ...interface{}) { f.Badf(node.Pos(), format, args...) }
+	report := func format, args { f.Badf(node.Pos(), format, args...) }
 
 	switch {
 	case strings.HasPrefix(fn.Name.Name, "Example"):

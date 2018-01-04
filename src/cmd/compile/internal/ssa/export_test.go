@@ -143,19 +143,19 @@ func init() {
 	// TODO(josharian): move universe initialization to the types package,
 	// so this test setup can share it.
 
-	types.Tconv = func(t *types.Type, flag, mode, depth int) string {
+	types.Tconv = func t, flag, mode, depth {
 		return t.Etype.String()
 	}
-	types.Sconv = func(s *types.Sym, flag, mode int) string {
+	types.Sconv = func s, flag, mode {
 		return "sym"
 	}
-	types.FormatSym = func(sym *types.Sym, s fmt.State, verb rune, mode int) {
+	types.FormatSym = func sym, s, verb, mode {
 		fmt.Fprintf(s, "sym")
 	}
-	types.FormatType = func(t *types.Type, s fmt.State, verb rune, mode int) {
+	types.FormatType = func t, s, verb, mode {
 		fmt.Fprintf(s, "%v", t.Etype)
 	}
-	types.Dowidth = func(t *types.Type) {}
+	types.Dowidth = func t {}
 
 	types.Tptr = types.TPTR64
 	for _, typ := range [...]struct {

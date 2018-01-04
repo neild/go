@@ -142,7 +142,7 @@ func genaddmoduledata(ctxt *ld.Link) {
 	initfunc.Type = sym.STEXT
 	initfunc.Attr |= sym.AttrLocal
 	initfunc.Attr |= sym.AttrReachable
-	o := func(op uint32) {
+	o := func op {
 		initfunc.AddUint32(ctxt.Arch, op)
 	}
 	// addis r2, r12, .TOC.-func@ha

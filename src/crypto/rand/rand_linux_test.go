@@ -10,7 +10,7 @@ import (
 )
 
 func TestBatched(t *testing.T) {
-	fillBatched := batched(func(p []byte) bool {
+	fillBatched := batched(func p {
 		for i := range p {
 			p[i] = byte(i)
 		}
@@ -28,14 +28,14 @@ func TestBatched(t *testing.T) {
 }
 
 func TestBatchedError(t *testing.T) {
-	b := batched(func(p []byte) bool { return false }, 5)
+	b := batched(func p { return false }, 5)
 	if b(make([]byte, 13)) {
 		t.Fatal("batched function should have returned false")
 	}
 }
 
 func TestBatchedEmpty(t *testing.T) {
-	b := batched(func(p []byte) bool { return false }, 5)
+	b := batched(func p { return false }, 5)
 	if !b(make([]byte, 0)) {
 		t.Fatal("empty slice should always return true")
 	}

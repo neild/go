@@ -102,7 +102,7 @@ func caninl(fn *Node) {
 
 	var reason string // reason, if any, that the function was not inlined
 	if Debug['m'] > 1 {
-		defer func() {
+		defer func {
 			if reason != "" {
 				fmt.Printf("%v: cannot inline %v: %s\n", fn.Line(), fn.Func.Nname, reason)
 			}
@@ -230,7 +230,7 @@ func inlFlood(n *Node) {
 	typecheckinl(n)
 
 	// Recursively flood any functions called by this one.
-	inspectList(n.Func.Inl, func(n *Node) bool {
+	inspectList(n.Func.Inl, func n {
 		switch n.Op {
 		case OCALLFUNC, OCALLMETH:
 			inlFlood(asNode(n.Left.Type.Nname()))

@@ -32,7 +32,7 @@ const (
 
 // Do the 64-bit functions panic? If so, don't bother testing.
 var test64err = func() (err interface{}) {
-	defer func() {
+	defer func {
 		err = recover()
 	}()
 	var x int64
@@ -885,8 +885,8 @@ func TestHammer32(t *testing.T) {
 		c := make(chan int)
 		var val uint32
 		for i := 0; i < p; i++ {
-			go func() {
-				defer func() {
+			go func {
+				defer func {
 					if err := recover(); err != nil {
 						t.Error(err.(string))
 					}
@@ -1041,8 +1041,8 @@ func TestHammer64(t *testing.T) {
 		c := make(chan int)
 		var val uint64
 		for i := 0; i < p; i++ {
-			go func() {
-				defer func() {
+			go func {
+				defer func {
 					if err := recover(); err != nil {
 						t.Error(err.(string))
 					}
@@ -1183,7 +1183,7 @@ func TestHammerStoreLoad(t *testing.T) {
 		c := make(chan int)
 		var val uint64
 		for p := 0; p < procs; p++ {
-			go func() {
+			go func {
 				for i := 0; i < n; i++ {
 					tt(t, unsafe.Pointer(&val))
 				}
@@ -1209,7 +1209,7 @@ func TestStoreLoadSeqCst32(t *testing.T) {
 	X := [2]int32{}
 	ack := [2][3]int32{{-1, -1, -1}, {-1, -1, -1}}
 	for p := 0; p < 2; p++ {
-		go func(me int) {
+		go func me {
 			he := 1 - me
 			for i := int32(1); i < N; i++ {
 				StoreInt32(&X[me], i)
@@ -1254,7 +1254,7 @@ func TestStoreLoadSeqCst64(t *testing.T) {
 	X := [2]int64{}
 	ack := [2][3]int64{{-1, -1, -1}, {-1, -1, -1}}
 	for p := 0; p < 2; p++ {
-		go func(me int) {
+		go func me {
 			he := 1 - me
 			for i := int64(1); i < N; i++ {
 				StoreInt64(&X[me], i)
@@ -1302,7 +1302,7 @@ func TestStoreLoadRelAcq32(t *testing.T) {
 	}
 	var X Data
 	for p := int32(0); p < 2; p++ {
-		go func(p int32) {
+		go func p {
 			for i := int32(1); i < N; i++ {
 				if (i+p)%2 == 0 {
 					X.data1 = i
@@ -1351,7 +1351,7 @@ func TestStoreLoadRelAcq64(t *testing.T) {
 	}
 	var X Data
 	for p := int64(0); p < 2; p++ {
-		go func(p int64) {
+		go func p {
 			for i := int64(1); i < N; i++ {
 				if (i+p)%2 == 0 {
 					X.data1 = i
@@ -1379,7 +1379,7 @@ func TestStoreLoadRelAcq64(t *testing.T) {
 }
 
 func shouldPanic(t *testing.T, name string, f func()) {
-	defer func() {
+	defer func {
 		if recover() == nil {
 			t.Errorf("%s did not panic", name)
 		}
@@ -1405,47 +1405,47 @@ func TestUnaligned64(t *testing.T) {
 	x := make([]uint32, 4)
 	p := (*uint64)(unsafe.Pointer(&x[1])) // misaligned
 
-	shouldPanic(t, "LoadUint64", func() { LoadUint64(p) })
-	shouldPanic(t, "StoreUint64", func() { StoreUint64(p, 1) })
-	shouldPanic(t, "CompareAndSwapUint64", func() { CompareAndSwapUint64(p, 1, 2) })
-	shouldPanic(t, "AddUint64", func() { AddUint64(p, 3) })
+	shouldPanic(t, "LoadUint64", func { LoadUint64(p) })
+	shouldPanic(t, "StoreUint64", func { StoreUint64(p, 1) })
+	shouldPanic(t, "CompareAndSwapUint64", func { CompareAndSwapUint64(p, 1, 2) })
+	shouldPanic(t, "AddUint64", func { AddUint64(p, 3) })
 }
 
 func TestNilDeref(t *testing.T) {
 	funcs := [...]func(){
-		func() { CompareAndSwapInt32(nil, 0, 0) },
-		func() { CompareAndSwapInt64(nil, 0, 0) },
-		func() { CompareAndSwapUint32(nil, 0, 0) },
-		func() { CompareAndSwapUint64(nil, 0, 0) },
-		func() { CompareAndSwapUintptr(nil, 0, 0) },
-		func() { CompareAndSwapPointer(nil, nil, nil) },
-		func() { SwapInt32(nil, 0) },
-		func() { SwapUint32(nil, 0) },
-		func() { SwapInt64(nil, 0) },
-		func() { SwapUint64(nil, 0) },
-		func() { SwapUintptr(nil, 0) },
-		func() { SwapPointer(nil, nil) },
-		func() { AddInt32(nil, 0) },
-		func() { AddUint32(nil, 0) },
-		func() { AddInt64(nil, 0) },
-		func() { AddUint64(nil, 0) },
-		func() { AddUintptr(nil, 0) },
-		func() { LoadInt32(nil) },
-		func() { LoadInt64(nil) },
-		func() { LoadUint32(nil) },
-		func() { LoadUint64(nil) },
-		func() { LoadUintptr(nil) },
-		func() { LoadPointer(nil) },
-		func() { StoreInt32(nil, 0) },
-		func() { StoreInt64(nil, 0) },
-		func() { StoreUint32(nil, 0) },
-		func() { StoreUint64(nil, 0) },
-		func() { StoreUintptr(nil, 0) },
-		func() { StorePointer(nil, nil) },
+		func { CompareAndSwapInt32(nil, 0, 0) },
+		func { CompareAndSwapInt64(nil, 0, 0) },
+		func { CompareAndSwapUint32(nil, 0, 0) },
+		func { CompareAndSwapUint64(nil, 0, 0) },
+		func { CompareAndSwapUintptr(nil, 0, 0) },
+		func { CompareAndSwapPointer(nil, nil, nil) },
+		func { SwapInt32(nil, 0) },
+		func { SwapUint32(nil, 0) },
+		func { SwapInt64(nil, 0) },
+		func { SwapUint64(nil, 0) },
+		func { SwapUintptr(nil, 0) },
+		func { SwapPointer(nil, nil) },
+		func { AddInt32(nil, 0) },
+		func { AddUint32(nil, 0) },
+		func { AddInt64(nil, 0) },
+		func { AddUint64(nil, 0) },
+		func { AddUintptr(nil, 0) },
+		func { LoadInt32(nil) },
+		func { LoadInt64(nil) },
+		func { LoadUint32(nil) },
+		func { LoadUint64(nil) },
+		func { LoadUintptr(nil) },
+		func { LoadPointer(nil) },
+		func { StoreInt32(nil, 0) },
+		func { StoreInt64(nil, 0) },
+		func { StoreUint32(nil, 0) },
+		func { StoreUint64(nil, 0) },
+		func { StoreUintptr(nil, 0) },
+		func { StorePointer(nil, nil) },
 	}
 	for _, f := range funcs {
-		func() {
-			defer func() {
+		func {
+			defer func {
 				runtime.GC()
 				recover()
 			}()

@@ -389,11 +389,11 @@ func (tr *Reader) readHeader() (*Header, *block, error) {
 
 			// For Format detection, check if block is properly formatted since
 			// the parser is more liberal than what USTAR actually permits.
-			notASCII := func(r rune) bool { return r >= 0x80 }
+			notASCII := func r { return r >= 0x80 }
 			if bytes.IndexFunc(tr.blk[:], notASCII) >= 0 {
 				hdr.Format = FormatUnknown // Non-ASCII characters in block.
 			}
-			nul := func(b []byte) bool { return int(b[len(b)-1]) == 0 }
+			nul := func b { return int(b[len(b)-1]) == 0 }
 			if !(nul(v7.Size()) && nul(v7.Mode()) && nul(v7.UID()) && nul(v7.GID()) &&
 				nul(v7.ModTime()) && nul(ustar.DevMajor()) && nul(ustar.DevMinor())) {
 				hdr.Format = FormatUnknown // Numeric fields must end in NUL
@@ -520,7 +520,7 @@ func readGNUSparseMap1x0(r io.Reader) (sparseDatas, error) {
 
 	// feedTokens copies data in blocks from r into buf until there are
 	// at least cnt newlines in buf. It will not read more blocks than needed.
-	feedTokens := func(n int64) error {
+	feedTokens := func n {
 		for cntNewline < n {
 			if _, err := mustReadFull(r, blk[:]); err != nil {
 				return err
@@ -537,7 +537,7 @@ func readGNUSparseMap1x0(r io.Reader) (sparseDatas, error) {
 
 	// nextToken gets the next token delimited by a newline. This assumes that
 	// at least one newline exists in the buffer.
-	nextToken := func() string {
+	nextToken := func {
 		cntNewline--
 		tok, _ := buf.ReadString('\n')
 		return strings.TrimRight(tok, "\n")

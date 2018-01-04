@@ -249,7 +249,7 @@ func (r *Rets) ToParams() []*Param {
 
 // List returns source code of syscall return parameters.
 func (r *Rets) List() string {
-	s := join(r.ToParams(), func(p *Param) string { return p.Name + " " + p.Type }, ", ")
+	s := join(r.ToParams(), func p { return p.Name + " " + p.Type }, ", ")
 	if len(s) > 0 {
 		s = "(" + s + ")"
 	}
@@ -259,7 +259,7 @@ func (r *Rets) List() string {
 // PrintList returns source code of trace printing part correspondent
 // to syscall return values.
 func (r *Rets) PrintList() string {
-	return join(r.ToParams(), func(p *Param) string { return fmt.Sprintf(`"%s=", %s, `, p.Name, p.Name) }, `", ", `)
+	return join(r.ToParams(), func p { return fmt.Sprintf(`"%s=", %s, `, p.Name, p.Name) }, `", ", `)
 }
 
 // SetReturnValuesCode returns source code that accepts syscall return values.
@@ -476,18 +476,18 @@ func (f *Fn) DLLFuncName() string {
 
 // ParamList returns source code for function f parameters.
 func (f *Fn) ParamList() string {
-	return join(f.Params, func(p *Param) string { return p.Name + " " + p.Type }, ", ")
+	return join(f.Params, func p { return p.Name + " " + p.Type }, ", ")
 }
 
 // HelperParamList returns source code for helper function f parameters.
 func (f *Fn) HelperParamList() string {
-	return join(f.Params, func(p *Param) string { return p.Name + " " + p.HelperType() }, ", ")
+	return join(f.Params, func p { return p.Name + " " + p.HelperType() }, ", ")
 }
 
 // ParamPrintList returns source code of trace printing part correspondent
 // to syscall input parameters.
 func (f *Fn) ParamPrintList() string {
-	return join(f.Params, func(p *Param) string { return fmt.Sprintf(`"%s=", %s, `, p.Name, p.Name) }, `", ", `)
+	return join(f.Params, func p { return fmt.Sprintf(`"%s=", %s, `, p.Name, p.Name) }, `", ", `)
 }
 
 // ParamCount return number of syscall parameters for function f.
@@ -751,7 +751,7 @@ func (src *Source) Generate(w io.Writer) error {
 	funcMap := template.FuncMap{
 		"packagename": packagename,
 		"syscalldot":  syscalldot,
-		"newlazydll": func(dll string) string {
+		"newlazydll": func dll {
 			arg := "\"" + dll + ".dll\""
 			if !*systemDLL {
 				return syscalldot() + "NewLazyDLL(" + arg + ")"

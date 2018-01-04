@@ -33,13 +33,13 @@ func TestStopTheWorldDeadlock(t *testing.T) {
 	}
 	maxprocs := runtime.GOMAXPROCS(3)
 	compl := make(chan bool, 2)
-	go func() {
+	go func {
 		for i := 0; i != 1000; i += 1 {
 			runtime.GC()
 		}
 		compl <- true
 	}()
-	go func() {
+	go func {
 		for i := 0; i != 1000; i += 1 {
 			runtime.GOMAXPROCS(3)
 		}
@@ -63,7 +63,7 @@ func TestYieldLockedProgress(t *testing.T) {
 func testYieldProgress(locked bool) {
 	c := make(chan bool)
 	cack := make(chan bool)
-	go func() {
+	go func {
 		if locked {
 			runtime.LockOSThread()
 		}
@@ -85,7 +85,7 @@ func testYieldProgress(locked bool) {
 func TestYieldLocked(t *testing.T) {
 	const N = 10
 	c := make(chan bool)
-	go func() {
+	go func {
 		runtime.LockOSThread()
 		for i := 0; i < N; i++ {
 			runtime.Gosched()
@@ -118,7 +118,7 @@ func TestGoroutineParallelism(t *testing.T) {
 		x := uint32(0)
 		for p := 0; p < P; p++ {
 			// Test that all P goroutines are scheduled at the same time
-			go func(p int) {
+			go func p {
 				for i := 0; i < 3; i++ {
 					expected := uint32(P*i + p)
 					for atomic.LoadUint32(&x) != expected {
@@ -165,7 +165,7 @@ func testGoroutineParallelism2(t *testing.T, load, netpoll bool) {
 			done := make(chan bool)
 			x := uint32(0)
 			for p := 0; p < P; p++ {
-				go func() {
+				go func {
 					if atomic.AddUint32(&x, 1) == uint32(P) {
 						done <- true
 						return
@@ -194,9 +194,9 @@ func testGoroutineParallelism2(t *testing.T, load, netpoll bool) {
 		x := uint32(0)
 		// Spawn P goroutines in a nested fashion just to differ from TestGoroutineParallelism.
 		for p := 0; p < P/2; p++ {
-			go func(p int) {
+			go func p {
 				for p2 := 0; p2 < 2; p2++ {
-					go func(p2 int) {
+					go func p2 {
 						for i := 0; i < 3; i++ {
 							expected := uint32(P*i + p*2 + p2)
 							for atomic.LoadUint32(&x) != expected {
@@ -217,7 +217,7 @@ func testGoroutineParallelism2(t *testing.T, load, netpoll bool) {
 func TestBlockLocked(t *testing.T) {
 	const N = 10
 	c := make(chan bool)
-	go func() {
+	go func {
 		runtime.LockOSThread()
 		for i := 0; i < N; i++ {
 			c <- true
@@ -233,7 +233,7 @@ func TestTimerFairness(t *testing.T) {
 	done := make(chan bool)
 	c := make(chan bool)
 	for i := 0; i < 2; i++ {
-		go func() {
+		go func {
 			for {
 				select {
 				case c <- true:
@@ -259,7 +259,7 @@ func TestTimerFairness2(t *testing.T) {
 	done := make(chan bool)
 	c := make(chan bool)
 	for i := 0; i < 2; i++ {
-		go func() {
+		go func {
 			timer := time.After(20 * time.Millisecond)
 			var buf [1]byte
 			for {
@@ -280,7 +280,7 @@ func TestTimerFairness2(t *testing.T) {
 
 // The function is used to test preemption at split stack checks.
 // Declaring a var avoids inlining at the call site.
-var preempt = func() int {
+var preempt = func {
 	var a [128]int
 	sum := 0
 	for _, v := range a {
@@ -298,7 +298,7 @@ func TestPreemption(t *testing.T) {
 	c := make(chan bool)
 	var x uint32
 	for g := 0; g < 2; g++ {
-		go func(g int) {
+		go func g {
 			for i := 0; i < N; i++ {
 				for atomic.LoadUint32(&x) != uint32(g) {
 					preempt()
@@ -323,7 +323,7 @@ func TestPreemptionGC(t *testing.T) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(P + 1))
 	var stop uint32
 	for i := 0; i < P; i++ {
-		go func() {
+		go func {
 			for atomic.LoadUint32(&stop) == 0 {
 				preempt()
 			}
@@ -394,7 +394,7 @@ func TestPingPongHog(t *testing.T) {
 	hogChan, lightChan := make(chan bool), make(chan bool)
 	hogCount, lightCount := 0, 0
 
-	run := func(limit int, counter *int, wake chan bool) {
+	run := func limit, counter, wake {
 		for {
 			select {
 			case <-done:
@@ -446,7 +446,7 @@ func BenchmarkPingPongHog(b *testing.B) {
 
 	// Create a CPU hog
 	stop, done := make(chan bool), make(chan bool)
-	go func() {
+	go func {
 		for {
 			select {
 			case <-stop:
@@ -459,14 +459,14 @@ func BenchmarkPingPongHog(b *testing.B) {
 
 	// Ping-pong b.N times
 	ping, pong := make(chan bool), make(chan bool)
-	go func() {
+	go func {
 		for j := 0; j < b.N; j++ {
 			pong <- <-ping
 		}
 		close(stop)
 		done <- true
 	}()
-	go func() {
+	go func {
 		for i := 0; i < b.N; i++ {
 			ping <- <-pong
 		}
@@ -583,7 +583,7 @@ func TestSchedLocalQueueEmpty(t *testing.T) {
 }
 
 func benchmarkStackGrowth(b *testing.B, rec int) {
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			stackGrowthRecursive(rec)
 		}
@@ -609,7 +609,7 @@ func BenchmarkCreateGoroutinesParallel(b *testing.B) {
 func benchmarkCreateGoroutines(b *testing.B, procs int) {
 	c := make(chan bool)
 	var f func(n int)
-	f = func(n int) {
+	f = func n {
 		if n == 0 {
 			c <- true
 			return
@@ -632,7 +632,7 @@ func BenchmarkCreateGoroutinesCapture(b *testing.B) {
 		wg.Add(N)
 		for i := 0; i < N; i++ {
 			i := i
-			go func() {
+			go func {
 				if i >= N {
 					b.Logf("bad") // just to capture b
 				}
@@ -648,7 +648,7 @@ func BenchmarkClosureCall(b *testing.B) {
 	off1 := 1
 	for i := 0; i < b.N; i++ {
 		off2 := 2
-		func() {
+		func {
 			sum += i + off1 + off2
 		}()
 	}
@@ -671,7 +671,7 @@ func benchmarkWakeupParallel(b *testing.B, spin func(time.Duration)) {
 		50 * time.Microsecond,
 		100 * time.Microsecond,
 	} {
-		b.Run(delay.String(), func(b *testing.B) {
+		b.Run(delay.String(), func b {
 			if b.N == 0 {
 				return
 			}
@@ -710,7 +710,7 @@ func benchmarkWakeupParallel(b *testing.B, spin func(time.Duration)) {
 			ping, pong := make(chan struct{}), make(chan struct{})
 			start := make(chan struct{})
 			done := make(chan struct{})
-			go func() {
+			go func {
 				<-start
 				for i := 0; i < b.N; i++ {
 					// sender
@@ -722,7 +722,7 @@ func benchmarkWakeupParallel(b *testing.B, spin func(time.Duration)) {
 				}
 				done <- struct{}{}
 			}()
-			go func() {
+			go func {
 				for i := 0; i < b.N; i++ {
 					// receiver
 					spin(delay)
@@ -742,7 +742,7 @@ func benchmarkWakeupParallel(b *testing.B, spin func(time.Duration)) {
 }
 
 func BenchmarkWakeupParallelSpinning(b *testing.B) {
-	benchmarkWakeupParallel(b, func(d time.Duration) {
+	benchmarkWakeupParallel(b, func d {
 		end := time.Now().Add(d)
 		for time.Now().Before(end) {
 			// do nothing
@@ -760,7 +760,7 @@ func BenchmarkWakeupParallelSyscall(b *testing.B) {
 	if sysNanosleep == nil {
 		b.Skipf("skipping on %v; sysNanosleep not defined", runtime.GOOS)
 	}
-	benchmarkWakeupParallel(b, func(d time.Duration) {
+	benchmarkWakeupParallel(b, func d {
 		sysNanosleep(d)
 	})
 }
@@ -834,7 +834,7 @@ func TestStealOrder(t *testing.T) {
 }
 
 func TestLockOSThreadNesting(t *testing.T) {
-	go func() {
+	go func {
 		e, i := runtime.LockOSCounts()
 		if e != 0 || i != 0 {
 			t.Errorf("want locked counts 0, 0; got %d, %d", e, i)

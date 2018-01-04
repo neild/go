@@ -39,7 +39,7 @@ func (t fileTransport) RoundTrip(req *Request) (resp *Response, err error) {
 	// populated (even if the body itself is still being
 	// written to the res.Body, a pipe)
 	rw, resc := newPopulateResponseWriter()
-	go func() {
+	go func {
 		t.fh.ServeHTTP(rw, req)
 		rw.finish()
 	}()

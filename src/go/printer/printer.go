@@ -158,7 +158,7 @@ func (p *printer) commentBefore(next token.Position) bool {
 //
 func (p *printer) commentSizeBefore(next token.Position) int {
 	// save/restore current p.commentInfo (p.nextComment() modifies it)
-	defer func(info commentInfo) {
+	defer func info {
 		p.commentInfo = info
 	}(p.commentInfo)
 
@@ -632,7 +632,7 @@ func (p *printer) writeComment(comment *ast.Comment) {
 				// accordingly and suspend indentation temporarily.
 				indent := p.indent
 				p.indent = 0
-				defer func() {
+				defer func {
 					p.pos.Filename = ldir[:i]
 					p.pos.Line = line
 					p.pos.Column = 1

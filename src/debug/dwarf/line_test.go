@@ -53,7 +53,7 @@ func TestLineGCCWindows(t *testing.T) {
 	//   gcc (tdm64-1) 4.9.2
 	//   > gcc -g -o line-gcc-win.bin line1.c C:\workdir\go\src\debug\dwarf\testdata\line2.c
 
-	toWindows := func(lf *LineFile) *LineFile {
+	toWindows := func lf {
 		lf2 := *lf
 		lf2.Name = strings.Replace(lf2.Name, "/home/austin/go.dev/", "C:\\workdir\\go\\", -1)
 		lf2.Name = strings.Replace(lf2.Name, "/", "\\", -1)

@@ -73,7 +73,7 @@ func (t *timer) reset(q *queue, deadline int64) {
 
 func timerExpired(i interface{}, seq uintptr) {
 	t := i.(*timer)
-	go func() {
+	go func {
 		t.q.Lock()
 		defer t.q.Unlock()
 		t.expired = true
@@ -504,7 +504,7 @@ type netproto struct {
 }
 
 var netprotoAF_INET = &netproto{
-	bind: func(f *netFile, sa Sockaddr) error {
+	bind: func f, sa {
 		if sa == nil {
 			f.addr = &SockaddrInet4{
 				Port: nextport,

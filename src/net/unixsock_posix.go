@@ -178,7 +178,7 @@ func (ln *UnixListener) close() error {
 	// sequence in ListenUnix. It's only non-Go
 	// programs that can mess us up.
 	// Even if there are racy calls to Close, we want to unlink only for the first one.
-	ln.unlinkOnce.Do(func() {
+	ln.unlinkOnce.Do(func {
 		if ln.path[0] != '@' && ln.unlink {
 			syscall.Unlink(ln.path)
 		}

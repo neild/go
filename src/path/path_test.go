@@ -84,7 +84,7 @@ func TestCleanMallocs(t *testing.T) {
 	}
 
 	for _, test := range cleantests {
-		allocs := testing.AllocsPerRun(100, func() { Clean(test.result) })
+		allocs := testing.AllocsPerRun(100, func { Clean(test.result) })
 		if allocs > 0 {
 			t.Errorf("Clean(%q): %v allocs, want zero", test.result, allocs)
 		}

@@ -64,7 +64,7 @@ func TestWriter(t *testing.T) {
 		t.Fatal("rand.Read failed:", err)
 	}
 	writeTests[1].Data = largeData
-	defer func() {
+	defer func {
 		writeTests[1].Data = nil
 	}()
 
@@ -252,7 +252,7 @@ func TestWriterOffset(t *testing.T) {
 		t.Fatal("rand.Read failed:", err)
 	}
 	writeTests[1].Data = largeData
-	defer func() {
+	defer func {
 		writeTests[1].Data = nil
 	}()
 
@@ -342,7 +342,7 @@ func testReadFile(t *testing.T, f *File, wt *WriteTest) {
 func BenchmarkCompressedZipGarbage(b *testing.B) {
 	bigBuf := bytes.Repeat([]byte("a"), 1<<20)
 
-	runOnce := func(buf *bytes.Buffer) {
+	runOnce := func buf {
 		buf.Reset()
 		zw := NewWriter(buf)
 		for j := 0; j < 3; j++ {
@@ -362,7 +362,7 @@ func BenchmarkCompressedZipGarbage(b *testing.B) {
 	runOnce(&bytes.Buffer{})
 	b.ResetTimer()
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		var buf bytes.Buffer
 		for pb.Next() {
 			runOnce(&buf)

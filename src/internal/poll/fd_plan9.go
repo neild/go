@@ -139,7 +139,7 @@ func setDeadlineImpl(fd *FD, t time.Time, mode int) error {
 	} else {
 		// Interrupt I/O operation once timer has expired
 		if mode == 'r' || mode == 'r'+'w' {
-			fd.rtimer = time.AfterFunc(d, func() {
+			fd.rtimer = time.AfterFunc(d, func {
 				fd.rtimedout.setTrue()
 				if fd.raio != nil {
 					fd.raio.Cancel()
@@ -147,7 +147,7 @@ func setDeadlineImpl(fd *FD, t time.Time, mode int) error {
 			})
 		}
 		if mode == 'w' || mode == 'r'+'w' {
-			fd.wtimer = time.AfterFunc(d, func() {
+			fd.wtimer = time.AfterFunc(d, func {
 				fd.wtimedout.setTrue()
 				if fd.waio != nil {
 					fd.waio.Cancel()

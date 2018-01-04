@@ -145,7 +145,7 @@ func TestDeadCode(t *testing.T) {
 			// Mark blocks reachable from entry.
 			live := make(map[*Block]bool)
 			var visit func(*Block)
-			visit = func(b *Block) {
+			visit = func b {
 				if !live[b] {
 					live[b] = true
 					for _, succ := range b.Succs {

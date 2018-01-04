@@ -45,7 +45,7 @@ func Addrs(af int, name string) ([]Addr, error) {
 	if len(eps) == 0 {
 		return nil, err
 	}
-	defer func() {
+	defer func {
 		for _, ep := range eps {
 			ep.close()
 		}

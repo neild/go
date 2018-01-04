@@ -85,7 +85,7 @@ func ExampleWriter_RegisterCompressor() {
 	w := zip.NewWriter(buf)
 
 	// Register a custom Deflate compressor.
-	w.RegisterCompressor(zip.Deflate, func(out io.Writer) (io.WriteCloser, error) {
+	w.RegisterCompressor(zip.Deflate, func out {
 		return flate.NewWriter(out, flate.BestCompression)
 	})
 

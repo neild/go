@@ -29,7 +29,7 @@ func (b *Builder) AddASN1Enum(v int64) {
 }
 
 func (b *Builder) addASN1Signed(tag asn1.Tag, v int64) {
-	b.AddASN1(tag, func(c *Builder) {
+	b.AddASN1(tag, func c {
 		length := 1
 		for i := v; i >= 0x80 || i < -0x80; i >>= 8 {
 			length++
@@ -44,7 +44,7 @@ func (b *Builder) addASN1Signed(tag asn1.Tag, v int64) {
 
 // AddASN1Uint64 appends a DER-encoded ASN.1 INTEGER.
 func (b *Builder) AddASN1Uint64(v uint64) {
-	b.AddASN1(asn1.INTEGER, func(c *Builder) {
+	b.AddASN1(asn1.INTEGER, func c {
 		length := 1
 		for i := v; i >= 0x80; i >>= 8 {
 			length++
@@ -63,7 +63,7 @@ func (b *Builder) AddASN1BigInt(n *big.Int) {
 		return
 	}
 
-	b.AddASN1(asn1.INTEGER, func(c *Builder) {
+	b.AddASN1(asn1.INTEGER, func c {
 		if n.Sign() < 0 {
 			// A negative number has to be converted to two's-complement form. So we
 			// invert and subtract 1. If the most-significant-bit isn't set then
@@ -93,7 +93,7 @@ func (b *Builder) AddASN1BigInt(n *big.Int) {
 
 // AddASN1OctetString appends a DER-encoded ASN.1 OCTET STRING.
 func (b *Builder) AddASN1OctetString(bytes []byte) {
-	b.AddASN1(asn1.OCTET_STRING, func(c *Builder) {
+	b.AddASN1(asn1.OCTET_STRING, func c {
 		c.AddBytes(bytes)
 	})
 }
@@ -106,7 +106,7 @@ func (b *Builder) AddASN1GeneralizedTime(t time.Time) {
 		b.err = fmt.Errorf("cryptobyte: cannot represent %v as a GeneralizedTime", t)
 		return
 	}
-	b.AddASN1(asn1.GeneralizedTime, func(c *Builder) {
+	b.AddASN1(asn1.GeneralizedTime, func c {
 		c.AddBytes([]byte(t.Format(generalizedTimeFormatStr)))
 	})
 }
@@ -114,7 +114,7 @@ func (b *Builder) AddASN1GeneralizedTime(t time.Time) {
 // AddASN1BitString appends a DER-encoded ASN.1 BIT STRING. This does not
 // support BIT STRINGs that are not a whole number of bytes.
 func (b *Builder) AddASN1BitString(data []byte) {
-	b.AddASN1(asn1.BIT_STRING, func(b *Builder) {
+	b.AddASN1(asn1.BIT_STRING, func b {
 		b.AddUint8(0)
 		b.AddBytes(data)
 	})
@@ -160,7 +160,7 @@ func isValidOID(oid encoding_asn1.ObjectIdentifier) bool {
 }
 
 func (b *Builder) AddASN1ObjectIdentifier(oid encoding_asn1.ObjectIdentifier) {
-	b.AddASN1(asn1.OBJECT_IDENTIFIER, func(b *Builder) {
+	b.AddASN1(asn1.OBJECT_IDENTIFIER, func b {
 		if !isValidOID(oid) {
 			b.err = fmt.Errorf("cryptobyte: invalid OID: %v", oid)
 			return
@@ -174,7 +174,7 @@ func (b *Builder) AddASN1ObjectIdentifier(oid encoding_asn1.ObjectIdentifier) {
 }
 
 func (b *Builder) AddASN1Boolean(v bool) {
-	b.AddASN1(asn1.BOOLEAN, func(b *Builder) {
+	b.AddASN1(asn1.BOOLEAN, func b {
 		if v {
 			b.AddUint8(0xff)
 		} else {

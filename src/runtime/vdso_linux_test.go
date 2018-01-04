@@ -42,7 +42,7 @@ func TestClockVDSOAndFallbackPaths(t *testing.T) {
 }
 
 func BenchmarkClockVDSOAndFallbackPaths(b *testing.B) {
-	run := func(b *testing.B) {
+	run := func b {
 		for i := 0; i < b.N; i++ {
 			// Call via time.Now() - see comment in test above.
 			time.Now()

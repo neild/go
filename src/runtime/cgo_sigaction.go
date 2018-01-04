@@ -59,7 +59,7 @@ func rt_sigaction(sig uintptr, new, old *sigactiont, size uintptr) int32 {
 			// The function literal that we pass to systemstack is not nosplit, but
 			// that's ok: we'll be running on a fresh, clean system stack so the stack
 			// check will always succeed anyway.
-			systemstack(func() {
+			systemstack(func {
 				ret = callCgoSigaction(sig, new, old)
 			})
 		}

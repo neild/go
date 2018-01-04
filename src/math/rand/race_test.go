@@ -20,7 +20,7 @@ func TestConcurrent(t *testing.T) {
 	defer wg.Wait()
 	wg.Add(numRoutines)
 	for i := 0; i < numRoutines; i++ {
-		go func(i int) {
+		go func i {
 			defer wg.Done()
 			buf := make([]byte, 997)
 			for j := 0; j < numCycles; j++ {

@@ -18,7 +18,7 @@ import (
 )
 
 func init() {
-	isReadonlyError = func(err error) bool { return err == syscall.EROFS }
+	isReadonlyError = func err { return err == syscall.EROFS }
 }
 
 func checkUidGid(t *testing.T, path string, uid, gid int) {
@@ -173,8 +173,8 @@ func TestLchown(t *testing.T) {
 // Issue 16919: Readdir must return a non-empty slice or an error.
 func TestReaddirRemoveRace(t *testing.T) {
 	oldStat := *LstatP
-	defer func() { *LstatP = oldStat }()
-	*LstatP = func(name string) (FileInfo, error) {
+	defer func { *LstatP = oldStat }()
+	*LstatP = func name {
 		if strings.HasSuffix(name, "some-file") {
 			// Act like it's been deleted.
 			return nil, ErrNotExist

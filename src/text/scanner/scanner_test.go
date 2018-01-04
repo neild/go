@@ -363,7 +363,7 @@ func TestScanCustomIdent(t *testing.T) {
 	// ident = ( 'a' | 'b' ) { digit } .
 	// digit = '0' .. '3' .
 	// with a maximum length of 4
-	s.IsIdentRune = func(ch rune, i int) bool {
+	s.IsIdentRune = func ch, i {
 		return i == 0 && (ch == 'a' || ch == 'b') || 0 < i && i < 4 && '0' <= ch && ch <= '3'
 	}
 	checkTok(t, s, 1, s.Scan(), 'f', "f")
@@ -426,7 +426,7 @@ func TestScanWhitespace(t *testing.T) {
 func testError(t *testing.T, src, pos, msg string, tok rune) {
 	s := new(Scanner).Init(strings.NewReader(src))
 	errorCalled := false
-	s.Error = func(s *Scanner, m string) {
+	s.Error = func s, m {
 		if !errorCalled {
 			// only look at first error
 			if p := s.Pos().String(); p != pos {
@@ -494,7 +494,7 @@ func (errReader) Read(b []byte) (int, error) {
 func TestIOError(t *testing.T) {
 	s := new(Scanner).Init(errReader{})
 	errorCalled := false
-	s.Error = func(s *Scanner, msg string) {
+	s.Error = func s, msg {
 		if !errorCalled {
 			if want := io.ErrNoProgress.Error(); msg != want {
 				t.Errorf("msg = %q, want %q", msg, want)

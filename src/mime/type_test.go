@@ -14,7 +14,7 @@ import (
 func setMimeInit(fn func()) (cleanup func()) {
 	once = sync.Once{}
 	testInitMime = fn
-	return func() { testInitMime = nil }
+	return func { testInitMime = nil }
 }
 
 func clearMimeTypes() {
@@ -49,7 +49,7 @@ func TestTypeByExtension(t *testing.T) {
 }
 
 func TestTypeByExtension_LocalData(t *testing.T) {
-	cleanup := setMimeInit(func() {
+	cleanup := setMimeInit(func {
 		clearMimeTypes()
 		setType(".foo", "x/foo")
 		setType(".bar", "x/bar")
@@ -77,7 +77,7 @@ func TestTypeByExtensionCase(t *testing.T) {
 	const custom = "test/test; charset=iso-8859-1"
 	const caps = "test/test; WAS=ALLCAPS"
 
-	cleanup := setMimeInit(func() {
+	cleanup := setMimeInit(func {
 		clearMimeTypes()
 		setType(".TEST", caps)
 		setType(".tesT", custom)
@@ -99,7 +99,7 @@ func TestTypeByExtensionCase(t *testing.T) {
 }
 
 func TestExtensionsByType(t *testing.T) {
-	cleanup := setMimeInit(func() {
+	cleanup := setMimeInit(func {
 		clearMimeTypes()
 		setType(".gif", "image/gif")
 		setType(".a", "foo/letter")
@@ -140,7 +140,7 @@ func TestExtensionsByType(t *testing.T) {
 }
 
 func TestLookupMallocs(t *testing.T) {
-	n := testing.AllocsPerRun(10000, func() {
+	n := testing.AllocsPerRun(10000, func {
 		TypeByExtension(".html")
 		TypeByExtension(".HtML")
 	})
@@ -158,8 +158,8 @@ func BenchmarkTypeByExtension(b *testing.B) {
 		".HTML",
 		".unused",
 	} {
-		b.Run(ext, func(b *testing.B) {
-			b.RunParallel(func(pb *testing.PB) {
+		b.Run(ext, func b {
+			b.RunParallel(func pb {
 				for pb.Next() {
 					TypeByExtension(ext)
 				}
@@ -177,8 +177,8 @@ func BenchmarkExtensionsByType(b *testing.B) {
 		"text/html; charset=utf-8",
 		"application/octet-stream",
 	} {
-		b.Run(typ, func(b *testing.B) {
-			b.RunParallel(func(pb *testing.PB) {
+		b.Run(typ, func b {
+			b.RunParallel(func pb {
 				for pb.Next() {
 					if _, err := ExtensionsByType(typ); err != nil {
 						b.Fatal(err)

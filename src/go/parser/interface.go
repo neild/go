@@ -93,7 +93,7 @@ func ParseFile(fset *token.FileSet, filename string, src interface{}, mode Mode)
 	}
 
 	var p parser
-	defer func() {
+	defer func {
 		if e := recover(); e != nil {
 			// resume same panic if it's not a bailout
 			if _, ok := e.(bailout); !ok {
@@ -189,7 +189,7 @@ func ParseExprFrom(fset *token.FileSet, filename string, src interface{}, mode M
 	}
 
 	var p parser
-	defer func() {
+	defer func {
 		if e := recover(); e != nil {
 			// resume same panic if it's not a bailout
 			if _, ok := e.(bailout); !ok {

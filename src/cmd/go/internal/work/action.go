@@ -146,7 +146,7 @@ func actionGraphJSON(a *Action) string {
 	var workq []*Action
 	var inWorkq = make(map[*Action]int)
 
-	add := func(a *Action) {
+	add := func a {
 		if _, ok := inWorkq[a]; ok {
 			return
 		}
@@ -204,7 +204,7 @@ const (
 
 func (b *Builder) Init() {
 	var err error
-	b.Print = func(a ...interface{}) (int, error) {
+	b.Print = func a {
 		return fmt.Fprint(os.Stderr, a...)
 	}
 	b.actionCache = make(map[cacheKey]*Action)
@@ -224,7 +224,7 @@ func (b *Builder) Init() {
 		}
 		if !cfg.BuildWork {
 			workdir := b.WorkDir
-			base.AtExit(func() { os.RemoveAll(workdir) })
+			base.AtExit(func { os.RemoveAll(workdir) })
 		}
 	}
 
@@ -323,7 +323,7 @@ func (b *Builder) CompileAction(mode, depMode BuildMode, p *load.Package) *Actio
 	}
 
 	// Construct package build action.
-	a := b.cacheAction("build", p, func() *Action {
+	a := b.cacheAction("build", p, func {
 		a := &Action{
 			Mode:    "build",
 			Package: p,
@@ -371,7 +371,7 @@ func (b *Builder) CompileAction(mode, depMode BuildMode, p *load.Package) *Actio
 // to make sure that the install depends on (runs after) vet.
 func (b *Builder) VetAction(mode, depMode BuildMode, p *load.Package) *Action {
 	// Construct vet action.
-	a := b.cacheAction("vet", p, func() *Action {
+	a := b.cacheAction("vet", p, func {
 		a1 := b.CompileAction(mode, depMode, p)
 
 		// vet expects to be able to import "fmt".
@@ -404,7 +404,7 @@ func (b *Builder) VetAction(mode, depMode BuildMode, p *load.Package) *Action {
 // depMode is the action (build or install) to use when compiling dependencies.
 func (b *Builder) LinkAction(mode, depMode BuildMode, p *load.Package) *Action {
 	// Construct link action.
-	a := b.cacheAction("link", p, func() *Action {
+	a := b.cacheAction("link", p, func {
 		a := &Action{
 			Mode:    "link",
 			Package: p,
@@ -478,7 +478,7 @@ func (b *Builder) installAction(a1 *Action, mode BuildMode) *Action {
 	}
 
 	p := a1.Package
-	return b.cacheAction(a1.Mode+"-install", p, func() *Action {
+	return b.cacheAction(a1.Mode+"-install", p, func {
 		// The install deletes the temporary build result,
 		// so we need all other actions, both past and future,
 		// that attempt to depend on the build to depend instead
@@ -615,7 +615,7 @@ func (b *Builder) buildmodeShared(mode, depMode BuildMode, args []string, pkgs [
 func (b *Builder) linkSharedAction(mode, depMode BuildMode, shlib string, a1 *Action) *Action {
 	fullShlib := shlib
 	shlib = filepath.Base(shlib)
-	a := b.cacheAction("build-shlib "+shlib, nil, func() *Action {
+	a := b.cacheAction("build-shlib "+shlib, nil, func {
 		if a1 == nil {
 			// TODO(rsc): Need to find some other place to store config,
 			// not in pkg directory. See golang.org/issue/22196.
@@ -657,7 +657,7 @@ func (b *Builder) linkSharedAction(mode, depMode BuildMode, shlib string, a1 *Ac
 		}
 		a.Target = filepath.Join(a.Objdir, shlib)
 		if cfg.BuildToolchainName != "gccgo" {
-			add := func(a1 *Action, pkg string, force bool) {
+			add := func a1, pkg, force {
 				for _, a2 := range a1.Deps {
 					if a2.Package != nil && a2.Package.ImportPath == pkg {
 						return
@@ -696,7 +696,7 @@ func (b *Builder) linkSharedAction(mode, depMode BuildMode, shlib string, a1 *Ac
 	if (mode == ModeInstall || mode == ModeBuggyInstall) && a.Func != nil {
 		buildAction := a
 
-		a = b.cacheAction("install-shlib "+shlib, nil, func() *Action {
+		a = b.cacheAction("install-shlib "+shlib, nil, func {
 			// Determine the eventual install target.
 			// The install target is root/pkg/shlib, where root is the source root
 			// in which all the packages lie.

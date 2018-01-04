@@ -426,7 +426,7 @@ func macholoadsym(m *ldMachoObj, symtab *ldMachoSymtab) int {
 // Load loads the Mach-O file pn from f.
 // Symbols are written into syms, and a slice of the text symbols is returned.
 func Load(arch *sys.Arch, syms *sym.Symbols, f *bio.Reader, pkg string, length int64, pn string) (textp []*sym.Symbol, err error) {
-	errorf := func(str string, args ...interface{}) ([]*sym.Symbol, error) {
+	errorf := func str, args {
 		return nil, fmt.Errorf("loadmacho: %v: %v", pn, fmt.Sprintf(str, args...))
 	}
 

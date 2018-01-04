@@ -13,7 +13,7 @@ import (
 
 // turn uint64 op into float64 op
 func fop(f func(x, y uint64) uint64) func(x, y float64) float64 {
-	return func(x, y float64) float64 {
+	return func x, y {
 		bx := math.Float64bits(x)
 		by := math.Float64bits(y)
 		return math.Float64frombits(f(bx, by))

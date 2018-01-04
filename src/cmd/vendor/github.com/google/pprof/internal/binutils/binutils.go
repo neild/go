@@ -85,7 +85,7 @@ func (bu *Binutils) update(fn func(r *binrep)) {
 // symbolization (using nm), which is much faster than addr2line but
 // provides only symbol name information (no file/line).
 func (bu *Binutils) SetFastSymbolization(fast bool) {
-	bu.update(func(r *binrep) { r.fast = fast })
+	bu.update(func r { r.fast = fast })
 }
 
 // SetTools processes the contents of the tools option. It
@@ -94,7 +94,7 @@ func (bu *Binutils) SetFastSymbolization(fast bool) {
 // tool named t. If t is not specified, the path is searched for all
 // tools.
 func (bu *Binutils) SetTools(config string) {
-	bu.update(func(r *binrep) { initTools(r, config) })
+	bu.update(func r { initTools(r, config) })
 }
 
 func initTools(b *binrep, config string) {
@@ -193,7 +193,7 @@ func (b *binrep) openELF(name string, start, limit, offset uint64) (plugin.ObjFi
 	defer ef.Close()
 
 	var stextOffset *uint64
-	var pageAligned = func(addr uint64) bool { return addr%4096 == 0 }
+	var pageAligned = func addr { return addr%4096 == 0 }
 	if strings.Contains(name, "vmlinux") || !pageAligned(start) || !pageAligned(limit) || !pageAligned(offset) {
 		// Reading all Symbols is expensive, and we only rarely need it so
 		// we don't want to do it every time. But if _stext happens to be

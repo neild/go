@@ -27,7 +27,7 @@ func TestGolden(t *testing.T) {
 	}
 	for _, file := range files {
 		name := strings.TrimSuffix(filepath.Base(file), ".test")
-		t.Run(name, func(t *testing.T) {
+		t.Run(name, func t {
 			orig, err := ioutil.ReadFile(file)
 			if err != nil {
 				t.Fatal(err)
@@ -63,7 +63,7 @@ func TestGolden(t *testing.T) {
 			}
 
 			// Write entire input in bulk.
-			t.Run("bulk", func(t *testing.T) {
+			t.Run("bulk", func t {
 				buf.Reset()
 				c = NewConverter(&buf, "", 0)
 				in = append([]byte{}, orig...)
@@ -73,7 +73,7 @@ func TestGolden(t *testing.T) {
 			})
 
 			// Write 2 bytes at a time on even boundaries.
-			t.Run("even2", func(t *testing.T) {
+			t.Run("even2", func t {
 				buf.Reset()
 				c = NewConverter(&buf, "", 0)
 				in = append([]byte{}, orig...)
@@ -89,7 +89,7 @@ func TestGolden(t *testing.T) {
 			})
 
 			// Write 2 bytes at a time on odd boundaries.
-			t.Run("odd2", func(t *testing.T) {
+			t.Run("odd2", func t {
 				buf.Reset()
 				c = NewConverter(&buf, "", 0)
 				in = append([]byte{}, orig...)
@@ -110,10 +110,10 @@ func TestGolden(t *testing.T) {
 			// Test with very small output buffers, to check that
 			// UTF8 sequences are not broken up.
 			for b := 5; b <= 8; b++ {
-				t.Run(fmt.Sprintf("tiny%d", b), func(t *testing.T) {
+				t.Run(fmt.Sprintf("tiny%d", b), func t {
 					oldIn := inBuffer
 					oldOut := outBuffer
-					defer func() {
+					defer func {
 						inBuffer = oldIn
 						outBuffer = oldOut
 					}()
@@ -148,7 +148,7 @@ func diffJSON(t *testing.T, have, want []byte) {
 	type event map[string]interface{}
 
 	// Parse into events, one per line.
-	parseEvents := func(b []byte) ([]event, []string) {
+	parseEvents := func b {
 		t.Helper()
 		var events []event
 		var lines []string
@@ -183,9 +183,9 @@ func diffJSON(t *testing.T, have, want []byte) {
 	// Fail reports a failure at the current i,j and stops the test.
 	// It shows the events around the current positions,
 	// with the current positions marked.
-	fail := func() {
+	fail := func {
 		var buf bytes.Buffer
-		show := func(i int, lines []string) {
+		show := func i, lines {
 			for k := -2; k < 5; k++ {
 				marker := ""
 				if k == 0 {
@@ -211,14 +211,14 @@ func diffJSON(t *testing.T, have, want []byte) {
 	var wantOutput, haveOutput string // collected "Output" of those events
 
 	// getTest returns the "Test" setting, or "" if it is missing.
-	getTest := func(e event) string {
+	getTest := func e {
 		s, _ := e["Test"].(string)
 		return s
 	}
 
 	// checkOutput collects output from the haveEvents for the current outputTest
 	// and then checks that the collected output matches the wanted output.
-	checkOutput := func() {
+	checkOutput := func {
 		for i < len(haveEvents) && haveEvents[i]["Action"] == "output" && getTest(haveEvents[i]) == outputTest {
 			haveOutput += haveEvents[i]["Output"].(string)
 			i++

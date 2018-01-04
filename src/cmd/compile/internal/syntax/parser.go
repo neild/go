@@ -43,10 +43,10 @@ func (p *parser) init(base *src.PosBase, r io.Reader, errh ErrorHandler, pragh P
 		// handlers are always at or after the current reading
 		// position, it is save to use the most recent position
 		// base to compute the corresponding Pos value.
-		func(line, col uint, msg string) {
+		func line, col, msg {
 			p.error_at(p.pos_at(line, col), msg)
 		},
-		func(line, col uint, text string) {
+		func line, col, text {
 			if strings.HasPrefix(text, "line ") {
 				p.updateBase(line, col+5, text[5:])
 				return
@@ -245,7 +245,7 @@ func (p *parser) trace(msg string) func() {
 	p.print(msg + " (")
 	const tab = ". "
 	p.indent = append(p.indent, tab...)
-	return func() {
+	return func {
 		p.indent = p.indent[:len(p.indent)-len(tab)]
 		if x := recover(); x != nil {
 			panic(x) // skip print_trace
@@ -389,7 +389,7 @@ func (p *parser) list(open, sep, close token, f func() bool) src.Pos {
 func (p *parser) appendGroup(list []Decl, f func(*Group) Decl) []Decl {
 	if p.tok == _Lparen {
 		g := new(Group)
-		p.list(_Lparen, _Semi, _Rparen, func() bool {
+		p.list(_Lparen, _Semi, _Rparen, func {
 			list = append(list, f(g))
 			return false
 		})
@@ -971,7 +971,7 @@ func (p *parser) complitexpr() *CompositeLit {
 	x.pos = p.pos()
 
 	p.xnest++
-	x.Rbrace = p.list(_Lbrace, _Comma, _Rbrace, func() bool {
+	x.Rbrace = p.list(_Lbrace, _Comma, _Rbrace, func {
 		// value
 		e := p.bare_complitexpr()
 		if p.tok == _Colon {
@@ -1173,7 +1173,7 @@ func (p *parser) structType() *StructType {
 	typ.pos = p.pos()
 
 	p.want(_Struct)
-	p.list(_Lbrace, _Semi, _Rbrace, func() bool {
+	p.list(_Lbrace, _Semi, _Rbrace, func {
 		p.fieldDecl(typ)
 		return false
 	})
@@ -1191,7 +1191,7 @@ func (p *parser) interfaceType() *InterfaceType {
 	typ.pos = p.pos()
 
 	p.want(_Interface)
-	p.list(_Lbrace, _Semi, _Rbrace, func() bool {
+	p.list(_Lbrace, _Semi, _Rbrace, func {
 		if m := p.methodDecl(); m != nil {
 			typ.MethodList = append(typ.MethodList, m)
 		}
@@ -1451,7 +1451,7 @@ func (p *parser) paramList() (list []*Field) {
 	pos := p.pos()
 
 	var named int // number of parameters that have an explicit name and type
-	p.list(_Lparen, _Comma, _Rparen, func() bool {
+	p.list(_Lparen, _Comma, _Rparen, func {
 		if par := p.paramDeclOrNil(); par != nil {
 			if debug && par.Name == nil && par.Type == nil {
 				panic("parameter without name or type")
@@ -2085,7 +2085,7 @@ func (p *parser) argList() (list []Expr, hasDots bool) {
 	}
 
 	p.xnest++
-	p.list(_Lparen, _Comma, _Rparen, func() bool {
+	p.list(_Lparen, _Comma, _Rparen, func {
 		list = append(list, p.expr())
 		hasDots = p.got(_DotDotDot)
 		return hasDots

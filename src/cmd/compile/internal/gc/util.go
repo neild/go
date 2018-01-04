@@ -60,7 +60,7 @@ func startProfile() {
 		if err != nil {
 			Fatalf("%v", err)
 		}
-		atExit(func() {
+		atExit(func {
 			// Profile all outstanding allocations.
 			runtime.GC()
 			// compilebench parses the memory profile to extract memstats,
@@ -81,7 +81,7 @@ func startProfile() {
 			Fatalf("%v", err)
 		}
 		runtime.SetBlockProfileRate(1)
-		atExit(func() {
+		atExit(func {
 			pprof.Lookup("block").WriteTo(f, 0)
 			f.Close()
 		})
@@ -92,7 +92,7 @@ func startProfile() {
 			Fatalf("%v", err)
 		}
 		startMutexProfiling()
-		atExit(func() {
+		atExit(func {
 			pprof.Lookup("mutex").WriteTo(f, 0)
 			f.Close()
 		})

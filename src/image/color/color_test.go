@@ -11,7 +11,7 @@ import (
 
 func TestSqDiff(t *testing.T) {
 	// canonical sqDiff implementation
-	orig := func(x, y uint32) uint32 {
+	orig := func x, y {
 		var d uint32
 		if x > y {
 			d = uint32(x - y)

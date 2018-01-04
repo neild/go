@@ -220,7 +220,7 @@ func typecheck(t *testing.T, path string, filenames []string) {
 
 	// typecheck package files
 	conf := Config{
-		Error:    func(err error) { t.Error(err) },
+		Error:    func err { t.Error(err) },
 		Importer: stdLibImporter,
 	}
 	info := Info{Uses: make(map[*ast.Ident]Object)}

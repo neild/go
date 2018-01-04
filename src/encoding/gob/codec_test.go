@@ -1489,8 +1489,8 @@ func TestFuzzOneByte(t *testing.T) {
 			b := []byte(s)
 			b[i] ^= byte(j)
 			var e DT
-			func() {
-				defer func() {
+			func {
+				defer func {
 					if p := recover(); p != nil {
 						t.Errorf("crash for b[%d] ^= 0x%x", i, j)
 						panic(p)

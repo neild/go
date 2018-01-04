@@ -175,7 +175,7 @@ func TestPassFD(t *testing.T) {
 
 	buf := make([]byte, 32) // expect 1 byte
 	oob := make([]byte, 32) // expect 24 bytes
-	closeUnix := time.AfterFunc(5*time.Second, func() {
+	closeUnix := time.AfterFunc(5*time.Second, func {
 		t.Logf("timeout reading from unix socket")
 		uc.Close()
 	})

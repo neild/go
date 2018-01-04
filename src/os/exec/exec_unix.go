@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	skipStdinCopyError = func(err error) bool {
+	skipStdinCopyError = func err {
 		// Ignore EPIPE errors copying to stdin if the program
 		// completed successfully otherwise.
 		// See Issue 9173.

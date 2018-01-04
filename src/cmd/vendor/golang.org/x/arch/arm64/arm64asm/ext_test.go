@@ -133,7 +133,7 @@ func testExtDis(
 	}
 	ext.Size = size
 	ext.File = f
-	defer func() {
+	defer func {
 		f.Close()
 		if !*keep {
 			os.Remove(file)
@@ -148,11 +148,11 @@ func testExtDis(
 
 		errors = make([]string, 0, 100) // Sampled errors, at most cap
 	)
-	go func() {
+	go func {
 		errc <- extdis(ext)
 	}()
 
-	generate(func(enc []byte) {
+	generate(func enc {
 		dec, ok := <-ext.Dec
 		if !ok {
 			t.Errorf("decoding stream ended early")
@@ -224,7 +224,7 @@ func writeInst(generate func(func([]byte))) (file string, f *os.File, size int, 
 	w := bufio.NewWriter(f)
 	defer w.Flush()
 	size = 0
-	generate(func(x []byte) {
+	generate(func x {
 		if debug {
 			fmt.Printf("%#x: %x%x\n", start+size, x, zeros[len(x):])
 		}
@@ -500,7 +500,7 @@ func doFuzzy(inst *InstJson, Ninst int) {
 
 // JSONCases generates ARM64 instructions according to inst.json.
 func JSONCases(t *testing.T) func(func([]byte)) {
-	return func(try func([]byte)) {
+	return func try {
 		data, err := ioutil.ReadFile("inst.json")
 		if err != nil {
 			t.Fatal(err)
@@ -541,9 +541,9 @@ func JSONCases(t *testing.T) func(func([]byte)) {
 
 // condCases generates conditional instructions.
 func condCases(t *testing.T) func(func([]byte)) {
-	return func(try func([]byte)) {
+	return func try {
 		condmark = true
-		JSONCases(t)(func(enc []byte) {
+		JSONCases(t)(func enc {
 			try(enc)
 		})
 	}
@@ -552,7 +552,7 @@ func condCases(t *testing.T) func(func([]byte)) {
 // hexCases generates the cases written in hexadecimal in the encoded string.
 // Spaces in 'encoded' separate entire test cases, not individual bytes.
 func hexCases(t *testing.T, encoded string) func(func([]byte)) {
-	return func(try func([]byte)) {
+	return func try {
 		for _, x := range strings.Fields(encoded) {
 			src, err := hex.DecodeString(x)
 			if err != nil {
@@ -593,7 +593,7 @@ func testdataCases(t *testing.T) func(func([]byte)) {
 		codes = append(codes, code)
 	}
 
-	return func(try func([]byte)) {
+	return func try {
 		for _, code := range codes {
 			try(code)
 		}

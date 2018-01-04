@@ -229,7 +229,7 @@ func makeExprList(a []*ast.Ident) []ast.Expr {
 func typecheck1(cfg *TypeConfig, f interface{}, typeof map[interface{}]string, assign map[string][]interface{}) {
 	// set sets the type of n to typ.
 	// If isDecl is true, n is being declared.
-	set := func(n ast.Expr, typ string, isDecl bool) {
+	set := func n, typ, isDecl {
 		if typeof[n] != "" || typ == "" {
 			if typeof[n] != typ {
 				assign[typ] = append(assign[typ], n)
@@ -252,7 +252,7 @@ func typecheck1(cfg *TypeConfig, f interface{}, typeof map[interface{}]string, a
 	// Type-check an assignment lhs = rhs.
 	// If isDecl is true, this is := so we can update
 	// the types of the objects that lhs refers to.
-	typecheckAssign := func(lhs, rhs []ast.Expr, isDecl bool) {
+	typecheckAssign := func lhs, rhs, isDecl {
 		if len(lhs) > 1 && len(rhs) == 1 {
 			if _, ok := rhs[0].(*ast.CallExpr); ok {
 				t := split(typeof[rhs[0]])
@@ -282,7 +282,7 @@ func typecheck1(cfg *TypeConfig, f interface{}, typeof map[interface{}]string, a
 		}
 	}
 
-	expand := func(s string) string {
+	expand := func s {
 		typ := cfg.Type[s]
 		if typ != nil && typ.Def != "" {
 			return typ.Def
@@ -298,7 +298,7 @@ func typecheck1(cfg *TypeConfig, f interface{}, typeof map[interface{}]string, a
 	// the curfn stack.
 	var curfn []*ast.FuncType
 
-	before := func(n interface{}) {
+	before := func n {
 		// push function type on stack
 		switch n := n.(type) {
 		case *ast.FuncDecl:
@@ -309,12 +309,12 @@ func typecheck1(cfg *TypeConfig, f interface{}, typeof map[interface{}]string, a
 	}
 
 	// After is the real type checker.
-	after := func(n interface{}) {
+	after := func n {
 		if n == nil {
 			return
 		}
 		if false && reflect.TypeOf(n).Kind() == reflect.Ptr { // debugging trace
-			defer func() {
+			defer func {
 				if t := typeof[n]; t != "" {
 					pos := fset.Position(n.(ast.Node).Pos())
 					fmt.Fprintf(os.Stderr, "%s: typeof[%s] = %s\n", pos, gofmt(n), t)

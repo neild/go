@@ -12,7 +12,7 @@ import "runtime"
 func forceGoDNS() func() {
 	switch runtime.GOOS {
 	case "plan9", "windows":
-		return func() {}
+		return func {}
 	default:
 		return nil
 	}

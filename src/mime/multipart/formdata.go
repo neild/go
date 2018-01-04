@@ -33,7 +33,7 @@ func (r *Reader) ReadForm(maxMemory int64) (*Form, error) {
 
 func (r *Reader) readForm(maxMemory int64) (_ *Form, err error) {
 	form := &Form{make(map[string][]string), make(map[string][]*FileHeader)}
-	defer func() {
+	defer func {
 		if err != nil {
 			form.RemoveAll()
 		}

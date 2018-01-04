@@ -80,7 +80,7 @@ func parseNSSConf(r io.Reader) *nssConf {
 		return &nssConf{err: err}
 	}
 	conf := new(nssConf)
-	conf.err = foreachLine(slurp, func(line []byte) error {
+	conf.err = foreachLine(slurp, func line {
 		line = trimSpace(removeComment(line))
 		if len(line) == 0 {
 			return nil
@@ -134,7 +134,7 @@ func parseNSSConf(r io.Reader) *nssConf {
 
 // parses "foo=bar !foo=bar"
 func parseCriteria(x []byte) (c []nssCriterion, err error) {
-	err = foreachField(x, func(f []byte) error {
+	err = foreachField(x, func f {
 		not := false
 		if len(f) > 0 && f[0] == '!' {
 			not = true

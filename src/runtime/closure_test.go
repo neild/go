@@ -9,14 +9,14 @@ var s int
 
 func BenchmarkCallClosure(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		s += func(ii int) int { return 2 * ii }(i)
+		s += func ii { return 2 * ii }(i)
 	}
 }
 
 func BenchmarkCallClosure1(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		j := i
-		s += func(ii int) int { return 2*ii + j }(i)
+		s += func ii { return 2*ii + j }(i)
 	}
 }
 
@@ -25,7 +25,7 @@ var ss *int
 func BenchmarkCallClosure2(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		j := i
-		s += func() int {
+		s += func {
 			ss = &j
 			return 2
 		}()
@@ -33,7 +33,7 @@ func BenchmarkCallClosure2(b *testing.B) {
 }
 
 func addr1(x int) *int {
-	return func() *int { return &x }()
+	return func { return &x }()
 }
 
 func BenchmarkCallClosure3(b *testing.B) {
@@ -43,7 +43,7 @@ func BenchmarkCallClosure3(b *testing.B) {
 }
 
 func addr2() (x int, p *int) {
-	return 0, func() *int { return &x }()
+	return 0, func { return &x }()
 }
 
 func BenchmarkCallClosure4(b *testing.B) {

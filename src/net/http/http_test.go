@@ -39,7 +39,7 @@ func TestForeachHeaderElement(t *testing.T) {
 	}
 	for _, tt := range tests {
 		var got []string
-		foreachHeaderElement(tt.in, func(v string) {
+		foreachHeaderElement(tt.in, func v {
 			got = append(got, v)
 		})
 		if !reflect.DeepEqual(got, tt.want) {

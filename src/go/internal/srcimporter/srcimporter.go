@@ -103,7 +103,7 @@ func (p *Importer) ImportFrom(path, srcDir string, mode types.ImportMode) (*type
 	}
 
 	p.packages[bp.ImportPath] = &importing
-	defer func() {
+	defer func {
 		// clean up in case of error
 		// TODO(gri) Eventually we may want to leave a (possibly empty)
 		// package in the map in all cases (and use that package to
@@ -133,7 +133,7 @@ func (p *Importer) ImportFrom(path, srcDir string, mode types.ImportMode) (*type
 		IgnoreFuncBodies: true,
 		FakeImportC:      true,
 		// continue type-checking after the first error
-		Error: func(err error) {
+		Error: func err {
 			if firstHardErr == nil && !err.(types.Error).Soft {
 				firstHardErr = err
 			}
@@ -170,7 +170,7 @@ func (p *Importer) parseFiles(dir string, filenames []string) ([]*ast.File, erro
 	var wg sync.WaitGroup
 	wg.Add(len(filenames))
 	for i, filename := range filenames {
-		go func(i int, filepath string) {
+		go func i, filepath {
 			defer wg.Done()
 			if open != nil {
 				src, err := open(filepath)

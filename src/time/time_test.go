@@ -162,8 +162,8 @@ func TestNanosecondsToLocalTime(t *testing.T) {
 }
 
 func TestSecondsToUTCAndBack(t *testing.T) {
-	f := func(sec int64) bool { return Unix(sec, 0).UTC().Unix() == sec }
-	f32 := func(sec int32) bool { return f(int64(sec)) }
+	f := func sec { return Unix(sec, 0).UTC().Unix() == sec }
+	f32 := func sec { return f(int64(sec)) }
 	cfg := &quick.Config{MaxCount: 10000}
 
 	// Try a reasonable date first, then the huge ones.
@@ -176,12 +176,12 @@ func TestSecondsToUTCAndBack(t *testing.T) {
 }
 
 func TestNanosecondsToUTCAndBack(t *testing.T) {
-	f := func(nsec int64) bool {
+	f := func nsec {
 		t := Unix(0, nsec).UTC()
 		ns := t.Unix()*1e9 + int64(t.Nanosecond())
 		return ns == nsec
 	}
-	f32 := func(nsec int32) bool { return f(int64(nsec)) }
+	f32 := func nsec { return f(int64(nsec)) }
 	cfg := &quick.Config{MaxCount: 10000}
 
 	// Try a small date first, then the large ones. (The span is only a few hundred years
@@ -249,7 +249,7 @@ func TestTruncateRound(t *testing.T) {
 
 	b1e9.SetInt64(1e9)
 
-	testOne := func(ti, tns, di int64) bool {
+	testOne := func ti, tns, di {
 		t0 := Unix(ti, int64(tns)).UTC()
 		d := Duration(di)
 		if d < 0 {
@@ -329,7 +329,7 @@ func TestTruncateRound(t *testing.T) {
 	}
 
 	// divisors of Second
-	f1 := func(ti int64, tns int32, logdi int32) bool {
+	f1 := func ti, tns, logdi {
 		d := Duration(1)
 		a, b := uint(logdi%9), (logdi>>16)%9
 		d <<= a
@@ -341,7 +341,7 @@ func TestTruncateRound(t *testing.T) {
 	quick.Check(f1, cfg)
 
 	// multiples of Second
-	f2 := func(ti int64, tns int32, di int32) bool {
+	f2 := func ti, tns, di {
 		d := Duration(di) * Second
 		if d < 0 {
 			d = -d
@@ -351,7 +351,7 @@ func TestTruncateRound(t *testing.T) {
 	quick.Check(f2, cfg)
 
 	// halfway cases
-	f3 := func(tns, di int64) bool {
+	f3 := func tns, di {
 		di &= 0xfffffffe
 		if di == 0 {
 			di = 2
@@ -367,7 +367,7 @@ func TestTruncateRound(t *testing.T) {
 	quick.Check(f3, cfg)
 
 	// full generality
-	f4 := func(ti int64, tns int32, di int64) bool {
+	f4 := func ti, tns, di {
 		return testOne(ti, int64(tns), di)
 	}
 	quick.Check(f4, cfg)
@@ -896,7 +896,7 @@ func TestLocationRace(t *testing.T) {
 	ResetLocalOnceForTest() // reset the Once to trigger the race
 
 	c := make(chan string, 1)
-	go func() {
+	go func {
 		c <- Now().String()
 	}()
 	_ = Now().String()
@@ -917,8 +917,8 @@ var mallocTest = []struct {
 	desc  string
 	fn    func()
 }{
-	{0, `time.Now()`, func() { t = Now() }},
-	{0, `time.Now().UnixNano()`, func() { u = Now().UnixNano() }},
+	{0, `time.Now()`, func { t = Now() }},
+	{0, `time.Now().UnixNano()`, func { u = Now().UnixNano() }},
 }
 
 func TestCountMallocs(t *testing.T) {
@@ -1124,82 +1124,82 @@ var defaultLocTests = []struct {
 	name string
 	f    func(t1, t2 Time) bool
 }{
-	{"After", func(t1, t2 Time) bool { return t1.After(t2) == t2.After(t1) }},
-	{"Before", func(t1, t2 Time) bool { return t1.Before(t2) == t2.Before(t1) }},
-	{"Equal", func(t1, t2 Time) bool { return t1.Equal(t2) == t2.Equal(t1) }},
+	{"After", func t1, t2 { return t1.After(t2) == t2.After(t1) }},
+	{"Before", func t1, t2 { return t1.Before(t2) == t2.Before(t1) }},
+	{"Equal", func t1, t2 { return t1.Equal(t2) == t2.Equal(t1) }},
 
-	{"IsZero", func(t1, t2 Time) bool { return t1.IsZero() == t2.IsZero() }},
-	{"Date", func(t1, t2 Time) bool {
+	{"IsZero", func t1, t2 { return t1.IsZero() == t2.IsZero() }},
+	{"Date", func t1, t2 {
 		a1, b1, c1 := t1.Date()
 		a2, b2, c2 := t2.Date()
 		return a1 == a2 && b1 == b2 && c1 == c2
 	}},
-	{"Year", func(t1, t2 Time) bool { return t1.Year() == t2.Year() }},
-	{"Month", func(t1, t2 Time) bool { return t1.Month() == t2.Month() }},
-	{"Day", func(t1, t2 Time) bool { return t1.Day() == t2.Day() }},
-	{"Weekday", func(t1, t2 Time) bool { return t1.Weekday() == t2.Weekday() }},
-	{"ISOWeek", func(t1, t2 Time) bool {
+	{"Year", func t1, t2 { return t1.Year() == t2.Year() }},
+	{"Month", func t1, t2 { return t1.Month() == t2.Month() }},
+	{"Day", func t1, t2 { return t1.Day() == t2.Day() }},
+	{"Weekday", func t1, t2 { return t1.Weekday() == t2.Weekday() }},
+	{"ISOWeek", func t1, t2 {
 		a1, b1 := t1.ISOWeek()
 		a2, b2 := t2.ISOWeek()
 		return a1 == a2 && b1 == b2
 	}},
-	{"Clock", func(t1, t2 Time) bool {
+	{"Clock", func t1, t2 {
 		a1, b1, c1 := t1.Clock()
 		a2, b2, c2 := t2.Clock()
 		return a1 == a2 && b1 == b2 && c1 == c2
 	}},
-	{"Hour", func(t1, t2 Time) bool { return t1.Hour() == t2.Hour() }},
-	{"Minute", func(t1, t2 Time) bool { return t1.Minute() == t2.Minute() }},
-	{"Second", func(t1, t2 Time) bool { return t1.Second() == t2.Second() }},
-	{"Nanosecond", func(t1, t2 Time) bool { return t1.Hour() == t2.Hour() }},
-	{"YearDay", func(t1, t2 Time) bool { return t1.YearDay() == t2.YearDay() }},
+	{"Hour", func t1, t2 { return t1.Hour() == t2.Hour() }},
+	{"Minute", func t1, t2 { return t1.Minute() == t2.Minute() }},
+	{"Second", func t1, t2 { return t1.Second() == t2.Second() }},
+	{"Nanosecond", func t1, t2 { return t1.Hour() == t2.Hour() }},
+	{"YearDay", func t1, t2 { return t1.YearDay() == t2.YearDay() }},
 
 	// Using Equal since Add don't modify loc using "==" will cause a fail
-	{"Add", func(t1, t2 Time) bool { return t1.Add(Hour).Equal(t2.Add(Hour)) }},
-	{"Sub", func(t1, t2 Time) bool { return t1.Sub(t2) == t2.Sub(t1) }},
+	{"Add", func t1, t2 { return t1.Add(Hour).Equal(t2.Add(Hour)) }},
+	{"Sub", func t1, t2 { return t1.Sub(t2) == t2.Sub(t1) }},
 
 	//Original caus for this test case bug 15852
-	{"AddDate", func(t1, t2 Time) bool { return t1.AddDate(1991, 9, 3) == t2.AddDate(1991, 9, 3) }},
+	{"AddDate", func t1, t2 { return t1.AddDate(1991, 9, 3) == t2.AddDate(1991, 9, 3) }},
 
-	{"UTC", func(t1, t2 Time) bool { return t1.UTC() == t2.UTC() }},
-	{"Local", func(t1, t2 Time) bool { return t1.Local() == t2.Local() }},
-	{"In", func(t1, t2 Time) bool { return t1.In(UTC) == t2.In(UTC) }},
+	{"UTC", func t1, t2 { return t1.UTC() == t2.UTC() }},
+	{"Local", func t1, t2 { return t1.Local() == t2.Local() }},
+	{"In", func t1, t2 { return t1.In(UTC) == t2.In(UTC) }},
 
-	{"Local", func(t1, t2 Time) bool { return t1.Local() == t2.Local() }},
-	{"Zone", func(t1, t2 Time) bool {
+	{"Local", func t1, t2 { return t1.Local() == t2.Local() }},
+	{"Zone", func t1, t2 {
 		a1, b1 := t1.Zone()
 		a2, b2 := t2.Zone()
 		return a1 == a2 && b1 == b2
 	}},
 
-	{"Unix", func(t1, t2 Time) bool { return t1.Unix() == t2.Unix() }},
-	{"UnixNano", func(t1, t2 Time) bool { return t1.UnixNano() == t2.UnixNano() }},
+	{"Unix", func t1, t2 { return t1.Unix() == t2.Unix() }},
+	{"UnixNano", func t1, t2 { return t1.UnixNano() == t2.UnixNano() }},
 
-	{"MarshalBinary", func(t1, t2 Time) bool {
+	{"MarshalBinary", func t1, t2 {
 		a1, b1 := t1.MarshalBinary()
 		a2, b2 := t2.MarshalBinary()
 		return bytes.Equal(a1, a2) && b1 == b2
 	}},
-	{"GobEncode", func(t1, t2 Time) bool {
+	{"GobEncode", func t1, t2 {
 		a1, b1 := t1.GobEncode()
 		a2, b2 := t2.GobEncode()
 		return bytes.Equal(a1, a2) && b1 == b2
 	}},
-	{"MarshalJSON", func(t1, t2 Time) bool {
+	{"MarshalJSON", func t1, t2 {
 		a1, b1 := t1.MarshalJSON()
 		a2, b2 := t2.MarshalJSON()
 		return bytes.Equal(a1, a2) && b1 == b2
 	}},
-	{"MarshalText", func(t1, t2 Time) bool {
+	{"MarshalText", func t1, t2 {
 		a1, b1 := t1.MarshalText()
 		a2, b2 := t2.MarshalText()
 		return bytes.Equal(a1, a2) && b1 == b2
 	}},
 
-	{"Truncate", func(t1, t2 Time) bool { return t1.Truncate(Hour).Equal(t2.Truncate(Hour)) }},
-	{"Round", func(t1, t2 Time) bool { return t1.Round(Hour).Equal(t2.Round(Hour)) }},
+	{"Truncate", func t1, t2 { return t1.Truncate(Hour).Equal(t2.Truncate(Hour)) }},
+	{"Round", func t1, t2 { return t1.Round(Hour).Equal(t2.Round(Hour)) }},
 
-	{"== Time{}", func(t1, t2 Time) bool { return (t1 == Time{}) == (t2 == Time{}) }},
+	{"== Time{}", func t1, t2 { return (t1 == Time{}) == (t2 == Time{}) }},
 }
 
 func TestDefaultLoc(t *testing.T) {

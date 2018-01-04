@@ -19,10 +19,10 @@ func ExampleWithCancel() {
 	// The callers of gen need to cancel the context once
 	// they are done consuming generated integers not to leak
 	// the internal goroutine started by gen.
-	gen := func(ctx context.Context) <-chan int {
+	gen := func ctx {
 		dst := make(chan int)
 		n := 1
-		go func() {
+		go func {
 			for {
 				select {
 				case <-ctx.Done():
@@ -96,7 +96,7 @@ func ExampleWithTimeout() {
 func ExampleWithValue() {
 	type favContextKey string
 
-	f := func(ctx context.Context, k favContextKey) {
+	f := func ctx, k {
 		if v := ctx.Value(k); v != nil {
 			fmt.Println("found value:", v)
 			return

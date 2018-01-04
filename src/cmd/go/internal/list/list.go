@@ -158,7 +158,7 @@ func runList(cmd *base.Command, args []string) {
 
 	var do func(*load.PackagePublic)
 	if *listJson {
-		do = func(p *load.PackagePublic) {
+		do = func p {
 			b, err := json.MarshalIndent(p, "", "\t")
 			if err != nil {
 				out.Flush()
@@ -169,7 +169,7 @@ func runList(cmd *base.Command, args []string) {
 		}
 	} else {
 		var cachedCtxt *Context
-		context := func() *Context {
+		context := func {
 			if cachedCtxt == nil {
 				cachedCtxt = newContext(&cfg.BuildContext)
 			}
@@ -183,7 +183,7 @@ func runList(cmd *base.Command, args []string) {
 		if err != nil {
 			base.Fatalf("%s", err)
 		}
-		do = func(p *load.PackagePublic) {
+		do = func p {
 			if err := tmpl.Execute(out, p); err != nil {
 				out.Flush()
 				base.Fatalf("%s", err)

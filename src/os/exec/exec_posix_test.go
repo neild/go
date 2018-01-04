@@ -66,7 +66,7 @@ func TestWaitid(t *testing.T) {
 	}
 
 	ch := make(chan error)
-	go func() {
+	go func {
 		ch <- cmd.Wait()
 	}()
 

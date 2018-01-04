@@ -71,7 +71,7 @@ func gentext(ctxt *ld.Link) {
 	initfunc.Type = sym.STEXT
 	initfunc.Attr |= sym.AttrLocal
 	initfunc.Attr |= sym.AttrReachable
-	o := func(op ...uint8) {
+	o := func op {
 		for _, op1 := range op {
 			initfunc.AddUint8(op1)
 		}

@@ -176,7 +176,7 @@ func semacreate(mp *m) {
 	if mp.waitsema != 0 {
 		return
 	}
-	systemstack(func() {
+	systemstack(func {
 		mu := nacl_mutex_create(0)
 		if mu < 0 {
 			print("nacl_mutex_create: error ", -mu, "\n")
@@ -196,7 +196,7 @@ func semacreate(mp *m) {
 func semasleep(ns int64) int32 {
 	var ret int32
 
-	systemstack(func() {
+	systemstack(func {
 		_g_ := getg()
 		if nacl_mutex_lock(_g_.m.waitsemalock) < 0 {
 			throw("semasleep")
@@ -233,7 +233,7 @@ func semasleep(ns int64) int32 {
 
 //go:nosplit
 func semawakeup(mp *m) {
-	systemstack(func() {
+	systemstack(func {
 		if nacl_mutex_lock(mp.waitsemalock) < 0 {
 			throw("semawakeup")
 		}

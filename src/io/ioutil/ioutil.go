@@ -19,7 +19,7 @@ func readAll(r io.Reader, capacity int64) (b []byte, err error) {
 	var buf bytes.Buffer
 	// If the buffer overflows, we will get bytes.ErrTooLarge.
 	// Return that as an error. Any other panic remains.
-	defer func() {
+	defer func {
 		e := recover()
 		if e == nil {
 			return
@@ -103,7 +103,7 @@ func ReadDir(dirname string) ([]os.FileInfo, error) {
 	if err != nil {
 		return nil, err
 	}
-	sort.Slice(list, func(i, j int) bool { return list[i].Name() < list[j].Name() })
+	sort.Slice(list, func i, j { return list[i].Name() < list[j].Name() })
 	return list, nil
 }
 
@@ -134,7 +134,7 @@ func (devNull) WriteString(s string) (int, error) {
 }
 
 var blackHolePool = sync.Pool{
-	New: func() interface{} {
+	New: func {
 		b := make([]byte, 8192)
 		return &b
 	},

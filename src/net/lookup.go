@@ -195,7 +195,7 @@ func (r *Resolver) LookupIPAddr(ctx context.Context, host string) ([]IPAddr, err
 	}
 
 	dnsWaitGroup.Add(1)
-	ch, called := lookupGroup.DoChan(host, func() (interface{}, error) {
+	ch, called := lookupGroup.DoChan(host, func {
 		defer dnsWaitGroup.Done()
 		return testHookLookupIP(ctx, resolverFunc, host)
 	})

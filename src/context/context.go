@@ -230,7 +230,7 @@ type CancelFunc func()
 func WithCancel(parent Context) (ctx Context, cancel CancelFunc) {
 	c := newCancelCtx(parent)
 	propagateCancel(parent, &c)
-	return &c, func() { c.cancel(true, Canceled) }
+	return &c, func { c.cancel(true, Canceled) }
 }
 
 // newCancelCtx returns an initialized cancelCtx.
@@ -256,7 +256,7 @@ func propagateCancel(parent Context, child canceler) {
 		}
 		p.mu.Unlock()
 	} else {
-		go func() {
+		go func {
 			select {
 			case <-parent.Done():
 				child.cancel(false, parent.Err())
@@ -393,16 +393,16 @@ func WithDeadline(parent Context, d time.Time) (Context, CancelFunc) {
 	dur := time.Until(d)
 	if dur <= 0 {
 		c.cancel(true, DeadlineExceeded) // deadline has already passed
-		return c, func() { c.cancel(true, Canceled) }
+		return c, func { c.cancel(true, Canceled) }
 	}
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	if c.err == nil {
-		c.timer = time.AfterFunc(dur, func() {
+		c.timer = time.AfterFunc(dur, func {
 			c.cancel(true, DeadlineExceeded)
 		})
 	}
-	return c, func() { c.cancel(true, Canceled) }
+	return c, func { c.cancel(true, Canceled) }
 }
 
 // A timerCtx carries a timer and a deadline. It embeds a cancelCtx to

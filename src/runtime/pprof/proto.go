@@ -238,7 +238,7 @@ func (b *profileBuilder) locForPC(addr uintptr) uint64 {
 		frame, more = frames.Next()
 	}
 	if len(b.mem) > 0 {
-		i := sort.Search(len(b.mem), func(i int) bool {
+		i := sort.Search(len(b.mem), func i {
 			return b.mem[i].end > addr
 		})
 		if i < len(b.mem) && b.mem[i].start <= addr && addr < b.mem[i].end {
@@ -363,7 +363,7 @@ func (b *profileBuilder) build() error {
 
 		var labels func()
 		if e.tag != nil {
-			labels = func() {
+			labels = func {
 				for k, v := range *(*labelMap)(e.tag) {
 					b.pbLabel(tagSample_Label, k, v, 0)
 				}
@@ -432,7 +432,7 @@ func parseProcSelfMaps(data []byte, addMapping func(lo, hi, offset uint64, file,
 	var line []byte
 	// next removes and returns the next field in the line.
 	// It also removes from line any spaces following the field.
-	next := func() []byte {
+	next := func {
 		j := bytes.IndexByte(line, ' ')
 		if j < 0 {
 			f := line

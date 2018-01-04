@@ -76,7 +76,7 @@ func TestStress(t *testing.T) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(4))
 	done := make(chan bool)
 	finished := make(chan bool)
-	go func() {
+	go func {
 		sig := make(chan os.Signal, 1)
 		Notify(sig, syscall.SIGUSR1)
 		defer Stop(sig)
@@ -90,7 +90,7 @@ func TestStress(t *testing.T) {
 		}
 		finished <- true
 	}()
-	go func() {
+	go func {
 	Loop:
 		for {
 			select {
@@ -364,7 +364,7 @@ func atomicStopTestProgram() {
 
 		var wg sync.WaitGroup
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			Stop(cs)
 		}()

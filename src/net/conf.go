@@ -49,7 +49,7 @@ func initConfVal() {
 	confVal.netCgo = netCgo || dnsMode == "cgo"
 
 	if confVal.dnsDebugLevel > 0 {
-		defer func() {
+		defer func {
 			switch {
 			case confVal.netGo:
 				if netGo {
@@ -120,7 +120,7 @@ func (c *conf) canUseCgo() bool {
 // hostLookupOrder determines which strategy to use to resolve hostname.
 func (c *conf) hostLookupOrder(hostname string) (ret hostLookupOrder) {
 	if c.dnsDebugLevel > 1 {
-		defer func() {
+		defer func {
 			print("go package net: hostLookupOrder(", hostname, ") = ", ret.String(), "\n")
 		}()
 	}
@@ -290,7 +290,7 @@ func (c *conf) hostLookupOrder(hostname string) (ret hostLookupOrder) {
 // etc.
 func goDebugNetDNS() (dnsMode string, debugLevel int) {
 	goDebug := goDebugString("netdns")
-	parsePart := func(s string) {
+	parsePart := func s {
 		if s == "" {
 			return
 		}

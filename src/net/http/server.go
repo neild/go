@@ -782,7 +782,7 @@ var (
 )
 
 var copyBufPool = sync.Pool{
-	New: func() interface{} {
+	New: func {
 		b := make([]byte, 32*1024)
 		return &b
 	},
@@ -930,7 +930,7 @@ func (c *conn) readRequest(ctx context.Context) (w *response, err error) {
 	}
 	c.rwc.SetReadDeadline(hdrDeadline)
 	if d := c.server.WriteTimeout; d != 0 {
-		defer func() {
+		defer func {
 			c.rwc.SetWriteDeadline(time.Now().Add(d))
 		}()
 	}
@@ -1177,7 +1177,7 @@ func (cw *chunkWriter) writeHeader(p []byte) {
 		header = w.handlerHeader
 	}
 	var excludeHeader map[string]bool
-	delHeader := func(key string) {
+	delHeader := func key {
 		if owned {
 			header.Del(key)
 			return
@@ -1719,7 +1719,7 @@ func isCommonNetReadError(err error) bool {
 func (c *conn) serve(ctx context.Context) {
 	c.remoteAddr = c.rwc.RemoteAddr().String()
 	ctx = context.WithValue(ctx, LocalAddrContextKey, c.rwc.LocalAddr())
-	defer func() {
+	defer func {
 		if err := recover(); err != nil && err != ErrAbortHandler {
 			const size = 64 << 10
 			buf := make([]byte, size)
@@ -1976,7 +1976,7 @@ func StripPrefix(prefix string, h Handler) Handler {
 	if prefix == "" {
 		return h
 	}
-	return HandlerFunc(func(w ResponseWriter, r *Request) {
+	return HandlerFunc(func w, r {
 		if p := strings.TrimPrefix(r.URL.Path, prefix); len(p) < len(r.URL.Path) {
 			r2 := new(Request)
 			*r2 = *r
@@ -3049,7 +3049,7 @@ func (srv *Server) onceSetNextProtoDefaults() {
 	// configured their TLSNextProto map.
 	if srv.TLSNextProto == nil {
 		conf := &http2Server{
-			NewWriteScheduler: func() http2WriteScheduler { return http2NewPriorityWriteScheduler(nil) },
+			NewWriteScheduler: func { return http2NewPriorityWriteScheduler(nil) },
 		}
 		srv.nextProtoErr = http2ConfigureServer(srv, conf)
 	}
@@ -3109,8 +3109,8 @@ func (h *timeoutHandler) ServeHTTP(w ResponseWriter, r *Request) {
 		h: make(Header),
 	}
 	panicChan := make(chan interface{}, 1)
-	go func() {
-		defer func() {
+	go func {
+		defer func {
 			if p := recover(); p != nil {
 				panicChan <- p
 			}

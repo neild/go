@@ -492,7 +492,7 @@ func TestWildWildcardListener(t *testing.T) {
 		t.Skipf("not supported on %s", runtime.GOOS)
 	}
 
-	defer func() {
+	defer func {
 		if p := recover(); p != nil {
 			t.Fatalf("panicked: %v", p)
 		}
@@ -540,7 +540,7 @@ func TestIPv4MulticastListener(t *testing.T) {
 		t.Skip("IPv4 is not supported")
 	}
 
-	closer := func(cs []*UDPConn) {
+	closer := func cs {
 		for _, c := range cs {
 			if c != nil {
 				c.Close()
@@ -618,7 +618,7 @@ func TestIPv6MulticastListener(t *testing.T) {
 		t.Skip("must be root")
 	}
 
-	closer := func(cs []*UDPConn) {
+	closer := func cs {
 		for _, c := range cs {
 			if c != nil {
 				c.Close()
@@ -706,7 +706,7 @@ func TestClosingListener(t *testing.T) {
 	}
 	addr := ln.Addr()
 
-	go func() {
+	go func {
 		for {
 			c, err := ln.Accept()
 			if err != nil {

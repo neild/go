@@ -107,7 +107,7 @@ func execSecurityRoots() (*CertPool, error) {
 	// defensive in the pathological case of many trust edits.
 	for i := 0; i < 4; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			for block := range blockCh {
 				cert, err := ParseCertificate(block.Bytes)
@@ -204,7 +204,7 @@ func getCertsWithTrustPolicy() (map[string]bool, error) {
 		return nil, err
 	}
 	defer os.RemoveAll(td)
-	run := func(file string, args ...string) error {
+	run := func file, args {
 		file = filepath.Join(td, file)
 		args = append(args, file)
 		cmd := exec.Command("/usr/bin/security", args...)

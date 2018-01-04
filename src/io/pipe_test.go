@@ -264,7 +264,7 @@ func TestPipeWriteClose2(t *testing.T) {
 
 func TestWriteEmpty(t *testing.T) {
 	r, w := Pipe()
-	go func() {
+	go func {
 		w.Write([]byte{})
 		w.Close()
 	}()
@@ -275,7 +275,7 @@ func TestWriteEmpty(t *testing.T) {
 
 func TestWriteNil(t *testing.T) {
 	r, w := Pipe()
-	go func() {
+	go func {
 		w.Write(nil)
 		w.Close()
 	}()
@@ -289,7 +289,7 @@ func TestWriteAfterWriterClose(t *testing.T) {
 
 	done := make(chan bool)
 	var writeErr error
-	go func() {
+	go func {
 		_, err := w.Write([]byte("hello"))
 		if err != nil {
 			t.Errorf("got error: %q; expected none", err)
@@ -348,11 +348,11 @@ func TestPipeConcurrent(t *testing.T) {
 		readSize = 2
 	)
 
-	t.Run("Write", func(t *testing.T) {
+	t.Run("Write", func t {
 		r, w := Pipe()
 
 		for i := 0; i < count; i++ {
-			go func() {
+			go func {
 				time.Sleep(time.Millisecond) // Increase probability of race
 				if n, err := w.Write([]byte(input)); n != len(input) || err != nil {
 					t.Errorf("Write() = (%d, %v); want (%d, nil)", n, err, len(input))
@@ -376,12 +376,12 @@ func TestPipeConcurrent(t *testing.T) {
 		}
 	})
 
-	t.Run("Read", func(t *testing.T) {
+	t.Run("Read", func t {
 		r, w := Pipe()
 
 		c := make(chan []byte, count*len(input)/readSize)
 		for i := 0; i < cap(c); i++ {
-			go func() {
+			go func {
 				time.Sleep(time.Millisecond) // Increase probability of race
 				buf := make([]byte, readSize)
 				if n, err := r.Read(buf); n != readSize || err != nil {
@@ -418,6 +418,6 @@ func sortBytesInGroups(b []byte, n int) []byte {
 		groups = append(groups, b[:n])
 		b = b[n:]
 	}
-	sort.Slice(groups, func(i, j int) bool { return bytes.Compare(groups[i], groups[j]) < 0 })
+	sort.Slice(groups, func i, j { return bytes.Compare(groups[i], groups[j]) < 0 })
 	return bytes.Join(groups, nil)
 }

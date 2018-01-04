@@ -78,10 +78,10 @@ func TestStrings(t *testing.T) {
 
 func TestSlice(t *testing.T) {
 	data := strings
-	Slice(data[:], func(i, j int) bool {
+	Slice(data[:], func i, j {
 		return data[i] < data[j]
 	})
-	if !SliceIsSorted(data[:], func(i, j int) bool { return data[i] < data[j] }) {
+	if !SliceIsSorted(data[:], func i, j { return data[i] < data[j] }) {
 		t.Errorf("sorted %v", strings)
 		t.Errorf("   got %v", data)
 	}
@@ -144,7 +144,7 @@ func (t *nonDeterministicTestingData) Swap(i, j int) {
 func TestNonDeterministicComparison(t *testing.T) {
 	// Ensure that sort.Sort does not panic when Less returns inconsistent results.
 	// See https://golang.org/issue/14377.
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			t.Error(r)
 		}
@@ -186,7 +186,7 @@ func BenchmarkSortString1K_Slice(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		copy(data, unsorted)
 		b.StartTimer()
-		Slice(data, func(i, j int) bool { return data[i] < data[j] })
+		Slice(data, func i, j { return data[i] < data[j] })
 		b.StopTimer()
 	}
 }
@@ -245,7 +245,7 @@ func BenchmarkStableInt1K_Slice(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		copy(data, unsorted)
 		b.StartTimer()
-		SliceStable(data, func(i, j int) bool { return data[i] < data[j] })
+		SliceStable(data, func i, j { return data[i] < data[j] })
 		b.StopTimer()
 	}
 }
@@ -271,7 +271,7 @@ func BenchmarkSortInt64K_Slice(b *testing.B) {
 			data[i] = i ^ 0xcccc
 		}
 		b.StartTimer()
-		Slice(data, func(i, j int) bool { return data[i] < data[j] })
+		Slice(data, func i, j { return data[i] < data[j] })
 		b.StopTimer()
 	}
 }
@@ -444,15 +444,15 @@ func testBentleyMcIlroy(t *testing.T, sort func(Interface), maxswap func(int) in
 }
 
 func TestSortBM(t *testing.T) {
-	testBentleyMcIlroy(t, Sort, func(n int) int { return n * lg(n) * 12 / 10 })
+	testBentleyMcIlroy(t, Sort, func n { return n * lg(n) * 12 / 10 })
 }
 
 func TestHeapsortBM(t *testing.T) {
-	testBentleyMcIlroy(t, Heapsort, func(n int) int { return n * lg(n) * 12 / 10 })
+	testBentleyMcIlroy(t, Heapsort, func n { return n * lg(n) * 12 / 10 })
 }
 
 func TestStableBM(t *testing.T) {
-	testBentleyMcIlroy(t, Stable, func(n int) int { return n * lg(n) * lg(n) / 3 })
+	testBentleyMcIlroy(t, Stable, func n { return n * lg(n) * lg(n) / 3 })
 }
 
 // This is based on the "antiquicksort" implementation by M. Douglas McIlroy.

@@ -16,7 +16,7 @@ func runParallel(N, iter int, f func()) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(int(N)))
 	done := make(chan bool)
 	for i := 0; i < N; i++ {
-		go func() {
+		go func {
 			for j := 0; j < iter; j++ {
 				f()
 			}
@@ -33,14 +33,14 @@ func TestXadduintptr(t *testing.T) {
 	const iter = 100000
 	inc := uintptr(100)
 	total := uintptr(0)
-	runParallel(N, iter, func() {
+	runParallel(N, iter, func {
 		atomic.Xadduintptr(&total, inc)
 	})
 	if want := uintptr(N * iter * inc); want != total {
 		t.Fatalf("xadduintpr error, want %d, got %d", want, total)
 	}
 	total = 0
-	runParallel(N, iter, func() {
+	runParallel(N, iter, func {
 		atomic.Xadduintptr(&total, inc)
 		atomic.Xadduintptr(&total, uintptr(-int64(inc)))
 	})
@@ -68,7 +68,7 @@ func TestXadduintptrOnUint64(t *testing.T) {
 }
 
 func shouldPanic(t *testing.T, name string, f func()) {
-	defer func() {
+	defer func {
 		if recover() == nil {
 			t.Errorf("%s did not panic", name)
 		}
@@ -96,10 +96,10 @@ func TestUnaligned64(t *testing.T) {
 	up64 := (*uint64)(unsafe.Pointer(&x[1])) // misaligned
 	p64 := (*int64)(unsafe.Pointer(&x[1]))   // misaligned
 
-	shouldPanic(t, "Load64", func() { atomic.Load64(up64) })
-	shouldPanic(t, "Loadint64", func() { atomic.Loadint64(p64) })
-	shouldPanic(t, "Store64", func() { atomic.Store64(up64, 0) })
-	shouldPanic(t, "Xadd64", func() { atomic.Xadd64(up64, 1) })
-	shouldPanic(t, "Xchg64", func() { atomic.Xchg64(up64, 1) })
-	shouldPanic(t, "Cas64", func() { atomic.Cas64(up64, 1, 2) })
+	shouldPanic(t, "Load64", func { atomic.Load64(up64) })
+	shouldPanic(t, "Loadint64", func { atomic.Loadint64(p64) })
+	shouldPanic(t, "Store64", func { atomic.Store64(up64, 0) })
+	shouldPanic(t, "Xadd64", func { atomic.Xadd64(up64, 1) })
+	shouldPanic(t, "Xchg64", func { atomic.Xchg64(up64, 1) })
+	shouldPanic(t, "Cas64", func { atomic.Cas64(up64, 1, 2) })
 }

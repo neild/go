@@ -912,7 +912,7 @@ func (ns Nodes) Sort(o NodeOrder) error {
 	switch o {
 	case FlatNameOrder:
 		s = nodeSorter{ns,
-			func(l, r *Node) bool {
+			func l, r {
 				if iv, jv := abs64(l.Flat), abs64(r.Flat); iv != jv {
 					return iv > jv
 				}
@@ -927,7 +927,7 @@ func (ns Nodes) Sort(o NodeOrder) error {
 		}
 	case FlatCumNameOrder:
 		s = nodeSorter{ns,
-			func(l, r *Node) bool {
+			func l, r {
 				if iv, jv := abs64(l.Flat), abs64(r.Flat); iv != jv {
 					return iv > jv
 				}
@@ -942,7 +942,7 @@ func (ns Nodes) Sort(o NodeOrder) error {
 		}
 	case NameOrder:
 		s = nodeSorter{ns,
-			func(l, r *Node) bool {
+			func l, r {
 				if iv, jv := l.Info.Name, r.Info.Name; iv != jv {
 					return iv < jv
 				}
@@ -951,7 +951,7 @@ func (ns Nodes) Sort(o NodeOrder) error {
 		}
 	case FileOrder:
 		s = nodeSorter{ns,
-			func(l, r *Node) bool {
+			func l, r {
 				if iv, jv := l.Info.File, r.Info.File; iv != jv {
 					return iv < jv
 				}
@@ -963,7 +963,7 @@ func (ns Nodes) Sort(o NodeOrder) error {
 		}
 	case AddressOrder:
 		s = nodeSorter{ns,
-			func(l, r *Node) bool {
+			func l, r {
 				if iv, jv := l.Info.Address, r.Info.Address; iv != jv {
 					return iv < jv
 				}
@@ -973,7 +973,7 @@ func (ns Nodes) Sort(o NodeOrder) error {
 	case CumNameOrder, EntropyOrder:
 		// Hold scoring for score-based ordering
 		var score map[*Node]int64
-		scoreOrder := func(l, r *Node) bool {
+		scoreOrder := func l, r {
 			if iv, jv := abs64(score[l]), abs64(score[r]); iv != jv {
 				return iv > jv
 			}

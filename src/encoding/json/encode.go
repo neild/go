@@ -284,7 +284,7 @@ func newEncodeState() *encodeState {
 }
 
 func (e *encodeState) marshal(v interface{}, opts encOpts) (err error) {
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			if _, ok := r.(runtime.Error); ok {
 				panic(r)
@@ -357,7 +357,7 @@ func typeEncoder(t reflect.Type) encoderFunc {
 		f  encoderFunc
 	)
 	wg.Add(1)
-	fi, loaded := encoderCache.LoadOrStore(t, encoderFunc(func(e *encodeState, v reflect.Value, opts encOpts) {
+	fi, loaded := encoderCache.LoadOrStore(t, encoderFunc(func e, v, opts {
 		wg.Wait()
 		f(e, v, opts)
 	}))
@@ -673,7 +673,7 @@ func (me *mapEncoder) encode(e *encodeState, v reflect.Value, opts encOpts) {
 			e.error(&MarshalerError{v.Type(), err})
 		}
 	}
-	sort.Slice(sv, func(i, j int) bool { return sv[i].s < sv[j].s })
+	sort.Slice(sv, func i, j { return sv[i].s < sv[j].s })
 
 	for i, kv := range sv {
 		if i > 0 {
@@ -1171,7 +1171,7 @@ func typeFields(t reflect.Type) []field {
 		}
 	}
 
-	sort.Slice(fields, func(i, j int) bool {
+	sort.Slice(fields, func i, j {
 		x := fields
 		// sort field by name, breaking ties with depth, then
 		// breaking ties with "name came from json tag", then

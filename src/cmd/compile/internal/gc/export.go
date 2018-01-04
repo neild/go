@@ -247,7 +247,7 @@ func dumpexport(bout *bio.Writer) {
 
 		// verify that we can read the copied export data back in
 		// (use empty package map to avoid collisions)
-		types.CleanroomDo(func() {
+		types.CleanroomDo(func {
 			Import(types.NewPkg("", ""), bufio.NewReader(&copy)) // must not die
 		})
 	} else {

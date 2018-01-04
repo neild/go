@@ -21,7 +21,7 @@ type Bench struct {
 }
 
 func benchmarkEndToEnd(b *testing.B, ctor func() interface{}, pipe func() (r io.Reader, w io.Writer, err error)) {
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		r, w, err := pipe()
 		if err != nil {
 			b.Fatal("can't get pipe:", err)
@@ -41,7 +41,7 @@ func benchmarkEndToEnd(b *testing.B, ctor func() interface{}, pipe func() (r io.
 }
 
 func BenchmarkEndToEndPipe(b *testing.B) {
-	benchmarkEndToEnd(b, func() interface{} {
+	benchmarkEndToEnd(b, func {
 		return &Bench{7, 3.2, "now is the time", bytes.Repeat([]byte("for all good men"), 100)}
 	}, func() (r io.Reader, w io.Writer, err error) {
 		r, w, err = os.Pipe()
@@ -50,7 +50,7 @@ func BenchmarkEndToEndPipe(b *testing.B) {
 }
 
 func BenchmarkEndToEndByteBuffer(b *testing.B) {
-	benchmarkEndToEnd(b, func() interface{} {
+	benchmarkEndToEnd(b, func {
 		return &Bench{7, 3.2, "now is the time", bytes.Repeat([]byte("for all good men"), 100)}
 	}, func() (r io.Reader, w io.Writer, err error) {
 		var buf bytes.Buffer
@@ -59,7 +59,7 @@ func BenchmarkEndToEndByteBuffer(b *testing.B) {
 }
 
 func BenchmarkEndToEndSliceByteBuffer(b *testing.B) {
-	benchmarkEndToEnd(b, func() interface{} {
+	benchmarkEndToEnd(b, func {
 		v := &Bench{7, 3.2, "now is the time", nil}
 		Register(v)
 		arr := make([]interface{}, 100)
@@ -87,7 +87,7 @@ func TestCountEncodeMallocs(t *testing.T) {
 	enc := NewEncoder(&buf)
 	bench := &Bench{7, 3.2, "now is the time", []byte("for all good men")}
 
-	allocs := testing.AllocsPerRun(N, func() {
+	allocs := testing.AllocsPerRun(N, func {
 		err := enc.Encode(bench)
 		if err != nil {
 			t.Fatal("encode:", err)
@@ -113,7 +113,7 @@ func TestCountDecodeMallocs(t *testing.T) {
 	bench := &Bench{7, 3.2, "now is the time", []byte("for all good men")}
 
 	// Fill the buffer with enough to decode
-	testing.AllocsPerRun(N, func() {
+	testing.AllocsPerRun(N, func {
 		err := enc.Encode(bench)
 		if err != nil {
 			t.Fatal("encode:", err)
@@ -121,7 +121,7 @@ func TestCountDecodeMallocs(t *testing.T) {
 	})
 
 	dec := NewDecoder(&buf)
-	allocs := testing.AllocsPerRun(N, func() {
+	allocs := testing.AllocsPerRun(N, func {
 		*bench = Bench{}
 		err := dec.Decode(&bench)
 		if err != nil {
@@ -135,7 +135,7 @@ func TestCountDecodeMallocs(t *testing.T) {
 
 func benchmarkEncodeSlice(b *testing.B, a interface{}) {
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		var buf bytes.Buffer
 		enc := NewEncoder(&buf)
 
@@ -229,7 +229,7 @@ func benchmarkDecodeSlice(b *testing.B, a interface{}) {
 	rt := ra.Type()
 	b.ResetTimer()
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		// TODO(#19025): Move per-thread allocation before ResetTimer.
 		rp := reflect.New(rt)
 		rp.Elem().Set(reflect.MakeSlice(rt, ra.Len(), ra.Cap()))

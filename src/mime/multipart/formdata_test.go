@@ -174,7 +174,7 @@ Content-Disposition: form-data; name="largetext"
 		{"too-large", 0, ErrMessageTooLarge},
 	}
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.name, func t {
 			b := strings.NewReader(testBody)
 			r := NewReader(b, boundary)
 			f, err := r.ReadForm(tc.maxMemory)

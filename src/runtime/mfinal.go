@@ -365,7 +365,7 @@ func SetFinalizer(obj interface{}, finalizer interface{}) {
 	ftyp := f._type
 	if ftyp == nil {
 		// switch to system stack and remove finalizer
-		systemstack(func() {
+		systemstack(func {
 			removefinalizer(e.data)
 		})
 		return
@@ -414,7 +414,7 @@ okarg:
 	// make sure we have a finalizer goroutine
 	createfing()
 
-	systemstack(func() {
+	systemstack(func {
 		if !addfinalizer(e.data, (*funcval)(f.data), nret, fint, ot) {
 			throw("runtime.SetFinalizer: finalizer already set")
 		}

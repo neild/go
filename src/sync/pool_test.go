@@ -54,7 +54,7 @@ func TestPoolNew(t *testing.T) {
 
 	i := 0
 	p := Pool{
-		New: func() interface{} {
+		New: func {
 			i++
 			return i
 		},
@@ -98,7 +98,7 @@ loop:
 		var fin, fin1 uint32
 		for i := 0; i < N; i++ {
 			v := new(string)
-			runtime.SetFinalizer(v, func(vv *string) {
+			runtime.SetFinalizer(v, func vv {
 				atomic.AddUint32(&fin, 1)
 			})
 			p.Put(v)
@@ -129,7 +129,7 @@ func TestPoolStress(t *testing.T) {
 	var p Pool
 	done := make(chan bool)
 	for i := 0; i < P; i++ {
-		go func() {
+		go func {
 			var v interface{} = 0
 			for j := 0; j < N; j++ {
 				if v == nil {
@@ -152,7 +152,7 @@ func TestPoolStress(t *testing.T) {
 
 func BenchmarkPool(b *testing.B) {
 	var p Pool
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			p.Put(1)
 			p.Get()
@@ -162,7 +162,7 @@ func BenchmarkPool(b *testing.B) {
 
 func BenchmarkPoolOverflow(b *testing.B) {
 	var p Pool
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			for b := 0; b < 100; b++ {
 				p.Put(1)

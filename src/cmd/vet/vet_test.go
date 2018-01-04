@@ -118,7 +118,7 @@ func TestVet(t *testing.T) {
 			continue
 		}
 		files := files
-		t.Run(fmt.Sprint(i), func(t *testing.T) {
+		t.Run(fmt.Sprint(i), func t {
 			t.Parallel()
 			t.Logf("files: %q", files)
 			Vet(t, files)
@@ -170,7 +170,7 @@ func TestVetDirs(t *testing.T) {
 		"cgo",
 	} {
 		dir := dir
-		t.Run(dir, func(t *testing.T) {
+		t.Run(dir, func t {
 			t.Parallel()
 			gos, err := filepath.Glob(filepath.Join("testdata", dir, "*.go"))
 			if err != nil {
@@ -206,7 +206,7 @@ func TestTags(t *testing.T) {
 	Build(t)
 	for _, tag := range []string{"testtag", "x testtag y", "x,testtag,y"} {
 		tag := tag
-		t.Run(tag, func(t *testing.T) {
+		t.Run(tag, func t {
 			t.Parallel()
 			t.Logf("-tags=%s", tag)
 			args := []string{

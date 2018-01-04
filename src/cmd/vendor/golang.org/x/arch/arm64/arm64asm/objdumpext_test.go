@@ -66,7 +66,7 @@ func objdump(ext *ExtDis) error {
 		enc     []byte
 		text    string
 	)
-	flush := func() {
+	flush := func {
 		if addr == next {
 			// PC-relative addresses are translated to absolute addresses based on PC by GNU objdump
 			// Following logical rewrites the absolute addresses back to PC-relative ones for comparing

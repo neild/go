@@ -509,13 +509,13 @@ func TestWriterReset(t *testing.T) {
 			t.Errorf("level %d Writer not reset after Reset", level)
 		}
 	}
-	testResetOutput(t, func(w io.Writer) (*Writer, error) { return NewWriter(w, NoCompression) })
-	testResetOutput(t, func(w io.Writer) (*Writer, error) { return NewWriter(w, DefaultCompression) })
-	testResetOutput(t, func(w io.Writer) (*Writer, error) { return NewWriter(w, BestCompression) })
+	testResetOutput(t, func w { return NewWriter(w, NoCompression) })
+	testResetOutput(t, func w { return NewWriter(w, DefaultCompression) })
+	testResetOutput(t, func w { return NewWriter(w, BestCompression) })
 	dict := []byte("we are the world")
-	testResetOutput(t, func(w io.Writer) (*Writer, error) { return NewWriterDict(w, NoCompression, dict) })
-	testResetOutput(t, func(w io.Writer) (*Writer, error) { return NewWriterDict(w, DefaultCompression, dict) })
-	testResetOutput(t, func(w io.Writer) (*Writer, error) { return NewWriterDict(w, BestCompression, dict) })
+	testResetOutput(t, func w { return NewWriterDict(w, NoCompression, dict) })
+	testResetOutput(t, func w { return NewWriterDict(w, DefaultCompression, dict) })
+	testResetOutput(t, func w { return NewWriterDict(w, BestCompression, dict) })
 }
 
 func testResetOutput(t *testing.T, newWriter func(w io.Writer) (*Writer, error)) {
@@ -812,7 +812,7 @@ func TestBestSpeedMaxMatchOffset(t *testing.T) {
 	for _, matchBefore := range []bool{false, true} {
 		for _, extra := range []int{0, inputMargin - 1, inputMargin, inputMargin + 1, 2 * inputMargin} {
 			for offsetAdj := -5; offsetAdj <= +5; offsetAdj++ {
-				report := func(desc string, err error) {
+				report := func desc, err {
 					t.Errorf("matchBefore=%t, extra=%d, offsetAdj=%d: %s%v",
 						matchBefore, extra, offsetAdj, desc, err)
 				}
@@ -879,7 +879,7 @@ func TestMaxStackSize(t *testing.T) {
 	for level := HuffmanOnly; level <= BestCompression; level++ {
 		// Run in separate goroutine to increase probability of stack regrowth.
 		wg.Add(1)
-		go func(level int) {
+		go func level {
 			defer wg.Done()
 			zw, err := NewWriter(ioutil.Discard, level)
 			if err != nil {

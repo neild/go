@@ -104,8 +104,8 @@ func (cache *Cache) scratchBlocksForDom(maxBlockID int) (a, b, c, d, e, f, g []I
 }
 
 func dominators(f *Func) []*Block {
-	preds := func(b *Block) []Edge { return b.Preds }
-	succs := func(b *Block) []Edge { return b.Succs }
+	preds := func b { return b.Preds }
+	succs := func b { return b.Succs }
 
 	//TODO: benchmark and try to find criteria for swapping between
 	// dominatorsSimple and dominatorsLT

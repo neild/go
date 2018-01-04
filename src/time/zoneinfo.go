@@ -288,7 +288,7 @@ func LoadLocation(name string) (*Location, error) {
 		// much less dot dot. Likewise, none begin with a slash.
 		return nil, errLocation
 	}
-	zoneinfoOnce.Do(func() {
+	zoneinfoOnce.Do(func {
 		env, _ := syscall.Getenv("ZONEINFO")
 		zoneinfo = &env
 	})

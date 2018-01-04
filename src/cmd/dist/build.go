@@ -604,7 +604,7 @@ func runInstall(dir string, ch chan struct{}) {
 	xmkdirall(workdir)
 
 	var clean []string
-	defer func() {
+	defer func {
 		for _, name := range clean {
 			xremove(name)
 		}
@@ -650,7 +650,7 @@ func runInstall(dir string, ch chan struct{}) {
 	// This is the same heuristic build.ScanDir uses.
 	// There do exist real C files beginning with _,
 	// so limit that check to just Go files.
-	files = filter(files, func(p string) bool {
+	files = filter(files, func p {
 		return !strings.HasPrefix(p, ".") && (!strings.HasPrefix(p, "_") || !strings.HasSuffix(p, ".go"))
 	})
 
@@ -674,7 +674,7 @@ func runInstall(dir string, ch chan struct{}) {
 	// Is the target up-to-date?
 	var gofiles, missing []string
 	stale := rebuildall
-	files = filter(files, func(p string) bool {
+	files = filter(files, func p {
 		for _, suf := range depsuffix {
 			if strings.HasSuffix(p, suf) {
 				goto ok
@@ -877,7 +877,7 @@ func matchtag(tag string) bool {
 func shouldbuild(file, dir string) bool {
 	// Check file name for GOOS or GOARCH.
 	name := filepath.Base(file)
-	excluded := func(list []string, ok string) bool {
+	excluded := func list, ok {
 		for _, x := range list {
 			if x == ok || ok == "android" && x == "linux" {
 				continue

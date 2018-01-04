@@ -52,7 +52,7 @@ func (s *S) Recv(nul *struct{}, reply *R) error {
 }
 
 func TestGobError(t *testing.T) {
-	defer func() {
+	defer func {
 		err := recover()
 		if err == nil {
 			t.Fatal("no error")

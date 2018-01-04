@@ -815,7 +815,7 @@ func (dec *Decoder) decOpFor(wireId typeId, rt reflect.Type, name string, inProg
 			elemOp := dec.decOpFor(elemId, t.Elem(), name, inProgress)
 			ovfl := overflow(name)
 			helper := decArrayHelper[t.Elem().Kind()]
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.decodeArray(state, value, *elemOp, t.Len(), ovfl, helper)
 			}
 
@@ -825,7 +825,7 @@ func (dec *Decoder) decOpFor(wireId typeId, rt reflect.Type, name string, inProg
 			keyOp := dec.decOpFor(keyId, t.Key(), "key of "+name, inProgress)
 			elemOp := dec.decOpFor(elemId, t.Elem(), "element of "+name, inProgress)
 			ovfl := overflow(name)
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.decodeMap(t, state, value, *keyOp, *elemOp, ovfl)
 			}
 
@@ -844,7 +844,7 @@ func (dec *Decoder) decOpFor(wireId typeId, rt reflect.Type, name string, inProg
 			elemOp := dec.decOpFor(elemId, t.Elem(), name, inProgress)
 			ovfl := overflow(name)
 			helper := decSliceHelper[t.Elem().Kind()]
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.decodeSlice(state, value, *elemOp, ovfl, helper)
 			}
 
@@ -855,12 +855,12 @@ func (dec *Decoder) decOpFor(wireId typeId, rt reflect.Type, name string, inProg
 			if err != nil {
 				error_(err)
 			}
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				// indirect through enginePtr to delay evaluation for recursive structs.
 				dec.decodeStruct(*enginePtr, value)
 			}
 		case reflect.Interface:
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.decodeInterface(t, state, value)
 			}
 		}
@@ -884,7 +884,7 @@ func (dec *Decoder) decIgnoreOpFor(wireId typeId, inProgress map[typeId]*decOp) 
 		if wireId == tInterface {
 			// Special case because it's a method: the ignored item might
 			// define types and we need to record their state in the decoder.
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.ignoreInterface(state)
 			}
 			return &op
@@ -897,7 +897,7 @@ func (dec *Decoder) decIgnoreOpFor(wireId typeId, inProgress map[typeId]*decOp) 
 		case wire.ArrayT != nil:
 			elemId := wire.ArrayT.Elem
 			elemOp := dec.decIgnoreOpFor(elemId, inProgress)
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.ignoreArray(state, *elemOp, wire.ArrayT.Len)
 			}
 
@@ -906,14 +906,14 @@ func (dec *Decoder) decIgnoreOpFor(wireId typeId, inProgress map[typeId]*decOp) 
 			elemId := dec.wireType[wireId].MapT.Elem
 			keyOp := dec.decIgnoreOpFor(keyId, inProgress)
 			elemOp := dec.decIgnoreOpFor(elemId, inProgress)
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.ignoreMap(state, *keyOp, *elemOp)
 			}
 
 		case wire.SliceT != nil:
 			elemId := wire.SliceT.Elem
 			elemOp := dec.decIgnoreOpFor(elemId, inProgress)
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.ignoreSlice(state, *elemOp)
 			}
 
@@ -923,13 +923,13 @@ func (dec *Decoder) decIgnoreOpFor(wireId typeId, inProgress map[typeId]*decOp) 
 			if err != nil {
 				error_(err)
 			}
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				// indirect through enginePtr to delay evaluation for recursive structs
 				state.dec.ignoreStruct(*enginePtr)
 			}
 
 		case wire.GobEncoderT != nil, wire.BinaryMarshalerT != nil, wire.TextMarshalerT != nil:
-			op = func(i *decInstr, state *decoderState, value reflect.Value) {
+			op = func i, state, value {
 				state.dec.ignoreGobDecoder(state)
 			}
 		}
@@ -952,7 +952,7 @@ func (dec *Decoder) gobDecodeOpFor(ut *userTypeInfo) *decOp {
 		}
 	}
 	var op decOp
-	op = func(i *decInstr, state *decoderState, value reflect.Value) {
+	op = func i, state, value {
 		// We now have the base type. We need its address if the receiver is a pointer.
 		if value.Kind() != reflect.Ptr && rcvrType.Kind() == reflect.Ptr {
 			value = value.Addr()

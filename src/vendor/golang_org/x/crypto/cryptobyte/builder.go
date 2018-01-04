@@ -149,7 +149,7 @@ func (b *Builder) callContinuation(f BuilderContinuation, arg *Builder) {
 	if !*b.inContinuation {
 		*b.inContinuation = true
 
-		defer func() {
+		defer func {
 			*b.inContinuation = false
 
 			r := recover()

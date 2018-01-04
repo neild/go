@@ -221,7 +221,7 @@ func send(ireq *Request, rt RoundTripper, deadline time.Time) (resp *Response, d
 
 	// forkReq forks req into a shallow clone of ireq the first
 	// time it's called.
-	forkReq := func() {
+	forkReq := func {
 		if ireq == req {
 			req = new(Request)
 			*req = *ireq // shallow clone
@@ -293,7 +293,7 @@ func setRequestCancel(req *Request, rt RoundTripper, deadline time.Time) (stopTi
 	cancel := make(chan struct{})
 	req.Cancel = cancel
 
-	doCancel := func() {
+	doCancel := func {
 		// The newer way (the second way in the func comment):
 		close(cancel)
 
@@ -314,12 +314,12 @@ func setRequestCancel(req *Request, rt RoundTripper, deadline time.Time) (stopTi
 
 	stopTimerCh := make(chan struct{})
 	var once sync.Once
-	stopTimer = func() { once.Do(func() { close(stopTimerCh) }) }
+	stopTimer = func { once.Do(func { close(stopTimerCh) }) }
 
 	timer := time.NewTimer(time.Until(deadline))
 	var timedOut atomicBool
 
-	go func() {
+	go func {
 		select {
 		case <-initialReqCancel:
 			doCancel()
@@ -507,7 +507,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 		redirectMethod string
 		includeBody    bool
 	)
-	uerr := func(err error) error {
+	uerr := func err {
 		// the body may have been closed already by c.send()
 		if !reqBodyClosed {
 			req.closeBody()
@@ -652,7 +652,7 @@ func (c *Client) makeHeadersCopier(ireq *Request) func(*Request) {
 	}
 
 	preq := ireq // The previous request
-	return func(req *Request) {
+	return func req {
 		// If Jar is present and there was some initial cookies provided
 		// via the request header, then we may need to alter the initial
 		// cookies as we follow redirects since each redirect may end up

@@ -38,7 +38,7 @@ func (rw *rwmutex) rlock() {
 	acquirem()
 	if int32(atomic.Xadd(&rw.readerCount, 1)) < 0 {
 		// A writer is pending. Park on the reader queue.
-		systemstack(func() {
+		systemstack(func {
 			lock(&rw.rLock)
 			if rw.readerPass > 0 {
 				// Writer finished.
@@ -89,7 +89,7 @@ func (rw *rwmutex) lock() {
 	lock(&rw.rLock)
 	if r != 0 && atomic.Xadd(&rw.readerWait, r) != 0 {
 		// Wait for reader to wake us up.
-		systemstack(func() {
+		systemstack(func {
 			rw.writer.set(m)
 			unlock(&rw.rLock)
 			notesleep(&m.park)

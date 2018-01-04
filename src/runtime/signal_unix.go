@@ -523,7 +523,7 @@ func ensureSigM() {
 	maskUpdatedChan = make(chan struct{})
 	disableSigChan = make(chan uint32)
 	enableSigChan = make(chan uint32)
-	go func() {
+	go func {
 		// Signal masks are per-thread, so make sure this goroutine stays on one
 		// thread.
 		LockOSThread()

@@ -80,13 +80,13 @@ func newFsys() *fsys {
 }
 
 var fs = newFsys()
-var fsinit = func() {}
+var fsinit = func {}
 
 func init() {
 	// do not trigger loading of zipped file system here
 	oldFsinit := fsinit
-	defer func() { fsinit = oldFsinit }()
-	fsinit = func() {}
+	defer func { fsinit = oldFsinit }()
+	fsinit = func {}
 	Mkdir("/dev", 0555)
 	Mkdir("/tmp", 0777)
 	mkdev("/dev/null", 0666, openNull)

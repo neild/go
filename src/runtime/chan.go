@@ -188,7 +188,7 @@ func chansend(c *hchan, ep unsafe.Pointer, block bool, callerpc uintptr) bool {
 	if sg := c.recvq.dequeue(); sg != nil {
 		// Found a waiting receiver. We pass the value we want to send
 		// directly to the receiver, bypassing the channel buffer (if any).
-		send(c, sg, ep, func() { unlock(&c.lock) }, 3)
+		send(c, sg, ep, func { unlock(&c.lock) }, 3)
 		return true
 	}
 
@@ -469,7 +469,7 @@ func chanrecv(c *hchan, ep unsafe.Pointer, block bool) (selected, received bool)
 		// directly from sender. Otherwise, receive from head of queue
 		// and add sender's value to the tail of the queue (both map to
 		// the same buffer slot because the queue is full).
-		recv(c, sg, ep, func() { unlock(&c.lock) }, 3)
+		recv(c, sg, ep, func { unlock(&c.lock) }, 3)
 		return true, true
 	}
 

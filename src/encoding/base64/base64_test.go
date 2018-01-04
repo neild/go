@@ -387,7 +387,7 @@ func TestDecoderIssue3577(t *testing.T) {
 		nextc:  next,
 	})
 	errc := make(chan error)
-	go func() {
+	go func {
 		_, err := ioutil.ReadAll(d)
 		errc <- err
 	}()
@@ -475,7 +475,7 @@ func BenchmarkEncodeToString(b *testing.B) {
 
 func BenchmarkDecodeString(b *testing.B) {
 	sizes := []int{2, 4, 8, 64, 8192}
-	benchFunc := func(b *testing.B, benchSize int) {
+	benchFunc := func b, benchSize {
 		data := StdEncoding.EncodeToString(make([]byte, benchSize))
 		b.SetBytes(int64(len(data)))
 		b.ResetTimer()
@@ -484,7 +484,7 @@ func BenchmarkDecodeString(b *testing.B) {
 		}
 	}
 	for _, size := range sizes {
-		b.Run(fmt.Sprintf("%d", size), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%d", size), func b {
 			benchFunc(b, size)
 		})
 	}

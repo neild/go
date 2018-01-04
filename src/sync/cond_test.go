@@ -18,7 +18,7 @@ func TestCondSignal(t *testing.T) {
 	running := make(chan bool, n)
 	awake := make(chan bool, n)
 	for i := 0; i < n; i++ {
-		go func() {
+		go func {
 			m.Lock()
 			running <- true
 			c.Wait()
@@ -56,7 +56,7 @@ func TestCondSignalGenerations(t *testing.T) {
 	running := make(chan bool, n)
 	awake := make(chan int, n)
 	for i := 0; i < n; i++ {
-		go func(i int) {
+		go func i {
 			m.Lock()
 			running <- true
 			c.Wait()
@@ -84,7 +84,7 @@ func TestCondBroadcast(t *testing.T) {
 	awake := make(chan int, n)
 	exit := false
 	for i := 0; i < n; i++ {
-		go func(g int) {
+		go func g {
 			m.Lock()
 			for !exit {
 				running <- g
@@ -132,7 +132,7 @@ func TestRace(t *testing.T) {
 	x := 0
 	c := NewCond(&Mutex{})
 	done := make(chan bool)
-	go func() {
+	go func {
 		c.L.Lock()
 		x = 1
 		c.Wait()
@@ -144,7 +144,7 @@ func TestRace(t *testing.T) {
 		c.L.Unlock()
 		done <- true
 	}()
-	go func() {
+	go func {
 		c.L.Lock()
 		for {
 			if x == 1 {
@@ -159,7 +159,7 @@ func TestRace(t *testing.T) {
 		c.L.Unlock()
 		done <- true
 	}()
-	go func() {
+	go func {
 		c.L.Lock()
 		for {
 			if x == 2 {
@@ -191,7 +191,7 @@ func TestCondSignalStealing(t *testing.T) {
 
 		// Start a waiter.
 		ch := make(chan struct{})
-		go func() {
+		go func {
 			m.Lock()
 			ch <- struct{}{}
 			cond.Wait()
@@ -214,11 +214,11 @@ func TestCondSignalStealing(t *testing.T) {
 		// The new waiter may or may not get notified, but the first one
 		// has to be notified.
 		done := false
-		go func() {
+		go func {
 			cond.Broadcast()
 		}()
 
-		go func() {
+		go func {
 			m.Lock()
 			for !done {
 				cond.Wait()
@@ -243,7 +243,7 @@ func TestCondSignalStealing(t *testing.T) {
 }
 
 func TestCondCopy(t *testing.T) {
-	defer func() {
+	defer func {
 		err := recover()
 		if err == nil || err.(string) != "sync.Cond is copied" {
 			t.Fatalf("got %v, expect sync.Cond is copied", err)
@@ -285,7 +285,7 @@ func benchmarkCond(b *testing.B, waiters int) {
 	id := 0
 
 	for routine := 0; routine < waiters+1; routine++ {
-		go func() {
+		go func {
 			for i := 0; i < b.N; i++ {
 				c.L.Lock()
 				if id == -1 {

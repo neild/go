@@ -25,7 +25,7 @@ const windowsInaccuracy = 17 * Millisecond
 
 func TestSleep(t *testing.T) {
 	const delay = 100 * Millisecond
-	go func() {
+	go func {
 		Sleep(delay / 2)
 		Interrupt()
 	}()
@@ -48,7 +48,7 @@ func TestAfterFunc(t *testing.T) {
 	i := 10
 	c := make(chan bool)
 	var f func()
-	f = func() {
+	f = func {
 		i--
 		if i >= 0 {
 			AfterFunc(0, f)
@@ -64,7 +64,7 @@ func TestAfterFunc(t *testing.T) {
 
 func TestAfterStress(t *testing.T) {
 	stop := uint32(0)
-	go func() {
+	go func {
 		for atomic.LoadUint32(&stop) == 0 {
 			runtime.GC()
 			// Yield so that the OS can wake up the timer thread,
@@ -89,7 +89,7 @@ func benchmark(b *testing.B, bench func(n int)) {
 	garbageAll := make([][]*Timer, runtime.GOMAXPROCS(0))
 	for i := range garbageAll {
 		wg.Add(1)
-		go func(i int) {
+		go func i {
 			defer wg.Done()
 			garbage := make([]*Timer, 1<<15)
 			for j := range garbage {
@@ -101,7 +101,7 @@ func benchmark(b *testing.B, bench func(n int)) {
 	wg.Wait()
 
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			bench(1000)
 		}
@@ -116,10 +116,10 @@ func benchmark(b *testing.B, bench func(n int)) {
 }
 
 func BenchmarkAfterFunc(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		c := make(chan bool)
 		var f func()
-		f = func() {
+		f = func {
 			n--
 			if n >= 0 {
 				AfterFunc(0, f)
@@ -134,7 +134,7 @@ func BenchmarkAfterFunc(b *testing.B) {
 }
 
 func BenchmarkAfter(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		for i := 0; i < n; i++ {
 			<-After(1)
 		}
@@ -142,7 +142,7 @@ func BenchmarkAfter(b *testing.B) {
 }
 
 func BenchmarkStop(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		for i := 0; i < n; i++ {
 			NewTimer(1 * Second).Stop()
 		}
@@ -150,7 +150,7 @@ func BenchmarkStop(b *testing.B) {
 }
 
 func BenchmarkSimultaneousAfterFunc(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		var wg sync.WaitGroup
 		wg.Add(n)
 		for i := 0; i < n; i++ {
@@ -161,7 +161,7 @@ func BenchmarkSimultaneousAfterFunc(b *testing.B) {
 }
 
 func BenchmarkStartStop(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		timers := make([]*Timer, n)
 		for i := 0; i < n; i++ {
 			timers[i] = AfterFunc(Hour, nil)
@@ -174,7 +174,7 @@ func BenchmarkStartStop(b *testing.B) {
 }
 
 func BenchmarkReset(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		t := NewTimer(Hour)
 		for i := 0; i < n; i++ {
 			t.Reset(Hour)
@@ -184,11 +184,11 @@ func BenchmarkReset(b *testing.B) {
 }
 
 func BenchmarkSleep(b *testing.B) {
-	benchmark(b, func(n int) {
+	benchmark(b, func n {
 		var wg sync.WaitGroup
 		wg.Add(n)
 		for i := 0; i < n; i++ {
-			go func() {
+			go func {
 				Sleep(Nanosecond)
 				wg.Done()
 			}()
@@ -235,10 +235,10 @@ func TestAfterTick(t *testing.T) {
 }
 
 func TestAfterStop(t *testing.T) {
-	AfterFunc(100*Millisecond, func() {})
+	AfterFunc(100*Millisecond, func {})
 	t0 := NewTimer(50 * Millisecond)
 	c1 := make(chan bool, 1)
-	t1 := AfterFunc(150*Millisecond, func() { c1 <- true })
+	t1 := AfterFunc(150*Millisecond, func { c1 <- true })
 	c2 := After(200 * Millisecond)
 	if !t0.Stop() {
 		t.Fatalf("failed to stop event 0")
@@ -323,8 +323,8 @@ func TestTimerStopStress(t *testing.T) {
 		return
 	}
 	for i := 0; i < 100; i++ {
-		go func(i int) {
-			timer := AfterFunc(2*Second, func() {
+		go func i {
+			timer := AfterFunc(2*Second, func {
 				t.Fatalf("timer %d was not stopped", i)
 			})
 			Sleep(1 * Second)
@@ -341,7 +341,7 @@ func TestSleepZeroDeadlock(t *testing.T) {
 	// After the GC nobody wakes up the goroutine from Gwaiting status.
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(4))
 	c := make(chan bool)
-	go func() {
+	go func {
 		for i := 0; i < 100; i++ {
 			runtime.GC()
 		}
@@ -430,7 +430,7 @@ func TestIssue5745(t *testing.T) {
 	}
 
 	ticker := NewTicker(Hour)
-	defer func() {
+	defer func {
 		// would deadlock here before the fix due to
 		// lock taken before the segfault.
 		ticker.Stop()

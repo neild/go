@@ -50,7 +50,7 @@ func TestFileConn(t *testing.T) {
 			network = c.LocalAddr().Network()
 			address = c.LocalAddr().String()
 		default:
-			handler := func(ls *localServer, ln Listener) {
+			handler := func ls, ln {
 				c, err := ln.Accept()
 				if err != nil {
 					return
@@ -192,7 +192,7 @@ func TestFileListener(t *testing.T) {
 
 		var wg sync.WaitGroup
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			c, err := Dial(ln2.Addr().Network(), ln2.Addr().String())
 			if err != nil {

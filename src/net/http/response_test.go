@@ -614,11 +614,11 @@ var readResponseCloseInMiddleTests = []struct {
 func TestReadResponseCloseInMiddle(t *testing.T) {
 	t.Parallel()
 	for _, test := range readResponseCloseInMiddleTests {
-		fatalf := func(format string, args ...interface{}) {
+		fatalf := func format, args {
 			args = append([]interface{}{test.chunked, test.compressed}, args...)
 			t.Fatalf("on test chunked=%v, compressed=%v: "+format, args...)
 		}
-		checkErr := func(err error, msg string) {
+		checkErr := func err, msg {
 			if err == nil {
 				return
 			}
@@ -692,7 +692,7 @@ func TestReadResponseCloseInMiddle(t *testing.T) {
 		rest, err := ioutil.ReadAll(bufr)
 		checkErr(err, "ReadAll on remainder")
 		if e, g := "Next Request Here", string(rest); e != g {
-			g = regexp.MustCompile(`(xx+)`).ReplaceAllStringFunc(g, func(match string) string {
+			g = regexp.MustCompile(`(xx+)`).ReplaceAllStringFunc(g, func match {
 				return fmt.Sprintf("x(repeated x%d)", len(match))
 			})
 			fatalf("remainder = %q, expected %q", g, e)
@@ -819,7 +819,7 @@ func TestReadResponseErrors(t *testing.T) {
 		wantErr interface{} // nil, err value, or string substring
 	}
 
-	status := func(s string, wantErr interface{}) testCase {
+	status := func s, wantErr {
 		if wantErr == true {
 			wantErr = "malformed HTTP status code"
 		}
@@ -830,7 +830,7 @@ func TestReadResponseErrors(t *testing.T) {
 		}
 	}
 
-	version := func(s string, wantErr interface{}) testCase {
+	version := func s, wantErr {
 		if wantErr == true {
 			wantErr = "malformed HTTP version"
 		}
@@ -841,7 +841,7 @@ func TestReadResponseErrors(t *testing.T) {
 		}
 	}
 
-	contentLength := func(status, body string, wantErr interface{}) testCase {
+	contentLength := func status, body, wantErr {
 		return testCase{
 			name:    fmt.Sprintf("status %q %q", status, body),
 			in:      fmt.Sprintf("HTTP/1.1 %s\r\n%s", status, body),

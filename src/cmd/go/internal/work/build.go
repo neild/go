@@ -269,7 +269,7 @@ func oneMainPkg(pkgs []*load.Package) []*load.Package {
 	return pkgs
 }
 
-var pkgsFilter = func(pkgs []*load.Package) []*load.Package { return pkgs }
+var pkgsFilter = func pkgs { return pkgs }
 
 var runtimeVersion = runtime.Version()
 
@@ -368,7 +368,7 @@ See also: go build, go get, go clean.
 // Name parts are joined with ','.
 func libname(args []string, pkgs []*load.Package) (string, error) {
 	var libname string
-	appendName := func(arg string) {
+	appendName := func arg {
 		if libname == "" {
 			libname = arg
 		} else {

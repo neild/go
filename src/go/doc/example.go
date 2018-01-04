@@ -95,7 +95,7 @@ func Examples(files ...*ast.File) []*Example {
 		list = append(list, flist...)
 	}
 	// sort by name
-	sort.Slice(list, func(i, j int) bool {
+	sort.Slice(list, func i, j {
 		return list[i].Name < list[j].Name
 	})
 	return list
@@ -171,7 +171,7 @@ func playExample(file *ast.File, body *ast.BlockStmt) *ast.File {
 	unresolved := make(map[string]bool)
 	usesTopDecl := false
 	var inspectFunc func(ast.Node) bool
-	inspectFunc = func(n ast.Node) bool {
+	inspectFunc = func n {
 		// For selector expressions, only inspect the left hand side.
 		// (For an expression like fmt.Println, only add "fmt" to the
 		// set of unresolved names, not "Println".)

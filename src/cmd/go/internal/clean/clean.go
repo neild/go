@@ -188,7 +188,7 @@ func clean(p *load.Package) {
 	if p.Name != "main" {
 		// Record which files are not in package main.
 		// The others are.
-		keep := func(list []string) {
+		keep := func list {
 			for _, f := range list {
 				packageFile[f] = true
 			}

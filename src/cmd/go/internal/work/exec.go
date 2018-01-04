@@ -37,7 +37,7 @@ func actionList(root *Action) []*Action {
 	seen := map[*Action]bool{}
 	all := []*Action{}
 	var walk func(*Action)
-	walk = func(a *Action) {
+	walk = func a {
 		if seen[a] {
 			return
 		}
@@ -98,7 +98,7 @@ func (b *Builder) Do(root *Action) {
 
 	// Handle runs a single action and takes care of triggering
 	// any actions that are runnable as a result.
-	handle := func(a *Action) {
+	handle := func a {
 		var err error
 
 		if a.Func != nil && (!a.Failed || a.IgnoreFail) {
@@ -148,7 +148,7 @@ func (b *Builder) Do(root *Action) {
 	}
 	for i := 0; i < par; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			for {
 				select {
@@ -319,7 +319,7 @@ func (b *Builder) build(a *Action) (err error) {
 		defer b.flushOutput(a)
 	}
 
-	defer func() {
+	defer func {
 		if err != nil && err != errPrintedOutput {
 			err = fmt.Errorf("go build %s: %v", a.Package.ImportPath, err)
 		}
@@ -439,7 +439,7 @@ func (b *Builder) build(a *Action) (err error) {
 		gccfiles = append(gccfiles, cfiles...)
 		cfiles = nil
 		if a.Package.Standard && a.Package.ImportPath == "runtime/cgo" {
-			filter := func(files, nongcc, gcc []string) ([]string, []string) {
+			filter := func files, nongcc, gcc {
 				for _, f := range files {
 					if strings.HasPrefix(f, "gcc_") {
 						gcc = append(gcc, f)
@@ -983,7 +983,7 @@ func (b *Builder) linkShared(a *Action) (err error) {
 
 // BuildInstallFunc is the action for installing a single package or executable.
 func BuildInstallFunc(b *Builder, a *Action) (err error) {
-	defer func() {
+	defer func {
 		if err != nil && err != errPrintedOutput {
 			// a.Package == nil is possible for the go install -buildmode=shared
 			// action that installs libmangledname.so, which corresponds to
@@ -1953,7 +1953,7 @@ func (b *Builder) cgo(a *Action, cgoExe, objdir string, pcCFLAGS, pcLDFLAGS, cgo
 	// we need to make them short enough not to be truncated
 	// in the final archive.
 	oseq := 0
-	nextOfile := func() string {
+	nextOfile := func {
 		oseq++
 		return objdir + fmt.Sprintf("_x%03d.o", oseq)
 	}
@@ -2155,7 +2155,7 @@ func (b *Builder) swigDoVersionCheck() error {
 }
 
 func (b *Builder) swigVersionCheck() error {
-	swigCheckOnce.Do(func() {
+	swigCheckOnce.Do(func {
 		swigCheck = b.swigDoVersionCheck()
 	})
 	return swigCheck
@@ -2197,7 +2197,7 @@ func (b *Builder) swigDoIntSize(objdir string) (intsize string, err error) {
 // Determine the size of int on the target system for the -intgosize option
 // of swig >= 2.0.9.
 func (b *Builder) swigIntSize(objdir string) (intsize string, err error) {
-	swigIntSizeOnce.Do(func() {
+	swigIntSizeOnce.Do(func {
 		swigIntSize, swigIntSizeError = b.swigDoIntSize(objdir)
 	})
 	return swigIntSize, swigIntSizeError

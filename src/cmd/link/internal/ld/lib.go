@@ -971,9 +971,9 @@ func hostobjCopy() (paths []string) {
 		paths = append(paths, dst)
 
 		wg.Add(1)
-		go func() {
+		go func {
 			sema <- struct{}{}
-			defer func() {
+			defer func {
 				<-sema
 				wg.Done()
 			}()
@@ -1226,7 +1226,7 @@ func (ctxt *Link) hostlink() {
 	if ctxt.linkShared {
 		seenDirs := make(map[string]bool)
 		seenLibs := make(map[string]bool)
-		addshlib := func(path string) {
+		addshlib := func path {
 			dir, base := filepath.Split(path)
 			if !seenDirs[dir] {
 				argv = append(argv, "-L"+dir)
@@ -1391,7 +1391,7 @@ func ldobj(ctxt *Link, f *bio.Reader, lib *sym.Library, length int64, pn string,
 
 	magic := uint32(c1)<<24 | uint32(c2)<<16 | uint32(c3)<<8 | uint32(c4)
 	if magic == 0x7f454c46 { // \x7F E L F
-		ldelf := func(ctxt *Link, f *bio.Reader, pkg string, length int64, pn string) {
+		ldelf := func ctxt, f, pkg, length, pn {
 			textp, flags, err := loadelf.Load(ctxt.Arch, ctxt.Syms, f, pkg, length, pn, ehdr.flags)
 			if err != nil {
 				Errorf(nil, "%v", err)
@@ -1404,7 +1404,7 @@ func ldobj(ctxt *Link, f *bio.Reader, lib *sym.Library, length int64, pn string,
 	}
 
 	if magic&^1 == 0xfeedface || magic&^0x01000000 == 0xcefaedfe {
-		ldmacho := func(ctxt *Link, f *bio.Reader, pkg string, length int64, pn string) {
+		ldmacho := func ctxt, f, pkg, length, pn {
 			textp, err := loadmacho.Load(ctxt.Arch, ctxt.Syms, f, pkg, length, pn)
 			if err != nil {
 				Errorf(nil, "%v", err)
@@ -1416,7 +1416,7 @@ func ldobj(ctxt *Link, f *bio.Reader, lib *sym.Library, length int64, pn string,
 	}
 
 	if c1 == 0x4c && c2 == 0x01 || c1 == 0x64 && c2 == 0x86 {
-		ldpe := func(ctxt *Link, f *bio.Reader, pkg string, length int64, pn string) {
+		ldpe := func ctxt, f, pkg, length, pn {
 			textp, rsrc, err := loadpe.Load(ctxt.Arch, ctxt.Syms, f, pkg, length, pn)
 			if err != nil {
 				Errorf(nil, "%v", err)

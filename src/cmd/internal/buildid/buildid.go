@@ -59,7 +59,7 @@ func ReadFile(name string) (id string, err error) {
 		return "", err
 	}
 
-	bad := func() (string, error) {
+	bad := func {
 		return "", &os.PathError{Op: "parse", Path: name, Err: errBuildIDMalformed}
 	}
 

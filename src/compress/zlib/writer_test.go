@@ -52,7 +52,7 @@ func testLevelDict(t *testing.T, fn string, b0 []byte, level int, d string) {
 	// Push data through a pipe that compresses at the write end, and decompresses at the read end.
 	piper, pipew := io.Pipe()
 	defer piper.Close()
-	go func() {
+	go func {
 		defer pipew.Close()
 		zlibw, err := NewWriterLevelDict(pipew, level, dict)
 		if err != nil {

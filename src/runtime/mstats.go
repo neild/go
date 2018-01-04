@@ -457,7 +457,7 @@ func init() {
 func ReadMemStats(m *MemStats) {
 	stopTheWorld("read mem stats")
 
-	systemstack(func() {
+	systemstack(func {
 		readmemstats_m(m)
 	})
 
@@ -479,7 +479,7 @@ func readmemstats_m(stats *MemStats) {
 
 //go:linkname readGCStats runtime/debug.readGCStats
 func readGCStats(pauses *[]uint64) {
-	systemstack(func() {
+	systemstack(func {
 		readGCStats_m(pauses)
 	})
 }

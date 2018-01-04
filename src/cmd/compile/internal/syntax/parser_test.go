@@ -23,7 +23,7 @@ var src_ = flag.String("src", "parser.go", "source file to parse")
 var verify = flag.Bool("verify", false, "verify idempotent printing")
 
 func TestParse(t *testing.T) {
-	ParseFile(*src_, func(err error) { t.Error(err) }, nil, 0)
+	ParseFile(*src_, func err { t.Error(err) }, nil, 0)
 }
 
 func TestStdLib(t *testing.T) {
@@ -41,12 +41,12 @@ func TestStdLib(t *testing.T) {
 	}
 
 	results := make(chan parseResult)
-	go func() {
+	go func {
 		defer close(results)
 		for _, dir := range []string{
 			runtime.GOROOT(),
 		} {
-			walkDirs(t, dir, func(filename string) {
+			walkDirs(t, dir, func filename {
 				if debug {
 					fmt.Printf("parsing %s\n", filename)
 				}
@@ -107,7 +107,7 @@ func walkDirs(t *testing.T, dir string, action func(string)) {
 		var wg sync.WaitGroup
 		wg.Add(len(files))
 		for _, filename := range files {
-			go func(filename string) {
+			go func filename {
 				defer wg.Done()
 				action(filename)
 			}(filename)
@@ -168,7 +168,7 @@ func TestParseFile(t *testing.T) {
 	}
 
 	var first error
-	_, err = ParseFile("", func(err error) {
+	_, err = ParseFile("", func err {
 		if first == nil {
 			first = err
 		}
@@ -202,7 +202,7 @@ func TestLineDirectives(t *testing.T) {
 
 		{"//line " + runtime.GOROOT() + "/src/a/a.go:123\n   foo", "syntax error: package statement must be first", "$GOROOT/src/a/a.go", 123 - linebase, 3},
 	} {
-		fileh := func(name string) string {
+		fileh := func name {
 			if strings.HasPrefix(name, runtime.GOROOT()) {
 				return "$GOROOT" + name[len(runtime.GOROOT()):]
 			}

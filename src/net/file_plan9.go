@@ -31,7 +31,7 @@ func (fd *netFD) status(ln int) (string, error) {
 
 func newFileFD(f *os.File) (net *netFD, err error) {
 	var ctl *os.File
-	close := func(fd int) {
+	close := func fd {
 		if err != nil {
 			syscall.Close(fd)
 		}

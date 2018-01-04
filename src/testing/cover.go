@@ -81,7 +81,7 @@ func coverReport() {
 		f, err = os.Create(toOutputDir(*coverProfile))
 		mustBeNil(err)
 		fmt.Fprintf(f, "mode: %s\n", cover.Mode)
-		defer func() { mustBeNil(f.Close()) }()
+		defer func { mustBeNil(f.Close()) }()
 	}
 
 	var active, total int64

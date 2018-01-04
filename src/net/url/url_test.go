@@ -1141,7 +1141,7 @@ var resolveReferenceTests = []struct {
 }
 
 func TestResolveReference(t *testing.T) {
-	mustParse := func(url string) *URL {
+	mustParse := func url {
 		u, err := Parse(url)
 		if err != nil {
 			t.Fatalf("Parse(%q) got err %v", url, err)
@@ -1711,7 +1711,7 @@ func TestGob(t *testing.T) {
 }
 
 func TestNilUser(t *testing.T) {
-	defer func() {
+	defer func {
 		if v := recover(); v != nil {
 			t.Fatalf("unexpected panic: %v", v)
 		}

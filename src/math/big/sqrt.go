@@ -92,7 +92,7 @@ func (z *Float) sqrtDirect(x *Float) {
 	// and the next guess is given by
 	//   t2 = t - g(t) = ½(t² + x)/t
 	u := new(Float)
-	ng := func(t *Float) *Float {
+	ng := func t {
 		u.prec = t.prec
 		u.Mul(t, t)        // u = t²
 		u.Add(u, x)        //   = t² + x
@@ -129,7 +129,7 @@ func (z *Float) sqrtInverse(x *Float) {
 	// and the next guess is given by
 	//   t2 = t - g(t) = ½t(3 - xt²)
 	u := new(Float)
-	ng := func(t *Float) *Float {
+	ng := func t {
 		u.prec = t.prec
 		u.Mul(t, t)           // u = t²
 		u.Mul(x, u)           //   = xt²

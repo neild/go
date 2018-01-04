@@ -50,7 +50,7 @@ func allCipherSuites() []uint16 {
 
 func init() {
 	testConfig = &Config{
-		Time:               func() time.Time { return time.Unix(0, 0) },
+		Time:               func { return time.Unix(0, 0) },
 		Rand:               zeroSource{},
 		Certificates:       make([]Certificate, 2),
 		InsecureSkipVerify: true,
@@ -74,7 +74,7 @@ func testClientHelloFailure(t *testing.T, serverConfig *Config, m handshakeMessa
 	// send message to server. Should return
 	// expected error.
 	c, s := net.Pipe()
-	go func() {
+	go func {
 		cli := Client(c, testConfig)
 		if ch, ok := m.(*clientHelloMsg); ok {
 			cli.vers = ch.vers
@@ -204,7 +204,7 @@ func TestRenegotiationExtension(t *testing.T) {
 	var buf []byte
 	c, s := net.Pipe()
 
-	go func() {
+	go func {
 		cli := Client(c, testConfig)
 		cli.vers = clientHello.vers
 		cli.writeRecord(recordTypeHandshake, clientHello.marshal())
@@ -265,7 +265,7 @@ func TestTLS12OnlyCipherSuites(t *testing.T) {
 	c, s := net.Pipe()
 	var reply interface{}
 	var clientErr error
-	go func() {
+	go func {
 		cli := Client(c, testConfig)
 		cli.vers = clientHello.vers
 		cli.writeRecord(recordTypeHandshake, clientHello.marshal())
@@ -290,7 +290,7 @@ func TestTLS12OnlyCipherSuites(t *testing.T) {
 
 func TestAlertForwarding(t *testing.T) {
 	c, s := net.Pipe()
-	go func() {
+	go func {
 		Client(c, testConfig).sendAlert(alertUnknownCA)
 		c.Close()
 	}()
@@ -316,7 +316,7 @@ func TestClose(t *testing.T) {
 func testHandshake(clientConfig, serverConfig *Config) (serverState, clientState ConnectionState, err error) {
 	c, s := net.Pipe()
 	done := make(chan bool)
-	go func() {
+	go func {
 		cli := Client(c, clientConfig)
 		cli.Handshake()
 		clientState = cli.ConnectionState()
@@ -524,7 +524,7 @@ func (test *serverTest) connFromCommand() (conn *recordingConn, child *exec.Cmd,
 	}
 
 	connChan := make(chan interface{})
-	go func() {
+	go func {
 		tcpConn, err := l.Accept()
 		if err != nil {
 			connChan <- err
@@ -587,7 +587,7 @@ func (test *serverTest) run(t *testing.T, write bool) {
 	}
 	server := Server(serverConn, config)
 	connStateChan := make(chan ConnectionState, 1)
-	go func() {
+	go func {
 		_, err := server.Write([]byte("hello, world\n"))
 		if len(test.expectHandshakeErrorIncluding) > 0 {
 			if err == nil {
@@ -779,7 +779,7 @@ func TestHandshakeServerALPN(t *testing.T) {
 		// version that supports the -alpn flag.
 		command: []string{"openssl", "s_client", "-alpn", "proto2,proto1"},
 		config:  config,
-		validate: func(state ConnectionState) error {
+		validate: func state {
 			// The server's preferences should override the client.
 			if state.NegotiatedProtocol != "proto1" {
 				return fmt.Errorf("Got protocol %q, wanted proto1", state.NegotiatedProtocol)
@@ -800,7 +800,7 @@ func TestHandshakeServerALPNNoMatch(t *testing.T) {
 		// version that supports the -alpn flag.
 		command: []string{"openssl", "s_client", "-alpn", "proto2,proto1"},
 		config:  config,
-		validate: func(state ConnectionState) error {
+		validate: func state {
 			// Rather than reject the connection, Go doesn't select
 			// a protocol when there is no overlap.
 			if state.NegotiatedProtocol != "" {
@@ -831,7 +831,7 @@ func TestHandshakeServerSNIGetCertificate(t *testing.T) {
 	// Replace the NameToCertificate map with a GetCertificate function
 	nameToCert := config.NameToCertificate
 	config.NameToCertificate = nil
-	config.GetCertificate = func(clientHello *ClientHelloInfo) (*Certificate, error) {
+	config.GetCertificate = func clientHello {
 		cert, _ := nameToCert[clientHello.ServerName]
 		return cert, nil
 	}
@@ -850,7 +850,7 @@ func TestHandshakeServerSNIGetCertificate(t *testing.T) {
 func TestHandshakeServerSNIGetCertificateNotFound(t *testing.T) {
 	config := testConfig.Clone()
 
-	config.GetCertificate = func(clientHello *ClientHelloInfo) (*Certificate, error) {
+	config.GetCertificate = func clientHello {
 		return nil, nil
 	}
 	test := &serverTest{
@@ -867,7 +867,7 @@ func TestHandshakeServerSNIGetCertificateError(t *testing.T) {
 	const errMsg = "TestHandshakeServerSNIGetCertificateError error"
 
 	serverConfig := testConfig.Clone()
-	serverConfig.GetCertificate = func(clientHello *ClientHelloInfo) (*Certificate, error) {
+	serverConfig.GetCertificate = func clientHello {
 		return nil, errors.New(errMsg)
 	}
 
@@ -886,7 +886,7 @@ func TestHandshakeServerEmptyCertificates(t *testing.T) {
 	const errMsg = "TestHandshakeServerEmptyCertificates error"
 
 	serverConfig := testConfig.Clone()
-	serverConfig.GetCertificate = func(clientHello *ClientHelloInfo) (*Certificate, error) {
+	serverConfig.GetCertificate = func clientHello {
 		return nil, errors.New(errMsg)
 	}
 	serverConfig.Certificates = nil
@@ -1009,7 +1009,7 @@ func benchmarkHandshakeServer(b *testing.B, cipherSuite uint16, curve CurveID, c
 
 	clientConn, serverConn := net.Pipe()
 	serverConn = &recordingConn{Conn: serverConn}
-	go func() {
+	go func {
 		client := Client(clientConn, testConfig)
 		client.Handshake()
 	}()
@@ -1023,7 +1023,7 @@ func benchmarkHandshakeServer(b *testing.B, cipherSuite uint16, curve CurveID, c
 	feeder := make(chan struct{})
 	clientConn, serverConn = net.Pipe()
 
-	go func() {
+	go func {
 		for range feeder {
 			for i, f := range flows {
 				if i%2 == 0 {
@@ -1054,23 +1054,23 @@ func benchmarkHandshakeServer(b *testing.B, cipherSuite uint16, curve CurveID, c
 }
 
 func BenchmarkHandshakeServer(b *testing.B) {
-	b.Run("RSA", func(b *testing.B) {
+	b.Run("RSA", func b {
 		benchmarkHandshakeServer(b, TLS_RSA_WITH_AES_128_GCM_SHA256,
 			0, testRSACertificate, testRSAPrivateKey)
 	})
-	b.Run("ECDHE-P256-RSA", func(b *testing.B) {
+	b.Run("ECDHE-P256-RSA", func b {
 		benchmarkHandshakeServer(b, TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,
 			CurveP256, testRSACertificate, testRSAPrivateKey)
 	})
-	b.Run("ECDHE-P256-ECDSA-P256", func(b *testing.B) {
+	b.Run("ECDHE-P256-ECDSA-P256", func b {
 		benchmarkHandshakeServer(b, TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 			CurveP256, testP256Certificate, testP256PrivateKey)
 	})
-	b.Run("ECDHE-X25519-ECDSA-P256", func(b *testing.B) {
+	b.Run("ECDHE-X25519-ECDSA-P256", func b {
 		benchmarkHandshakeServer(b, TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,
 			X25519, testP256Certificate, testP256PrivateKey)
 	})
-	b.Run("ECDHE-P521-ECDSA-P521", func(b *testing.B) {
+	b.Run("ECDHE-P521-ECDSA-P521", func b {
 		if testECDSAPrivateKey.PublicKey.Curve != elliptic.P521() {
 			b.Fatal("test ECDSA key doesn't use curve P-521")
 		}
@@ -1199,7 +1199,7 @@ func TestSNIGivenOnFailure(t *testing.T) {
 	serverConfig.CipherSuites = nil
 
 	c, s := net.Pipe()
-	go func() {
+	go func {
 		cli := Client(c, testConfig)
 		cli.vers = clientHello.vers
 		cli.writeRecord(recordTypeHandshake, clientHello.marshal())
@@ -1233,7 +1233,7 @@ var getConfigForClientTests = []struct {
 }{
 	{
 		nil,
-		func(clientHello *ClientHelloInfo) (*Config, error) {
+		func clientHello {
 			return nil, nil
 		},
 		"",
@@ -1241,7 +1241,7 @@ var getConfigForClientTests = []struct {
 	},
 	{
 		nil,
-		func(clientHello *ClientHelloInfo) (*Config, error) {
+		func clientHello {
 			return nil, errors.New("should bubble up")
 		},
 		"should bubble up",
@@ -1249,7 +1249,7 @@ var getConfigForClientTests = []struct {
 	},
 	{
 		nil,
-		func(clientHello *ClientHelloInfo) (*Config, error) {
+		func clientHello {
 			config := testConfig.Clone()
 			// Setting a maximum version of TLS 1.1 should cause
 			// the handshake to fail.
@@ -1260,13 +1260,13 @@ var getConfigForClientTests = []struct {
 		nil,
 	},
 	{
-		func(config *Config) {
+		func config {
 			for i := range config.SessionTicketKey {
 				config.SessionTicketKey[i] = byte(i)
 			}
 			config.sessionTicketKeys = nil
 		},
-		func(clientHello *ClientHelloInfo) (*Config, error) {
+		func clientHello {
 			config := testConfig.Clone()
 			for i := range config.SessionTicketKey {
 				config.SessionTicketKey[i] = 0
@@ -1275,7 +1275,7 @@ var getConfigForClientTests = []struct {
 			return config, nil
 		},
 		"",
-		func(config *Config) error {
+		func config {
 			// The value of SessionTicketKey should have been
 			// duplicated into the per-connection Config.
 			for i := range config.SessionTicketKey {
@@ -1287,7 +1287,7 @@ var getConfigForClientTests = []struct {
 		},
 	},
 	{
-		func(config *Config) {
+		func config {
 			var dummyKey [32]byte
 			for i := range dummyKey {
 				dummyKey[i] = byte(i)
@@ -1295,13 +1295,13 @@ var getConfigForClientTests = []struct {
 
 			config.SetSessionTicketKeys([][32]byte{dummyKey})
 		},
-		func(clientHello *ClientHelloInfo) (*Config, error) {
+		func clientHello {
 			config := testConfig.Clone()
 			config.sessionTicketKeys = nil
 			return config, nil
 		},
 		"",
-		func(config *Config) error {
+		func config {
 			// The session ticket keys should have been duplicated
 			// into the per-connection Config.
 			if l := len(config.sessionTicketKeys); l != 1 {
@@ -1323,7 +1323,7 @@ func TestGetConfigForClient(t *testing.T) {
 		}
 
 		var configReturned *Config
-		serverConfig.GetConfigForClient = func(clientHello *ClientHelloInfo) (*Config, error) {
+		serverConfig.GetConfigForClient = func clientHello {
 			config, err := test.callback(clientHello)
 			configReturned = config
 			return config, err
@@ -1331,7 +1331,7 @@ func TestGetConfigForClient(t *testing.T) {
 		c, s := net.Pipe()
 		done := make(chan error)
 
-		go func() {
+		go func {
 			defer s.Close()
 			done <- Server(s, serverConfig).Handshake()
 		}()

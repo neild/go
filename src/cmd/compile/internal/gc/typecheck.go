@@ -1256,7 +1256,7 @@ func typecheck1(n *Node, top int) *Node {
 			}
 		}
 
-		typecheckaste(OCALL, n.Left, n.Isddd(), t.Params(), n.List, func() string { return fmt.Sprintf("argument to %v", n.Left) })
+		typecheckaste(OCALL, n.Left, n.Isddd(), t.Params(), n.List, func { return fmt.Sprintf("argument to %v", n.Left) })
 		ok |= Etop
 		if t.NumResults() == 0 {
 			break
@@ -2066,7 +2066,7 @@ func typecheck1(n *Node, top int) *Node {
 		if Curfn.Type.FuncType().Outnamed && n.List.Len() == 0 {
 			break
 		}
-		typecheckaste(ORETURN, nil, false, Curfn.Type.Results(), n.List, func() string { return "return argument" })
+		typecheckaste(ORETURN, nil, false, Curfn.Type.Results(), n.List, func { return "return argument" })
 
 	case ORETJMP:
 		ok |= Etop
@@ -2546,7 +2546,7 @@ func typecheckaste(op Op, call *Node, isddd bool, tstruct *types.Type, nl Nodes,
 	var i int
 
 	lno := lineno
-	defer func() { lineno = lno }()
+	defer func { lineno = lno }()
 
 	if tstruct.Broke() {
 		return
@@ -2874,7 +2874,7 @@ func pushtype(n *Node, t *types.Type) {
 // 	n.Left = typecheckcomplit(n.Left)
 func typecheckcomplit(n *Node) *Node {
 	lno := lineno
-	defer func() {
+	defer func {
 		lineno = lno
 	}()
 

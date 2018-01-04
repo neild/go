@@ -100,7 +100,7 @@ func do(writer io.Writer, flagSet *flag.FlagSet, args []string) (err error) {
 		pkg := parsePackage(writer, buildPackage, userPath)
 		paths = append(paths, pkg.prettyPath())
 
-		defer func() {
+		defer func {
 			pkg.flush()
 			e := recover()
 			if e == nil {

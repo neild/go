@@ -104,7 +104,7 @@ func TestMain(m *testing.M) {
 			os.Exit(2)
 		}
 
-		goEnv := func(name string) string {
+		goEnv := func name {
 			out, err := exec.Command(gotool, "env", name).CombinedOutput()
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "go env %s: %v\n%s", name, err, out)
@@ -862,7 +862,7 @@ func TestNewReleaseRebuildsStalePackagesInGOPATH(t *testing.T) {
 			t.Fatal(err)
 		}
 		tg.sleep()
-		return func() {
+		return func {
 			if err := ioutil.WriteFile(name, old, 0666); err != nil {
 				t.Fatal(err)
 			}
@@ -939,7 +939,7 @@ func TestGoInstallCleansUpAfterGoBuild(t *testing.T) {
 	tg.setenv("GOPATH", tg.path("."))
 	tg.cd(tg.path("src/mycmd"))
 
-	doesNotExist := func(file, msg string) {
+	doesNotExist := func file, msg {
 		if _, err := os.Stat(file); err == nil {
 			t.Fatal(msg)
 		} else if !os.IsNotExist(err) {
@@ -1167,7 +1167,7 @@ func copyBad(tg *testgoData) {
 	}
 
 	tg.must(filepath.Walk("testdata/local",
-		func(path string, info os.FileInfo, err error) error {
+		func path, info, err {
 			if err != nil {
 				return err
 			}
@@ -2581,7 +2581,7 @@ func TestTestEmpty(t *testing.T) {
 	wd, _ := os.Getwd()
 	testdata := filepath.Join(wd, "testdata")
 	for _, dir := range []string{"pkg", "test", "xtest", "pkgtest", "pkgxtest", "pkgtestxtest", "testxtest"} {
-		t.Run(dir, func(t *testing.T) {
+		t.Run(dir, func t {
 			tg := testgo(t)
 			defer tg.cleanup()
 			tg.setenv("GOPATH", testdata)
@@ -2598,7 +2598,7 @@ func TestNoGoError(t *testing.T) {
 	wd, _ := os.Getwd()
 	testdata := filepath.Join(wd, "testdata")
 	for _, dir := range []string{"empty/test", "empty/xtest", "empty/testxtest", "exclude", "exclude/ignore", "exclude/empty"} {
-		t.Run(dir, func(t *testing.T) {
+		t.Run(dir, func t {
 			tg := testgo(t)
 			defer tg.cleanup()
 			tg.setenv("GOPATH", testdata)
@@ -2665,7 +2665,7 @@ func TestCoverageWithCgo(t *testing.T) {
 	}
 
 	for _, dir := range []string{"cgocover", "cgocover2", "cgocover3", "cgocover4"} {
-		t.Run(dir, func(t *testing.T) {
+		t.Run(dir, func t {
 			tg := testgo(t)
 			tg.parallel()
 			defer tg.cleanup()
@@ -2898,7 +2898,7 @@ func TestListTemplateContextFunction(t *testing.T) {
 		{"InstallSuffix", ""},
 	} {
 		tt := tt
-		t.Run(tt.v, func(t *testing.T) {
+		t.Run(tt.v, func t {
 			tg := testgo(t)
 			tg.parallel()
 			defer tg.cleanup()
@@ -2949,7 +2949,7 @@ func TestBuildDashIInstallsDependencies(t *testing.T) {
 	// don't let build -i overwrite runtime
 	tg.wantNotStale("runtime", "", "must be non-stale before build -i")
 
-	checkbar := func(desc string) {
+	checkbar := func desc {
 		tg.run("build", "-v", "-i", "x/y/bar")
 		tg.grepBoth("x/y/foo", "first build -i "+desc+" did not build x/y/foo")
 		tg.run("build", "-v", "-i", "x/y/bar")
@@ -3588,7 +3588,7 @@ func TestGoGetUpdate(t *testing.T) {
 	tg.makeTempdir()
 	tg.setenv("GOPATH", tg.path("."))
 
-	rewind := func() {
+	rewind := func {
 		tg.run("get", "github.com/rsc/go-get-issue-9224-cmd")
 		cmd := exec.Command("git", "reset", "--hard", "HEAD~")
 		cmd.Dir = tg.path("src/github.com/rsc/go-get-issue-9224-lib")
@@ -4428,7 +4428,7 @@ func TestExecutableGOROOT(t *testing.T) {
 		}
 	}
 
-	check := func(t *testing.T, exe, want string) {
+	check := func t, exe, want {
 		cmd := exec.Command(exe, "env", "GOROOT")
 		cmd.Env = env
 		out, err := cmd.CombinedOutput()
@@ -4460,7 +4460,7 @@ func TestExecutableGOROOT(t *testing.T) {
 	tg.must(copyFile(tg.goTool(), newGoTool, 0775))
 	newRoot := tg.path("new")
 
-	t.Run("RelocatedExe", func(t *testing.T) {
+	t.Run("RelocatedExe", func t {
 		t.Skip("TODO: skipping known broken test; see golang.org/issue/20284")
 
 		// Should fall back to default location in binary.
@@ -4479,7 +4479,7 @@ func TestExecutableGOROOT(t *testing.T) {
 	// If the binary is sitting in a bin dir next to ../pkg/tool, that counts as a GOROOT,
 	// so it should find the new tree.
 	tg.tempDir("new/pkg/tool")
-	t.Run("RelocatedTree", func(t *testing.T) {
+	t.Run("RelocatedTree", func t {
 		check(t, newGoTool, newRoot)
 	})
 
@@ -4487,7 +4487,7 @@ func TestExecutableGOROOT(t *testing.T) {
 	symGoTool := tg.path("other/bin/go" + exeSuffix)
 
 	// Symlink into go tree should still find go tree.
-	t.Run("SymlinkedExe", func(t *testing.T) {
+	t.Run("SymlinkedExe", func t {
 		testenv.MustHaveSymlink(t)
 		if err := os.Symlink(newGoTool, symGoTool); err != nil {
 			t.Fatal(err)
@@ -4501,7 +4501,7 @@ func TestExecutableGOROOT(t *testing.T) {
 	// new tree when they call runtime.GOROOT().
 	// This is implemented by having the go tool pass a -X option
 	// to the linker setting runtime/internal/sys.DefaultGoroot.
-	t.Run("RuntimeGoroot", func(t *testing.T) {
+	t.Run("RuntimeGoroot", func t {
 		// Build a working GOROOT the easy way, with symlinks.
 		testenv.MustHaveSymlink(t)
 		if err := os.Symlink(filepath.Join(testGOROOT, "src"), tg.path("new/src")); err != nil {
@@ -4620,8 +4620,8 @@ func TestBuildIDContainsArchModeEnv(t *testing.T) {
 	}
 
 	var tg *testgoData
-	testWith := func(before, after func()) func(*testing.T) {
-		return func(t *testing.T) {
+	testWith := func before, after {
+		return func t {
 			tg = testgo(t)
 			defer tg.cleanup()
 			tg.tempFile("src/mycmd/x.go", `package main
@@ -4637,17 +4637,17 @@ func main() {}`)
 		}
 	}
 
-	t.Run("386", testWith(func() {
+	t.Run("386", testWith(func {
 		tg.setenv("GOARCH", "386")
 		tg.setenv("GO386", "387")
-	}, func() {
+	}, func {
 		tg.setenv("GO386", "sse2")
 	}))
 
-	t.Run("arm", testWith(func() {
+	t.Run("arm", testWith(func {
 		tg.setenv("GOARCH", "arm")
 		tg.setenv("GOARM", "5")
-	}, func() {
+	}, func {
 		tg.setenv("GOARM", "7")
 	}))
 }
@@ -4712,8 +4712,8 @@ func TestTestRegexps(t *testing.T) {
 
 func TestListTests(t *testing.T) {
 	var tg *testgoData
-	testWith := func(listName, expected string) func(*testing.T) {
-		return func(t *testing.T) {
+	testWith := func listName, expected {
+		return func t {
 			tg = testgo(t)
 			defer tg.cleanup()
 			tg.run("test", "./testdata/src/testlist/...", fmt.Sprintf("-list=%s", listName))
@@ -4839,7 +4839,7 @@ func TestExecBuildX(t *testing.T) {
 
 func TestParallelNumber(t *testing.T) {
 	for _, n := range [...]string{"-1", "0"} {
-		t.Run(n, func(t *testing.T) {
+		t.Run(n, func t {
 			tg := testgo(t)
 			defer tg.cleanup()
 			tg.runFail("test", "-parallel", n, "testdata/standalone_parallel_sub_test.go")
@@ -5469,7 +5469,7 @@ func TestFailFast(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.run, func(t *testing.T) {
+		t.Run(tt.run, func t {
 			tg.runFail("test", "./testdata/src/failfast_test.go", "-run="+tt.run, "-failfast="+strconv.FormatBool(tt.failfast))
 
 			nfail := strings.Count(tg.getStdout(), "FAIL - ")

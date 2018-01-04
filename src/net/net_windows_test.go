@@ -40,7 +40,7 @@ func toErrno(err error) (syscall.Errno, bool) {
 // handles broken connections. It verifies that broken connections do
 // not affect future connections.
 func TestAcceptIgnoreSomeErrors(t *testing.T) {
-	recv := func(ln Listener, ignoreSomeReadErrors bool) (string, error) {
+	recv := func ln, ignoreSomeReadErrors {
 		c, err := ln.Accept()
 		if err != nil {
 			// Display windows errno in error message.
@@ -64,7 +64,7 @@ func TestAcceptIgnoreSomeErrors(t *testing.T) {
 		return "", err
 	}
 
-	send := func(addr string, data string) error {
+	send := func addr, data {
 		c, err := Dial("tcp", addr)
 		if err != nil {
 			return err
@@ -129,7 +129,7 @@ func TestAcceptIgnoreSomeErrors(t *testing.T) {
 
 	// Send second connection data (with delay in a separate goroutine).
 	result := make(chan error)
-	go func() {
+	go func {
 		time.Sleep(alittle)
 		err := send(ln.Addr().String(), "abc")
 		if err != nil {
@@ -137,7 +137,7 @@ func TestAcceptIgnoreSomeErrors(t *testing.T) {
 		}
 		result <- nil
 	}()
-	defer func() {
+	defer func {
 		err := <-result
 		if err != nil {
 			t.Fatalf("send failed: %v", err)
@@ -179,7 +179,7 @@ func isWindowsXP(t *testing.T) bool {
 }
 
 func runCmd(args ...string) ([]byte, error) {
-	removeUTF8BOM := func(b []byte) []byte {
+	removeUTF8BOM := func b {
 		if len(b) >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF {
 			return b[3:]
 		}
@@ -273,7 +273,7 @@ func TestInterfacesWithNetsh(t *testing.T) {
 		t.Skip("English version of netsh required for this test")
 	}
 
-	toString := func(name string, isup bool) string {
+	toString := func name, isup {
 		if isup {
 			return name + ":up"
 		}
@@ -565,7 +565,7 @@ func TestInterfaceHardwareAddrWithGetmac(t *testing.T) {
 	//
 	want := make(map[string]string)
 	group := make(map[string]string) // name / values for single adapter
-	getValue := func(name string) string {
+	getValue := func name {
 		value, found := group[name]
 		if !found {
 			t.Fatalf("%q has no %q line in it", group, name)
@@ -575,7 +575,7 @@ func TestInterfaceHardwareAddrWithGetmac(t *testing.T) {
 		}
 		return value
 	}
-	processGroup := func() {
+	processGroup := func {
 		if len(group) == 0 {
 			return
 		}

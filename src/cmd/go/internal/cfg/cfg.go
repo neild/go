@@ -43,8 +43,8 @@ var (
 )
 
 func init() {
-	BuildToolchainCompiler = func() string { return "missing-compiler" }
-	BuildToolchainLinker = func() string { return "missing-linker" }
+	BuildToolchainCompiler = func { return "missing-compiler" }
+	BuildToolchainLinker = func { return "missing-linker" }
 }
 
 // An EnvVar is an environment variable Name=Value.

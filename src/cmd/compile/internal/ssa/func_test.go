@@ -53,7 +53,7 @@ import (
 func Equiv(f, g *Func) bool {
 	valcor := make(map[*Value]*Value)
 	var checkVal func(fv, gv *Value) bool
-	checkVal = func(fv, gv *Value) bool {
+	checkVal = func fv, gv {
 		if fv == nil && gv == nil {
 			return true
 		}
@@ -86,7 +86,7 @@ func Equiv(f, g *Func) bool {
 	}
 	blkcor := make(map[*Block]*Block)
 	var checkBlk func(fb, gb *Block) bool
-	checkBlk = func(fb, gb *Block) bool {
+	checkBlk = func fb, gb {
 		if blkcor[fb] == nil && blkcor[gb] == nil {
 			blkcor[fb] = gb
 			blkcor[gb] = fb

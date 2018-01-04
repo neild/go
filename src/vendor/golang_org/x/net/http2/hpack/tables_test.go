@@ -44,21 +44,21 @@ func TestHeaderFieldTable(t *testing.T) {
 		{HeaderField{"key5", "value5-x", false}, 0, false, 0, false},
 	}
 
-	staticToDynamic := func(i uint64) uint64 {
+	staticToDynamic := func i {
 		if i == 0 {
 			return 0
 		}
 		return uint64(table.len()) - i + 1 // dynamic is the reversed table
 	}
 
-	searchStatic := func(f HeaderField) (uint64, bool) {
+	searchStatic := func f {
 		old := staticTable
 		staticTable = table
-		defer func() { staticTable = old }()
+		defer func { staticTable = old }()
 		return staticTable.search(f)
 	}
 
-	searchDynamic := func(f HeaderField) (uint64, bool) {
+	searchDynamic := func f {
 		return table.search(f)
 	}
 

@@ -525,7 +525,7 @@ func BenchmarkBaseMult(b *testing.B) {
 	k, _ := new(big.Int).SetString(e.k, 10)
 	b.ReportAllocs()
 	b.StartTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			p224.ScalarBaseMult(k.Bytes())
 		}
@@ -539,7 +539,7 @@ func BenchmarkBaseMultP256(b *testing.B) {
 	k, _ := new(big.Int).SetString(e.k, 10)
 	b.ReportAllocs()
 	b.StartTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			p256.ScalarBaseMult(k.Bytes())
 		}
@@ -554,7 +554,7 @@ func BenchmarkScalarMultP256(b *testing.B) {
 
 	b.ReportAllocs()
 	b.StartTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			p256.ScalarMult(x, y, priv)
 		}

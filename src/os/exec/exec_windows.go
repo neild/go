@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	skipStdinCopyError = func(err error) bool {
+	skipStdinCopyError = func err {
 		// Ignore ERROR_BROKEN_PIPE and ERROR_NO_DATA errors copying
 		// to stdin if the program completed successfully otherwise.
 		// See Issue 20445.

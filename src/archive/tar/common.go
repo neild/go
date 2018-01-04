@@ -333,7 +333,7 @@ func (h Header) allowedFormats() (format Format, paxHdrs map[string]string, err 
 
 	var whyNoUSTAR, whyNoPAX, whyNoGNU string
 	var preferPAX bool // Prefer PAX over USTAR
-	verifyString := func(s string, size int, name, paxKey string) {
+	verifyString := func s, size, name, paxKey {
 		// NUL-terminator is optional for path and linkpath.
 		// Technically, it is required for uname and gname,
 		// but neither GNU nor BSD tar checks for it.
@@ -360,7 +360,7 @@ func (h Header) allowedFormats() (format Format, paxHdrs map[string]string, err 
 			paxHdrs[paxKey] = v
 		}
 	}
-	verifyNumeric := func(n int64, size int, name, paxKey string) {
+	verifyNumeric := func n, size, name, paxKey {
 		if !fitsInBase256(size, n) {
 			whyNoGNU = fmt.Sprintf("GNU cannot encode %s=%d", name, n)
 			format.mustNotBe(FormatGNU)
@@ -379,7 +379,7 @@ func (h Header) allowedFormats() (format Format, paxHdrs map[string]string, err 
 			paxHdrs[paxKey] = v
 		}
 	}
-	verifyTime := func(ts time.Time, size int, name, paxKey string) {
+	verifyTime := func ts, size, name, paxKey {
 		if ts.IsZero() {
 			return // Always okay
 		}

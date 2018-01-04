@@ -18,7 +18,7 @@ func TestDialContextCancelRace(t *testing.T) {
 	oldConnectFunc := connectFunc
 	oldGetsockoptIntFunc := getsockoptIntFunc
 	oldTestHookCanceledDial := testHookCanceledDial
-	defer func() {
+	defer func {
 		connectFunc = oldConnectFunc
 		getsockoptIntFunc = oldGetsockoptIntFunc
 		testHookCanceledDial = oldTestHookCanceledDial
@@ -29,24 +29,24 @@ func TestDialContextCancelRace(t *testing.T) {
 		t.Fatal(err)
 	}
 	listenerDone := make(chan struct{})
-	go func() {
+	go func {
 		defer close(listenerDone)
 		c, err := ln.Accept()
 		if err == nil {
 			c.Close()
 		}
 	}()
-	defer func() { <-listenerDone }()
+	defer func { <-listenerDone }()
 	defer ln.Close()
 
 	sawCancel := make(chan bool, 1)
-	testHookCanceledDial = func() {
+	testHookCanceledDial = func {
 		sawCancel <- true
 	}
 
 	ctx, cancelCtx := context.WithCancel(context.Background())
 
-	connectFunc = func(fd int, addr syscall.Sockaddr) error {
+	connectFunc = func fd, addr {
 		err := oldConnectFunc(fd, addr)
 		t.Logf("connect(%d, addr) = %v", fd, err)
 		if err == nil {

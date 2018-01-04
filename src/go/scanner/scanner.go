@@ -213,7 +213,7 @@ exit:
 func (s *Scanner) findLineEnd() bool {
 	// initial '/' already consumed
 
-	defer func(offs int) {
+	defer func offs {
 		// reset scanner state to where it was upon calling findLineEnd
 		s.ch = '/'
 		s.offset = offs

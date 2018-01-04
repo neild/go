@@ -20,12 +20,12 @@ var newServers = map[string]newServerFunc{
 
 	// The manual variants of newServer create a Server manually by only filling
 	// in the exported fields of Server.
-	"NewServerManual": func(h http.Handler) *Server {
+	"NewServerManual": func h {
 		ts := &Server{Listener: newLocalListener(), Config: &http.Server{Handler: h}}
 		ts.Start()
 		return ts
 	},
-	"NewTLSServerManual": func(h http.Handler) *Server {
+	"NewTLSServerManual": func h {
 		ts := &Server{Listener: newLocalListener(), Config: &http.Server{Handler: h}}
 		ts.StartTLS()
 		return ts
@@ -34,26 +34,26 @@ var newServers = map[string]newServerFunc{
 
 func TestServer(t *testing.T) {
 	for _, name := range []string{"NewServer", "NewServerManual"} {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name, func t {
 			newServer := newServers[name]
-			t.Run("Server", func(t *testing.T) { testServer(t, newServer) })
-			t.Run("GetAfterClose", func(t *testing.T) { testGetAfterClose(t, newServer) })
-			t.Run("ServerCloseBlocking", func(t *testing.T) { testServerCloseBlocking(t, newServer) })
-			t.Run("ServerCloseClientConnections", func(t *testing.T) { testServerCloseClientConnections(t, newServer) })
-			t.Run("ServerClientTransportType", func(t *testing.T) { testServerClientTransportType(t, newServer) })
+			t.Run("Server", func t { testServer(t, newServer) })
+			t.Run("GetAfterClose", func t { testGetAfterClose(t, newServer) })
+			t.Run("ServerCloseBlocking", func t { testServerCloseBlocking(t, newServer) })
+			t.Run("ServerCloseClientConnections", func t { testServerCloseClientConnections(t, newServer) })
+			t.Run("ServerClientTransportType", func t { testServerClientTransportType(t, newServer) })
 		})
 	}
 	for _, name := range []string{"NewTLSServer", "NewTLSServerManual"} {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name, func t {
 			newServer := newServers[name]
-			t.Run("ServerClient", func(t *testing.T) { testServerClient(t, newServer) })
-			t.Run("TLSServerClientTransportType", func(t *testing.T) { testTLSServerClientTransportType(t, newServer) })
+			t.Run("ServerClient", func t { testServerClient(t, newServer) })
+			t.Run("TLSServerClientTransportType", func t { testTLSServerClientTransportType(t, newServer) })
 		})
 	}
 }
 
 func testServer(t *testing.T, newServer newServerFunc) {
-	ts := newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := newServer(http.HandlerFunc(func w, r {
 		w.Write([]byte("hello"))
 	}))
 	defer ts.Close()
@@ -73,7 +73,7 @@ func testServer(t *testing.T, newServer newServerFunc) {
 
 // Issue 12781
 func testGetAfterClose(t *testing.T, newServer newServerFunc) {
-	ts := newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := newServer(http.HandlerFunc(func w, r {
 		w.Write([]byte("hello"))
 	}))
 
@@ -99,10 +99,10 @@ func testGetAfterClose(t *testing.T, newServer newServerFunc) {
 }
 
 func testServerCloseBlocking(t *testing.T, newServer newServerFunc) {
-	ts := newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := newServer(http.HandlerFunc(func w, r {
 		w.Write([]byte("hello"))
 	}))
-	dial := func() net.Conn {
+	dial := func {
 		c, err := net.Dial("tcp", ts.Listener.Addr().String())
 		if err != nil {
 			t.Fatal(err)
@@ -129,7 +129,7 @@ func testServerCloseBlocking(t *testing.T, newServer newServerFunc) {
 // Issue 14290
 func testServerCloseClientConnections(t *testing.T, newServer newServerFunc) {
 	var s *Server
-	s = newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	s = newServer(http.HandlerFunc(func w, r {
 		s.CloseClientConnections()
 	}))
 	defer s.Close()
@@ -143,7 +143,7 @@ func testServerCloseClientConnections(t *testing.T, newServer newServerFunc) {
 // Tests that the Server.Client method works and returns an http.Client that can hit
 // NewTLSServer without cert warnings.
 func testServerClient(t *testing.T, newTLSServer newServerFunc) {
-	ts := newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := newTLSServer(http.HandlerFunc(func w, r {
 		w.Write([]byte("hello"))
 	}))
 	defer ts.Close()
@@ -165,7 +165,7 @@ func testServerClient(t *testing.T, newTLSServer newServerFunc) {
 // Tests that the Server.Client.Transport interface is implemented
 // by a *http.Transport.
 func testServerClientTransportType(t *testing.T, newServer newServerFunc) {
-	ts := newServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := newServer(http.HandlerFunc(func w, r {
 	}))
 	defer ts.Close()
 	client := ts.Client()
@@ -177,7 +177,7 @@ func testServerClientTransportType(t *testing.T, newServer newServerFunc) {
 // Tests that the TLS Server.Client.Transport interface is implemented
 // by a *http.Transport.
 func testTLSServerClientTransportType(t *testing.T, newTLSServer newServerFunc) {
-	ts := newTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := newTLSServer(http.HandlerFunc(func w, r {
 	}))
 	defer ts.Close()
 	client := ts.Client()

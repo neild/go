@@ -342,7 +342,7 @@ func TestBadLex(t *testing.T) {
 // firstError returns the first error value triggered by the input.
 func firstError(input *Input) (err error) {
 	panicOnError = true
-	defer func() {
+	defer func {
 		panicOnError = false
 		switch e := recover(); e := e.(type) {
 		case nil:

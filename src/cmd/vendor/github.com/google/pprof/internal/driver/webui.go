@@ -133,7 +133,7 @@ func defaultWebServer(args *plugin.HTTPServerArgs) error {
 		return err
 	}
 	isLocal := isLocalhost(args.Host)
-	handler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+	handler := http.HandlerFunc(func w, req {
 		if isLocal {
 			// Only allow local clients
 			host, _, err := net.SplitHostPort(req.RemoteAddr)

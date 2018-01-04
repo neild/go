@@ -169,7 +169,7 @@ Files:
 			retLine            []int
 		)
 
-		flushRet := func() {
+		flushRet := func {
 			if fn != nil && fn.vars["ret"] != nil && !haveRetArg && len(retLine) > 0 {
 				v := fn.vars["ret"]
 				for _, line := range retLine {
@@ -181,7 +181,7 @@ Files:
 		for lineno, line := range lines {
 			lineno++
 
-			badf := func(format string, args ...interface{}) {
+			badf := func format, args {
 				f.Badf(token.NoPos, "%s:%d: [%s] %s: %s", f.name, lineno, arch, fnName, fmt.Sprintf(format, args...))
 			}
 
@@ -487,7 +487,7 @@ func (f *File) asmParseDecl(decl *ast.FuncDecl) map[string]*asmFunc {
 
 	// addParams adds asmVars for each of the parameters in list.
 	// isret indicates whether the list are the arguments or the return values.
-	addParams := func(list []*ast.Field, isret bool) {
+	addParams := func list, isret {
 		argnum := 0
 		for _, fld := range list {
 			t := f.pkg.types[fld.Type].Type

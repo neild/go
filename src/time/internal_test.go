@@ -52,7 +52,7 @@ func CheckRuntimeTimerOverflow() {
 	// Start a goroutine that should send on t.C right away.
 	t := NewTimer(1)
 
-	defer func() {
+	defer func {
 		// Subsequent tests won't work correctly if we don't stop the
 		// overflow timer and kick the timer proc back into service.
 		//

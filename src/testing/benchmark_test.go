@@ -64,11 +64,11 @@ func TestRoundUp(t *testing.T) {
 }
 
 func TestRunParallel(t *testing.T) {
-	testing.Benchmark(func(b *testing.B) {
+	testing.Benchmark(func b {
 		procs := uint32(0)
 		iters := uint64(0)
 		b.SetParallelism(3)
-		b.RunParallel(func(pb *testing.PB) {
+		b.RunParallel(func pb {
 			atomic.AddUint32(&procs, 1)
 			for pb.Next() {
 				atomic.AddUint64(&iters, 1)
@@ -84,8 +84,8 @@ func TestRunParallel(t *testing.T) {
 }
 
 func TestRunParallelFail(t *testing.T) {
-	testing.Benchmark(func(b *testing.B) {
-		b.RunParallel(func(pb *testing.PB) {
+	testing.Benchmark(func b {
+		b.RunParallel(func pb {
 			// The function must be able to log/abort
 			// w/o crashing/deadlocking the whole benchmark.
 			b.Log("log")
@@ -96,11 +96,11 @@ func TestRunParallelFail(t *testing.T) {
 
 func ExampleB_RunParallel() {
 	// Parallel benchmark for text/template.Template.Execute on a single object.
-	testing.Benchmark(func(b *testing.B) {
+	testing.Benchmark(func b {
 		templ := template.Must(template.New("test").Parse("Hello, {{.}}!"))
 		// RunParallel will create GOMAXPROCS goroutines
 		// and distribute work among them.
-		b.RunParallel(func(pb *testing.PB) {
+		b.RunParallel(func pb {
 			// Each goroutine has its own bytes.Buffer.
 			var buf bytes.Buffer
 			for pb.Next() {

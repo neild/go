@@ -216,7 +216,7 @@ func TestConversions(t *testing.T) {
 		if err != nil {
 			errstr = err.Error()
 		}
-		errf := func(format string, args ...interface{}) {
+		errf := func format, args {
 			base := fmt.Sprintf("convertAssign #%d: for %v (%T) -> %T, ", n, ct.s, ct.s, ct.d)
 			t.Errorf(base+format, args...)
 		}
@@ -355,7 +355,7 @@ func TestRawBytesAllocs(t *testing.T) {
 	}
 
 	buf := make(RawBytes, 10)
-	test := func(name string, in interface{}, want string) {
+	test := func name, in, want {
 		if err := convertAssign(&buf, in); err != nil {
 			t.Fatalf("%s: convertAssign = %v", name, err)
 		}
@@ -373,7 +373,7 @@ func TestRawBytesAllocs(t *testing.T) {
 		}
 	}
 
-	n := testing.AllocsPerRun(100, func() {
+	n := testing.AllocsPerRun(100, func {
 		for _, tt := range tests {
 			test(tt.name, tt.in, tt.want)
 		}
@@ -390,7 +390,7 @@ func TestRawBytesAllocs(t *testing.T) {
 	}
 
 	// This one involves a convT2E allocation, string -> interface{}
-	n = testing.AllocsPerRun(100, func() {
+	n = testing.AllocsPerRun(100, func {
 		test("string", "foo", "foo")
 	})
 	if n > 1.5 && measureAllocs {

@@ -73,16 +73,16 @@ func cpuHog2(x int) int {
 }
 
 func TestCPUProfile(t *testing.T) {
-	testCPUProfile(t, []string{"runtime/pprof.cpuHog1"}, func(dur time.Duration) {
+	testCPUProfile(t, []string{"runtime/pprof.cpuHog1"}, func dur {
 		cpuHogger(cpuHog1, &salt1, dur)
 	})
 }
 
 func TestCPUProfileMultithreaded(t *testing.T) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(2))
-	testCPUProfile(t, []string{"runtime/pprof.cpuHog1", "runtime/pprof.cpuHog2"}, func(dur time.Duration) {
+	testCPUProfile(t, []string{"runtime/pprof.cpuHog1", "runtime/pprof.cpuHog2"}, func dur {
 		c := make(chan int)
-		go func() {
+		go func {
 			cpuHogger(cpuHog1, &salt1, dur)
 			c <- 1
 		}()
@@ -92,7 +92,7 @@ func TestCPUProfileMultithreaded(t *testing.T) {
 }
 
 func TestCPUProfileInlining(t *testing.T) {
-	testCPUProfile(t, []string{"runtime/pprof.inlinedCallee", "runtime/pprof.inlinedCaller"}, func(dur time.Duration) {
+	testCPUProfile(t, []string{"runtime/pprof.inlinedCallee", "runtime/pprof.inlinedCaller"}, func dur {
 		cpuHogger(inlinedCaller, &salt1, dur)
 	})
 }
@@ -209,7 +209,7 @@ func profileOk(t *testing.T, need []string, prof bytes.Buffer, duration time.Dur
 	have := make([]uintptr, len(need))
 	var samples uintptr
 	var buf bytes.Buffer
-	parseProfile(t, prof.Bytes(), func(count uintptr, stk []*profile.Location, labels map[string][]string) {
+	parseProfile(t, prof.Bytes(), func count, stk, labels {
 		fmt.Fprintf(&buf, "%d:", count)
 		fprintStack(&buf, stk)
 		samples += count
@@ -295,7 +295,7 @@ func TestCPUProfileWithFork(t *testing.T) {
 	garbage := make([]byte, heap)
 	// Need to touch the slice, otherwise it won't be paged in.
 	done := make(chan bool)
-	go func() {
+	go func {
 		for i := range garbage {
 			garbage[i] = 42
 		}
@@ -338,7 +338,7 @@ func TestGoroutineSwitch(t *testing.T) {
 
 		// Read profile to look for entries for runtime.gogo with an attempt at a traceback.
 		// The special entry
-		parseProfile(t, prof.Bytes(), func(count uintptr, stk []*profile.Location, _ map[string][]string) {
+		parseProfile(t, prof.Bytes(), func count, stk, _ {
 			// An entry with two frames with 'System' in its top frame
 			// exists to record a PC without a traceback. Those are okay.
 			if len(stk) == 2 {
@@ -377,7 +377,7 @@ func fprintStack(w io.Writer, stk []*profile.Location) {
 
 // Test that profiling of division operations is okay, especially on ARM. See issue 6681.
 func TestMathBigDivide(t *testing.T) {
-	testCPUProfile(t, nil, func(duration time.Duration) {
+	testCPUProfile(t, nil, func duration {
 		t := time.After(duration)
 		pi := new(big.Int)
 		for {
@@ -510,7 +510,7 @@ func TestBlockProfile(t *testing.T) {
 		test.f()
 	}
 
-	t.Run("debug=1", func(t *testing.T) {
+	t.Run("debug=1", func t {
 		var w bytes.Buffer
 		Lookup("block").WriteTo(&w, 1)
 		prof := w.String()
@@ -530,7 +530,7 @@ func TestBlockProfile(t *testing.T) {
 		}
 	})
 
-	t.Run("proto", func(t *testing.T) {
+	t.Run("proto", func t {
 		// proto format
 		var w bytes.Buffer
 		Lookup("block").WriteTo(&w, 0)
@@ -587,7 +587,7 @@ const blockDelay = 10 * time.Millisecond
 
 func blockChanRecv() {
 	c := make(chan bool)
-	go func() {
+	go func {
 		time.Sleep(blockDelay)
 		c <- true
 	}()
@@ -596,7 +596,7 @@ func blockChanRecv() {
 
 func blockChanSend() {
 	c := make(chan bool)
-	go func() {
+	go func {
 		time.Sleep(blockDelay)
 		<-c
 	}()
@@ -605,7 +605,7 @@ func blockChanSend() {
 
 func blockChanClose() {
 	c := make(chan bool)
-	go func() {
+	go func {
 		time.Sleep(blockDelay)
 		close(c)
 	}()
@@ -616,7 +616,7 @@ func blockSelectRecvAsync() {
 	const numTries = 3
 	c := make(chan bool, 1)
 	c2 := make(chan bool, 1)
-	go func() {
+	go func {
 		for i := 0; i < numTries; i++ {
 			time.Sleep(blockDelay)
 			c <- true
@@ -633,7 +633,7 @@ func blockSelectRecvAsync() {
 func blockSelectSendSync() {
 	c := make(chan bool)
 	c2 := make(chan bool)
-	go func() {
+	go func {
 		time.Sleep(blockDelay)
 		<-c
 	}()
@@ -646,7 +646,7 @@ func blockSelectSendSync() {
 func blockMutex() {
 	var mu sync.Mutex
 	mu.Lock()
-	go func() {
+	go func {
 		time.Sleep(blockDelay)
 		mu.Unlock()
 	}()
@@ -661,7 +661,7 @@ func blockCond() {
 	var mu sync.Mutex
 	c := sync.NewCond(&mu)
 	mu.Lock()
-	go func() {
+	go func {
 		time.Sleep(blockDelay)
 		mu.Lock()
 		c.Signal()
@@ -682,7 +682,7 @@ func TestMutexProfile(t *testing.T) {
 
 	blockMutex()
 
-	t.Run("debug=1", func(t *testing.T) {
+	t.Run("debug=1", func t {
 		var w bytes.Buffer
 		Lookup("mutex").WriteTo(&w, 1)
 		prof := w.String()
@@ -711,7 +711,7 @@ func TestMutexProfile(t *testing.T) {
 		}
 		t.Logf(prof)
 	})
-	t.Run("proto", func(t *testing.T) {
+	t.Run("proto", func t {
 		// proto format
 		var w bytes.Buffer
 		Lookup("mutex").WriteTo(&w, 0)
@@ -843,8 +843,8 @@ func TestEmptyCallStack(t *testing.T) {
 }
 
 func TestCPUProfileLabel(t *testing.T) {
-	testCPUProfile(t, []string{"runtime/pprof.cpuHogger;key=value"}, func(dur time.Duration) {
-		Do(context.Background(), Labels("key", "value"), func(context.Context) {
+	testCPUProfile(t, []string{"runtime/pprof.cpuHogger;key=value"}, func dur {
+		Do(context.Background(), Labels("key", "value"), func {
 			cpuHogger(cpuHog1, &salt1, dur)
 		})
 	})
@@ -854,15 +854,15 @@ func TestLabelRace(t *testing.T) {
 	// Test the race detector annotations for synchronization
 	// between settings labels and consuming them from the
 	// profile.
-	testCPUProfile(t, []string{"runtime/pprof.cpuHogger;key=value"}, func(dur time.Duration) {
+	testCPUProfile(t, []string{"runtime/pprof.cpuHogger;key=value"}, func dur {
 		start := time.Now()
 		var wg sync.WaitGroup
 		for time.Since(start) < dur {
 			var salts [10]int
 			for i := 0; i < 10; i++ {
 				wg.Add(1)
-				go func(j int) {
-					Do(context.Background(), Labels("key", "value"), func(context.Context) {
+				go func j {
+					Do(context.Background(), Labels("key", "value"), func {
 						cpuHogger(cpuHog1, &salts[j], time.Millisecond)
 					})
 					wg.Done()
@@ -891,7 +891,7 @@ func TestAtomicLoadStore64(t *testing.T) {
 	var flag uint64
 	done := make(chan bool, 1)
 
-	go func() {
+	go func {
 		for atomic.LoadUint64(&flag) == 0 {
 			runtime.Gosched()
 		}

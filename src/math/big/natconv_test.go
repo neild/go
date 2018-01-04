@@ -73,8 +73,8 @@ var strTests = []struct {
 func TestString(t *testing.T) {
 	// test invalid base explicitly
 	var panicStr string
-	func() {
-		defer func() {
+	func {
+		defer func {
 			panicStr = recover().(string)
 		}()
 		natOne.utoa(1)
@@ -264,7 +264,7 @@ func TestScanPiParallel(t *testing.T) {
 	const n = 2
 	c := make(chan int)
 	for i := 0; i < n; i++ {
-		go func() {
+		go func {
 			TestScanPi(t)
 			c <- 0
 		}()
@@ -287,7 +287,7 @@ func BenchmarkStringPiParallel(b *testing.B) {
 	if string(x.utoa(10)) != pi {
 		panic("benchmark incorrect: conversion failed")
 	}
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			x.utoa(10)
 		}
@@ -301,7 +301,7 @@ func BenchmarkScan(b *testing.B) {
 			if isRaceBuilder && y > 1000 {
 				continue
 			}
-			b.Run(fmt.Sprintf("%d/Base%d", y, base), func(b *testing.B) {
+			b.Run(fmt.Sprintf("%d/Base%d", y, base), func b {
 				b.StopTimer()
 				var z nat
 				z = z.expWW(x, y)
@@ -327,7 +327,7 @@ func BenchmarkString(b *testing.B) {
 			if isRaceBuilder && y > 1000 {
 				continue
 			}
-			b.Run(fmt.Sprintf("%d/Base%d", y, base), func(b *testing.B) {
+			b.Run(fmt.Sprintf("%d/Base%d", y, base), func b {
 				b.StopTimer()
 				var z nat
 				z = z.expWW(x, y)
@@ -344,11 +344,11 @@ func BenchmarkString(b *testing.B) {
 
 func BenchmarkLeafSize(b *testing.B) {
 	for n := 0; n <= 16; n++ {
-		b.Run(fmt.Sprint(n), func(b *testing.B) { LeafSizeHelper(b, 10, n) })
+		b.Run(fmt.Sprint(n), func b { LeafSizeHelper(b, 10, n) })
 	}
 	// Try some large lengths
 	for _, n := range []int{32, 64} {
-		b.Run(fmt.Sprint(n), func(b *testing.B) { LeafSizeHelper(b, 10, n) })
+		b.Run(fmt.Sprint(n), func b { LeafSizeHelper(b, 10, n) })
 	}
 }
 

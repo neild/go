@@ -424,19 +424,19 @@ func Main(archInit func(*Arch)) {
 	types.Widthptr = Widthptr
 	types.Dowidth = dowidth
 	types.Fatalf = Fatalf
-	types.Sconv = func(s *types.Sym, flag, mode int) string {
+	types.Sconv = func s, flag, mode {
 		return sconv(s, FmtFlag(flag), fmtMode(mode))
 	}
-	types.Tconv = func(t *types.Type, flag, mode, depth int) string {
+	types.Tconv = func t, flag, mode, depth {
 		return tconv(t, FmtFlag(flag), fmtMode(mode), depth)
 	}
-	types.FormatSym = func(sym *types.Sym, s fmt.State, verb rune, mode int) {
+	types.FormatSym = func sym, s, verb, mode {
 		symFormat(sym, s, verb, fmtMode(mode))
 	}
-	types.FormatType = func(t *types.Type, s fmt.State, verb rune, mode int) {
+	types.FormatType = func t, s, verb, mode {
 		typeFormat(t, s, verb, fmtMode(mode))
 	}
-	types.TypeLinkSym = func(t *types.Type) *obj.LSym {
+	types.TypeLinkSym = func t {
 		return typenamesym(t).Linksym()
 	}
 	types.FmtLeft = int(FmtLeft)
@@ -559,7 +559,7 @@ func Main(archInit func(*Arch)) {
 
 	if Debug['l'] != 0 {
 		// Find functions that can be inlined and clone them before walk expands them.
-		visitBottomUp(xtop, func(list []*Node, recursive bool) {
+		visitBottomUp(xtop, func list, recursive {
 			for _, n := range list {
 				if !recursive {
 					caninl(n)
@@ -658,7 +658,7 @@ func Main(archInit func(*Arch)) {
 		}
 
 		// Check whether any of the functions we have compiled have gigantic stack frames.
-		obj.SortSlice(largeStackFrames, func(i, j int) bool {
+		obj.SortSlice(largeStackFrames, func i, j {
 			return largeStackFrames[i].Before(largeStackFrames[j])
 		})
 		for _, largePos := range largeStackFrames {
@@ -1194,7 +1194,7 @@ func clearImports() {
 		}
 	}
 
-	obj.SortSlice(unused, func(i, j int) bool { return unused[i].pos.Before(unused[j].pos) })
+	obj.SortSlice(unused, func i, j { return unused[i].pos.Before(unused[j].pos) })
 	for _, pkg := range unused {
 		pkgnotused(pkg.pos, pkg.path, pkg.name)
 	}

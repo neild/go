@@ -538,12 +538,12 @@ func printCategories() {
 			decl := fmt.Sprintf("var _%s = &RangeTable{\n", name)
 			dumpRange(
 				decl,
-				func(code rune) bool { return categoryOp(code, name[0]) })
+				func code { return categoryOp(code, name[0]) })
 			continue
 		}
 		dumpRange(
 			fmt.Sprintf("var _%s = &RangeTable{\n", name),
-			func(code rune) bool { return chars[code].category == name })
+			func code { return chars[code].category == name })
 	}
 	decl.Sort()
 	println("// These variables have type *RangeTable.")
@@ -653,11 +653,11 @@ func fullCategoryTest(list []string) {
 			logger.Fatalf("unknown table %q", name)
 		}
 		if len(name) == 1 {
-			verifyRange(name, func(code rune) bool { return categoryOp(code, name[0]) }, r)
+			verifyRange(name, func code { return categoryOp(code, name[0]) }, r)
 		} else {
 			verifyRange(
 				name,
-				func(code rune) bool { return chars[code].category == name },
+				func code { return chars[code].category == name },
 				r)
 		}
 	}
@@ -1178,7 +1178,7 @@ func printCasefold() {
 		if orb == nil {
 			continue
 		}
-		sort.Slice(orb, func(i, j int) bool {
+		sort.Slice(orb, func i, j {
 			return orb[i] < orb[j]
 		})
 		c := orb[len(orb)-1]
@@ -1390,7 +1390,7 @@ func printCatFold(name string, m map[string]map[rune]bool) {
 		class := m[name]
 		dumpRange(
 			fmt.Sprintf("var fold%s = &RangeTable{\n", name),
-			func(code rune) bool { return class[code] })
+			func code { return class[code] })
 	}
 }
 

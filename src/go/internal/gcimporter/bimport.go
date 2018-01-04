@@ -51,7 +51,7 @@ type importer struct {
 // compromised, an error is returned.
 func BImportData(fset *token.FileSet, imports map[string]*types.Package, data []byte, path string) (_ int, pkg *types.Package, err error) {
 	// catch panics and return them as errors
-	defer func() {
+	defer func {
 		if e := recover(); e != nil {
 			// The package (filename) causing the problem is added to this
 			// error by a wrapper in the caller (Import in gcimporter.go).
@@ -332,7 +332,7 @@ func (p *importer) pos() token.Pos {
 		p.files[file] = f
 		// Allocate the fake linebreak indices on first use.
 		// TODO(adonovan): opt: save ~512KB using a more complex scheme?
-		fakeLinesOnce.Do(func() {
+		fakeLinesOnce.Do(func {
 			fakeLines = make([]int, maxlines)
 			for i := range fakeLines {
 				fakeLines[i] = i

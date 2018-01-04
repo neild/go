@@ -265,7 +265,7 @@ func (rpt *Report) newGraph(nodes graph.NodeSet) *graph.Graph {
 		s.NumUnit = numUnits
 	}
 
-	formatTag := func(v int64, key string) string {
+	formatTag := func v, key {
 		return measurement.ScaledLabel(v, key, o.OutputUnit)
 	}
 
@@ -381,7 +381,7 @@ func PrintAssembly(w io.Writer, rpt *Report, obj plugin.ObjTool, maxFuncs int) e
 	for s := range symNodes {
 		syms = append(syms, s)
 	}
-	byName := func(a, b *objSymbol) bool {
+	byName := func a, b {
 		if na, nb := a.sym.Name[0], b.sym.Name[0]; na != nb {
 			return na < nb
 		}
@@ -390,7 +390,7 @@ func PrintAssembly(w io.Writer, rpt *Report, obj plugin.ObjTool, maxFuncs int) e
 	if maxFuncs < 0 {
 		sort.Sort(orderSyms{syms, byName})
 	} else {
-		byFlatSum := func(a, b *objSymbol) bool {
+		byFlatSum := func a, b {
 			suma, _ := symNodes[a].Sum()
 			sumb, _ := symNodes[b].Sum()
 			if suma != sumb {
@@ -654,7 +654,7 @@ func printTags(w io.Writer, rpt *Report) error {
 	p := rpt.prof
 
 	o := rpt.options
-	formatTag := func(v int64, key string) string {
+	formatTag := func v, key {
 		return measurement.ScaledLabel(v, key, o.OutputUnit)
 	}
 
@@ -1203,7 +1203,7 @@ func genLabel(d int, n, l, f string) string {
 // New builds a new report indexing the sample values interpreting the
 // samples with the provided function.
 func New(prof *profile.Profile, o *Options) *Report {
-	format := func(v int64) string {
+	format := func v {
 		if r := o.Ratio; r > 0 && r != 1 {
 			fv := float64(v) * r
 			v = int64(fv)
@@ -1224,7 +1224,7 @@ func NewDefault(prof *profile.Profile, options Options) *Report {
 	}
 	o.SampleType = prof.SampleType[index].Type
 	o.SampleUnit = strings.ToLower(prof.SampleType[index].Unit)
-	o.SampleValue = func(v []int64) int64 {
+	o.SampleValue = func v {
 		return v[index]
 	}
 	return New(prof, o)

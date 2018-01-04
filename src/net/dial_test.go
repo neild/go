@@ -88,9 +88,9 @@ func TestDialerDualStackFDLeak(t *testing.T) {
 
 	before := sw.Sockets()
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
+	defer func { testHookLookupIP = origTestHookLookupIP }()
 	testHookLookupIP = lookupLocalhost
-	handler := func(dss *dualStackServer, ln Listener) {
+	handler := func dss, ln {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -113,7 +113,7 @@ func TestDialerDualStackFDLeak(t *testing.T) {
 	wg.Add(N)
 	d := &Dialer{DualStack: true, Timeout: 5 * time.Second}
 	for i := 0; i < N; i++ {
-		go func() {
+		go func {
 			defer wg.Done()
 			c, err := d.Dial("tcp", JoinHostPort("localhost", dss.port))
 			if err != nil {
@@ -211,10 +211,10 @@ func TestDialParallel(t *testing.T) {
 	}
 
 	origTestHookDialTCP := testHookDialTCP
-	defer func() { testHookDialTCP = origTestHookDialTCP }()
+	defer func { testHookDialTCP = origTestHookDialTCP }()
 	testHookDialTCP = slowDialTCP
 
-	nCopies := func(s string, n int) []string {
+	nCopies := func s, n {
 		out := make([]string, n)
 		for i := 0; i < n; i++ {
 			out[i] = s
@@ -252,7 +252,7 @@ func TestDialParallel(t *testing.T) {
 		{nCopies("::1", 1000), []string{}, "", true, instant},
 	}
 
-	handler := func(dss *dualStackServer, ln Listener) {
+	handler := func dss, ln {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -263,7 +263,7 @@ func TestDialParallel(t *testing.T) {
 	}
 
 	// Convert a list of IP strings into TCPAddrs.
-	makeAddrs := func(ips []string, port string) addrList {
+	makeAddrs := func ips, port {
 		var out addrList
 		for _, ip := range ips {
 			addr, err := ResolveTCPAddr("tcp", JoinHostPort(ip, port))
@@ -325,7 +325,7 @@ func TestDialParallel(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		var wg sync.WaitGroup
 		wg.Add(1)
-		go func() {
+		go func {
 			time.Sleep(5 * time.Millisecond)
 			cancel()
 			wg.Done()
@@ -364,11 +364,11 @@ func TestDialerFallbackDelay(t *testing.T) {
 	}
 
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
+	defer func { testHookLookupIP = origTestHookLookupIP }()
 	testHookLookupIP = lookupSlowFast
 
 	origTestHookDialTCP := testHookDialTCP
-	defer func() { testHookDialTCP = origTestHookDialTCP }()
+	defer func { testHookDialTCP = origTestHookDialTCP }()
 	testHookDialTCP = slowDialTCP
 
 	var testCases = []struct {
@@ -384,7 +384,7 @@ func TestDialerFallbackDelay(t *testing.T) {
 		{true, 0, 300 * time.Millisecond},
 	}
 
-	handler := func(dss *dualStackServer, ln Listener) {
+	handler := func dss, ln {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -431,7 +431,7 @@ func TestDialParallelSpuriousConnection(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(2)
-	handler := func(dss *dualStackServer, ln Listener) {
+	handler := func dss, ln {
 		// Accept one connection per address.
 		c, err := ln.Accept()
 		if err != nil {
@@ -458,8 +458,8 @@ func TestDialParallelSpuriousConnection(t *testing.T) {
 	const fallbackDelay = 100 * time.Millisecond
 
 	origTestHookDialTCP := testHookDialTCP
-	defer func() { testHookDialTCP = origTestHookDialTCP }()
-	testHookDialTCP = func(ctx context.Context, net string, laddr, raddr *TCPAddr) (*TCPConn, error) {
+	defer func { testHookDialTCP = origTestHookDialTCP }()
+	testHookDialTCP = func ctx, net, laddr, raddr {
 		// Sleep long enough for Happy Eyeballs to kick in, and inhibit cancelation.
 		// This forces dialParallel to juggle two successful connections.
 		time.Sleep(fallbackDelay * 2)
@@ -479,7 +479,7 @@ func TestDialParallelSpuriousConnection(t *testing.T) {
 		address: "?",
 	}
 
-	makeAddr := func(ip string) addrList {
+	makeAddr := func ip {
 		addr, err := ResolveTCPAddr("tcp", JoinHostPort(ip, dss.port))
 		if err != nil {
 			t.Fatal(err)
@@ -599,9 +599,9 @@ func TestDialerLocalAddr(t *testing.T) {
 	}
 
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
+	defer func { testHookLookupIP = origTestHookLookupIP }()
 	testHookLookupIP = lookupLocalhost
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -666,9 +666,9 @@ func TestDialerDualStack(t *testing.T) {
 	}
 
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
+	defer func { testHookLookupIP = origTestHookLookupIP }()
 	testHookLookupIP = lookupLocalhost
-	handler := func(dss *dualStackServer, ln Listener) {
+	handler := func dss, ln {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -708,7 +708,7 @@ func TestDialerDualStack(t *testing.T) {
 }
 
 func TestDialerKeepAlive(t *testing.T) {
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -725,11 +725,11 @@ func TestDialerKeepAlive(t *testing.T) {
 	if err := ls.buildup(handler); err != nil {
 		t.Fatal(err)
 	}
-	defer func() { testHookSetKeepAlive = func() {} }()
+	defer func { testHookSetKeepAlive = func {} }()
 
 	for _, keepAlive := range []bool{false, true} {
 		got := false
-		testHookSetKeepAlive = func() { got = true }
+		testHookSetKeepAlive = func { got = true }
 		var d Dialer
 		if keepAlive {
 			d.KeepAlive = 30 * time.Second
@@ -774,7 +774,7 @@ func TestDialCancel(t *testing.T) {
 	d.Cancel = cancel
 	errc := make(chan error, 1)
 	connc := make(chan Conn, 1)
-	go func() {
+	go func {
 		if c, err := d.Dial("tcp", blackholeIPPort); err != nil {
 			errc <- err
 		} else {
@@ -823,13 +823,13 @@ func TestCancelAfterDial(t *testing.T) {
 
 	var wg sync.WaitGroup
 	wg.Add(1)
-	defer func() {
+	defer func {
 		ln.Close()
 		wg.Wait()
 	}()
 
 	// Echo back the first line of each incoming connection.
-	go func() {
+	go func {
 		for {
 			c, err := ln.Accept()
 			if err != nil {
@@ -850,7 +850,7 @@ func TestCancelAfterDial(t *testing.T) {
 		wg.Done()
 	}()
 
-	try := func() {
+	try := func {
 		cancel := make(chan struct{})
 		d := &Dialer{Cancel: cancel}
 		c, err := d.Dial("tcp", ln.Addr().String())

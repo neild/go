@@ -271,7 +271,7 @@ func TestReadFrom(t *testing.T) {
 
 func TestReadFromNegativeReader(t *testing.T) {
 	var b Buffer
-	defer func() {
+	defer func {
 		switch err := recover().(type) {
 		case nil:
 			t.Fatal("bytes.Buffer.ReadFrom didn't panic")
@@ -496,7 +496,7 @@ func TestGrow(t *testing.T) {
 }
 
 func TestGrowOverflow(t *testing.T) {
-	defer func() {
+	defer func {
 		if err := recover(); err != ErrTooLarge {
 			t.Errorf("after too-large Grow, recover() = %v; want %v", err, ErrTooLarge)
 		}

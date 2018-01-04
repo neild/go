@@ -27,9 +27,9 @@ func parseFiles(filenames []string) uint {
 		p := &noder{err: make(chan syntax.Error)}
 		noders = append(noders, p)
 
-		go func(filename string) {
+		go func filename {
 			sem <- struct{}{}
-			defer func() { <-sem }()
+			defer func { <-sem }()
 			defer close(p.err)
 			base := src.NewFileBase(filename, absFilename(filename))
 

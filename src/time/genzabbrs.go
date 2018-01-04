@@ -108,7 +108,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	sort.Slice(zs, func(i, j int) bool {
+	sort.Slice(zs, func i, j {
 		return zs[i].UnixName < zs[j].UnixName
 	})
 	var v = struct {

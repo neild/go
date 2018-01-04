@@ -64,7 +64,7 @@ func SetTestHookServerServe(fn func(*Server, net.Listener)) { testHookServerServ
 
 func NewTestTimeoutHandler(handler Handler, ch <-chan time.Time) Handler {
 	ctx, cancel := context.WithCancel(context.Background())
-	go func() {
+	go func {
 		<-ch
 		cancel()
 	}()
@@ -181,7 +181,7 @@ func unnilTestHook(f *func()) {
 }
 
 func hookSetter(dst *func()) func(func()) {
-	return func(fn func()) {
+	return func fn {
 		unnilTestHook(&fn)
 		*dst = fn
 	}
@@ -215,5 +215,5 @@ func (r *Request) WithT(t *testing.T) *Request {
 func ExportSetH2GoawayTimeout(d time.Duration) (restore func()) {
 	old := http2goAwayTimeout
 	http2goAwayTimeout = d
-	return func() { http2goAwayTimeout = old }
+	return func { http2goAwayTimeout = old }
 }

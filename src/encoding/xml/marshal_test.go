@@ -1643,7 +1643,7 @@ func TestMarshal(t *testing.T) {
 			continue
 		}
 
-		t.Run(fmt.Sprintf("%d", idx), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%d", idx), func t {
 			data, err := Marshal(test.Value)
 			if err != nil {
 				if test.MarshalError == "" {
@@ -1774,7 +1774,7 @@ func TestUnmarshal(t *testing.T) {
 		dest := reflect.New(vt.Elem()).Interface()
 		err := Unmarshal([]byte(test.ExpectXML), dest)
 
-		t.Run(fmt.Sprintf("%d", i), func(t *testing.T) {
+		t.Run(fmt.Sprintf("%d", i), func t {
 			switch fix := dest.(type) {
 			case *Feed:
 				fix.Author.InnerXML = ""
@@ -1891,7 +1891,7 @@ func TestMarshalFlush(t *testing.T) {
 
 func BenchmarkMarshal(b *testing.B) {
 	b.ReportAllocs()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			Marshal(atomValue)
 		}
@@ -1901,7 +1901,7 @@ func BenchmarkMarshal(b *testing.B) {
 func BenchmarkUnmarshal(b *testing.B) {
 	b.ReportAllocs()
 	xml := []byte(atomXML)
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			Unmarshal(xml, &Feed{})
 		}
@@ -2282,7 +2282,7 @@ loop:
 				continue loop
 			}
 		}
-		errorf := func(f string, a ...interface{}) {
+		errorf := func f, a {
 			t.Errorf("#%d %s token #%d:%s", i, tt.desc, len(tt.toks)-1, fmt.Sprintf(f, a...))
 		}
 		switch {
@@ -2350,7 +2350,7 @@ func TestRace9796(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 2; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			Marshal(B{[]A{{}}})
 			wg.Done()
 		}()

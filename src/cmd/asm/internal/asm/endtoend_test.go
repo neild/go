@@ -38,7 +38,7 @@ func testEndToEnd(t *testing.T, goarch, file string) {
 	ctxt.Bso = bufio.NewWriter(os.Stdout)
 	defer ctxt.Bso.Flush()
 	failed := false
-	ctxt.DiagFunc = func(format string, args ...interface{}) {
+	ctxt.DiagFunc = func format, args {
 		failed = true
 		t.Errorf(format, args...)
 	}
@@ -182,7 +182,7 @@ Diff:
 	top := pList.Firstpc
 	var text *obj.LSym
 	ok = true
-	ctxt.DiagFunc = func(format string, args ...interface{}) {
+	ctxt.DiagFunc = func format, args {
 		t.Errorf(format, args...)
 		ok = false
 	}
@@ -281,7 +281,7 @@ func testErrors(t *testing.T, goarch, file string) {
 	defer ctxt.Bso.Flush()
 	failed := false
 	var errBuf bytes.Buffer
-	ctxt.DiagFunc = func(format string, args ...interface{}) {
+	ctxt.DiagFunc = func format, args {
 		failed = true
 		s := fmt.Sprintf(format, args...)
 		if !strings.HasSuffix(s, "\n") {
@@ -353,7 +353,7 @@ func testErrors(t *testing.T, goarch, file string) {
 }
 
 func Test386EndToEnd(t *testing.T) {
-	defer func(old string) { objabi.GO386 = old }(objabi.GO386)
+	defer func old { objabi.GO386 = old }(objabi.GO386)
 	for _, go386 := range []string{"387", "sse2"} {
 		t.Logf("GO386=%v", go386)
 		objabi.GO386 = go386
@@ -362,7 +362,7 @@ func Test386EndToEnd(t *testing.T) {
 }
 
 func TestARMEndToEnd(t *testing.T) {
-	defer func(old int) { objabi.GOARM = old }(objabi.GOARM)
+	defer func old { objabi.GOARM = old }(objabi.GOARM)
 	for _, goarm := range []int{5, 6, 7} {
 		t.Logf("GOARM=%d", goarm)
 		objabi.GOARM = goarm

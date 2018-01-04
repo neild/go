@@ -744,7 +744,7 @@ func (check *Checker) shift(x, y *operand, e *ast.BinaryExpr, op token.Token) {
 }
 
 var binaryOpPredicates = opPredicates{
-	token.ADD: func(typ Type) bool { return isNumeric(typ) || isString(typ) },
+	token.ADD: func typ { return isNumeric(typ) || isString(typ) },
 	token.SUB: isNumeric,
 	token.MUL: isNumeric,
 	token.QUO: isNumeric,
@@ -960,7 +960,7 @@ func (check *Checker) rawExpr(x *operand, e ast.Expr, hint Type) exprKind {
 	if trace {
 		check.trace(e.Pos(), "%s", e)
 		check.indent++
-		defer func() {
+		defer func {
 			check.indent--
 			check.trace(e.Pos(), "=> %s", x)
 		}()

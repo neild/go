@@ -72,7 +72,7 @@ func dumpobj1(outfile string, mode int) {
 		startobj = bout.Offset()
 	}
 
-	printheader := func() {
+	printheader := func {
 		fmt.Fprintf(bout, "go object %s %s %s %s\n", objabi.GOOS, objabi.GOARCH, objabi.Version, objabi.Expstring())
 		if buildid != "" {
 			fmt.Fprintf(bout, "build id %q\n", buildid)
@@ -264,7 +264,7 @@ func dumpglobls() {
 		}
 	}
 
-	obj.SortSlice(funcsyms, func(i, j int) bool {
+	obj.SortSlice(funcsyms, func i, j {
 		return funcsyms[i].LinksymName() < funcsyms[j].LinksymName()
 	})
 	for _, s := range funcsyms {

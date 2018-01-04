@@ -839,7 +839,7 @@ var (
 // urlStr will still be valid if err != nil.
 // The returned urlStr will be of the form "https://golang.org/x/tools?go-get=1"
 func metaImportsForPrefix(importPrefix string, security web.SecurityMode) (urlStr string, imports []metaImport, err error) {
-	setCache := func(res fetchResult) (fetchResult, error) {
+	setCache := func res {
 		fetchCacheMu.Lock()
 		defer fetchCacheMu.Unlock()
 		fetchCache[importPrefix] = res

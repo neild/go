@@ -85,7 +85,7 @@ func checkTreapNode(t *treapNode) {
 	// spanKey and span are the secondary keys.
 	// span == nil (0) will always be lessThan all
 	// spans of the same size.
-	lessThan := func(npages uintptr, s *mspan) bool {
+	lessThan := func npages, s {
 		if t.npagesKey != npages {
 			return t.npagesKey < npages
 		}

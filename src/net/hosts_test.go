@@ -59,7 +59,7 @@ var lookupStaticHostTests = []struct {
 }
 
 func TestLookupStaticHost(t *testing.T) {
-	defer func(orig string) { testHookHostsPath = orig }(testHookHostsPath)
+	defer func orig { testHookHostsPath = orig }(testHookHostsPath)
 
 	for _, tt := range lookupStaticHostTests {
 		testHookHostsPath = tt.name
@@ -128,7 +128,7 @@ var lookupStaticAddrTests = []struct {
 }
 
 func TestLookupStaticAddr(t *testing.T) {
-	defer func(orig string) { testHookHostsPath = orig }(testHookHostsPath)
+	defer func orig { testHookHostsPath = orig }(testHookHostsPath)
 
 	for _, tt := range lookupStaticAddrTests {
 		testHookHostsPath = tt.name
@@ -151,7 +151,7 @@ func testStaticAddr(t *testing.T, hostsPath string, ent staticHostEntry) {
 func TestHostCacheModification(t *testing.T) {
 	// Ensure that programs can't modify the internals of the host cache.
 	// See https://golang.org/issues/14212.
-	defer func(orig string) { testHookHostsPath = orig }(testHookHostsPath)
+	defer func orig { testHookHostsPath = orig }(testHookHostsPath)
 
 	testHookHostsPath = "testdata/ipv4-hosts"
 	ent := staticHostEntry{"localhost", []string{"127.0.0.1", "127.0.0.2", "127.0.0.3"}}

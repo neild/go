@@ -599,7 +599,7 @@ func (e *escaper) computeOutCtx(c context, t *template.Template) context {
 // context, and returns the best guess at the output context and whether the
 // assumption was correct.
 func (e *escaper) escapeTemplateBody(c context, t *template.Template) (context, bool) {
-	filter := func(e1 *escaper, c1 context) bool {
+	filter := func e1, c1 {
 		if c1.state == stateError {
 			// Do not update the input escaper, e.
 			return false

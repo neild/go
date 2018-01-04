@@ -106,7 +106,7 @@ func parsePackage(writer io.Writer, pkg *build.Package, userPath string) *Packag
 	// include tells parser.ParseDir which files to include.
 	// That means the file must be in the build package's GoFiles or CgoFiles
 	// list only (no tag-ignored files, tests, swig or other non-Go files).
-	include := func(info os.FileInfo) bool {
+	include := func info {
 		for _, name := range pkg.GoFiles {
 			if name == info.Name() {
 				return true

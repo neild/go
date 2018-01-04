@@ -138,7 +138,7 @@ type Entry struct {
 
 // get is Get but does not respect verify mode, so that Put can use it.
 func (c *Cache) get(id ActionID) (Entry, error) {
-	missing := func() (Entry, error) {
+	missing := func {
 		fmt.Fprintf(c.log, "%d miss %x\n", c.now().Unix(), id)
 		return Entry{}, errMissing
 	}

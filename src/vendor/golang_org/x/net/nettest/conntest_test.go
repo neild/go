@@ -23,7 +23,7 @@ func TestTestConn(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func t {
 			if !nettest.TestableNetwork(tt.network) {
 				t.Skipf("not supported on %s", runtime.GOOS)
 			}
@@ -37,14 +37,14 @@ func TestTestConn(t *testing.T) {
 				// Start a connection between two endpoints.
 				var err1, err2 error
 				done := make(chan bool)
-				go func() {
+				go func {
 					c2, err2 = ln.Accept()
 					close(done)
 				}()
 				c1, err1 = net.Dial(ln.Addr().Network(), ln.Addr().String())
 				<-done
 
-				stop = func() {
+				stop = func {
 					if err1 == nil {
 						c1.Close()
 					}

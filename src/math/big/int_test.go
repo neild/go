@@ -97,8 +97,8 @@ func testFunZZ(t *testing.T, msg string, f funZZ, a argZZ) {
 }
 
 func TestSumZZ(t *testing.T) {
-	AddZZ := func(z, x, y *Int) *Int { return z.Add(x, y) }
-	SubZZ := func(z, x, y *Int) *Int { return z.Sub(x, y) }
+	AddZZ := func z, x, y { return z.Add(x, y) }
+	SubZZ := func z, x, y { return z.Sub(x, y) }
 	for _, a := range sumZZ {
 		arg := a
 		testFunZZ(t, "AddZZ", AddZZ, arg)
@@ -115,7 +115,7 @@ func TestSumZZ(t *testing.T) {
 }
 
 func TestProdZZ(t *testing.T) {
-	MulZZ := func(z, x, y *Int) *Int { return z.Mul(x, y) }
+	MulZZ := func z, x, y { return z.Mul(x, y) }
 	for _, a := range prodZZ {
 		arg := a
 		testFunZZ(t, "MulZZ", MulZZ, arg)
@@ -1573,7 +1573,7 @@ func TestJacobi(t *testing.T) {
 
 func TestJacobiPanic(t *testing.T) {
 	const failureMsg = "test failure"
-	defer func() {
+	defer func {
 		msg := recover()
 		if msg == nil || msg == failureMsg {
 			panic(msg)
@@ -1669,7 +1669,7 @@ func BenchmarkIntSqr(b *testing.B) {
 		if isRaceBuilder && n > 1e3 {
 			continue
 		}
-		b.Run(fmt.Sprintf("%d", n), func(b *testing.B) {
+		b.Run(fmt.Sprintf("%d", n), func b {
 			benchmarkIntSqr(b, n)
 		})
 	}

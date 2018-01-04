@@ -89,7 +89,7 @@ func castagnoliInit() {
 	} else {
 		// Initialize the slicing-by-8 table.
 		castagnoliTable8 = slicingMakeTable(Castagnoli)
-		updateCastagnoli = func(crc uint32, p []byte) uint32 {
+		updateCastagnoli = func crc, p {
 			return slicingUpdate(crc, castagnoliTable8, p)
 		}
 	}
@@ -113,7 +113,7 @@ func ieeeInit() {
 	} else {
 		// Initialize the slicing-by-8 table.
 		ieeeTable8 = slicingMakeTable(IEEE)
-		updateIEEE = func(crc uint32, p []byte) uint32 {
+		updateIEEE = func crc, p {
 			return slicingUpdate(crc, ieeeTable8, p)
 		}
 	}

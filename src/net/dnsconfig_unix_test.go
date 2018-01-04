@@ -106,8 +106,8 @@ var dnsReadConfigTests = []struct {
 
 func TestDNSReadConfig(t *testing.T) {
 	origGetHostname := getHostname
-	defer func() { getHostname = origGetHostname }()
-	getHostname = func() (string, error) { return "host.domain.local", nil }
+	defer func { getHostname = origGetHostname }()
+	getHostname = func { return "host.domain.local", nil }
 
 	for _, tt := range dnsReadConfigTests {
 		conf := dnsReadConfig(tt.name)
@@ -123,8 +123,8 @@ func TestDNSReadConfig(t *testing.T) {
 
 func TestDNSReadMissingFile(t *testing.T) {
 	origGetHostname := getHostname
-	defer func() { getHostname = origGetHostname }()
-	getHostname = func() (string, error) { return "host.domain.local", nil }
+	defer func { getHostname = origGetHostname }()
+	getHostname = func { return "host.domain.local", nil }
 
 	conf := dnsReadConfig("a-nonexistent-file")
 	if !os.IsNotExist(conf.err) {
@@ -175,10 +175,10 @@ var dnsDefaultSearchTests = []struct {
 
 func TestDNSDefaultSearch(t *testing.T) {
 	origGetHostname := getHostname
-	defer func() { getHostname = origGetHostname }()
+	defer func { getHostname = origGetHostname }()
 
 	for _, tt := range dnsDefaultSearchTests {
-		getHostname = func() (string, error) { return tt.name, tt.err }
+		getHostname = func { return tt.name, tt.err }
 		got := dnsDefaultSearch()
 		if !reflect.DeepEqual(got, tt.want) {
 			t.Errorf("dnsDefaultSearch with hostname %q and error %+v = %q, wanted %q", tt.name, tt.err, got, tt.want)
@@ -188,8 +188,8 @@ func TestDNSDefaultSearch(t *testing.T) {
 
 func TestDNSNameLength(t *testing.T) {
 	origGetHostname := getHostname
-	defer func() { getHostname = origGetHostname }()
-	getHostname = func() (string, error) { return "host.domain.local", nil }
+	defer func { getHostname = origGetHostname }()
+	getHostname = func { return "host.domain.local", nil }
 
 	var char63 = ""
 	for i := 0; i < 63; i++ {

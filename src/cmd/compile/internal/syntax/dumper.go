@@ -24,7 +24,7 @@ func Fdump(w io.Writer, n Node) (err error) {
 		last:   '\n', // force printing of line number on first line
 	}
 
-	defer func() {
+	defer func {
 		if e := recover(); e != nil {
 			err = e.(localError).err // re-panics if it's not a localError
 		}

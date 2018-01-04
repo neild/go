@@ -50,7 +50,7 @@ func TestComposeWithNodeAttributesAndZeroFlat(t *testing.T) {
 		Bold:        true,
 		Peripheries: 2,
 		URL:         "www.google.com",
-		Formatter: func(ni *NodeInfo) string {
+		Formatter: func ni {
 			return strings.ToUpper(ni.Name)
 		},
 	}
@@ -180,7 +180,7 @@ func baseAttrsAndConfig() (*DotAttributes, *DotConfig) {
 		Title:  "testtitle",
 		Labels: []string{"label1", "label2"},
 		Total:  100,
-		FormatValue: func(v int64) string {
+		FormatValue: func v {
 			return strconv.FormatInt(v, 10)
 		},
 	}
@@ -278,7 +278,7 @@ func TestMultilinePrintableName(t *testing.T) {
 
 func TestTagCollapse(t *testing.T) {
 
-	makeTag := func(name, unit string, value, flat, cum int64) *Tag {
+	makeTag := func name, unit, value, flat, cum {
 		return &Tag{name, unit, value, flat, 0, cum, 0}
 	}
 

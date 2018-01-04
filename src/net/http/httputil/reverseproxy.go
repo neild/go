@@ -89,7 +89,7 @@ func singleJoiningSlash(a, b string) string {
 // Director policy.
 func NewSingleHostReverseProxy(target *url.URL) *ReverseProxy {
 	targetQuery := target.RawQuery
-	director := func(req *http.Request) {
+	director := func req {
 		req.URL.Scheme = target.Scheme
 		req.URL.Host = target.Host
 		req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
@@ -150,7 +150,7 @@ func (p *ReverseProxy) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 		ctx, cancel = context.WithCancel(ctx)
 		defer cancel()
 		notifyChan := cn.CloseNotify()
-		go func() {
+		go func {
 			select {
 			case <-notifyChan:
 				cancel()

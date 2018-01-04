@@ -71,7 +71,7 @@ func TestCallers(t *testing.T) {
 }
 
 func TestCallersPanic(t *testing.T) {
-	defer func() {
+	defer func {
 		if r := recover(); r == nil {
 			t.Fatal("did not panic")
 		}

@@ -44,7 +44,7 @@ func TestEncoderWriteField(t *testing.T) {
 	var buf bytes.Buffer
 	e := NewEncoder(&buf)
 	var got []HeaderField
-	d := NewDecoder(4<<10, func(f HeaderField) {
+	d := NewDecoder(4<<10, func f {
 		got = append(got, f)
 	})
 

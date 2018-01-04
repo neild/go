@@ -328,7 +328,7 @@ func TestImplicitsInfo(t *testing.T) {
 
 func predString(tv TypeAndValue) string {
 	var buf bytes.Buffer
-	pred := func(b bool, s string) {
+	pred := func b, s {
 		if b {
 			if buf.Len() > 0 {
 				buf.WriteString(", ")
@@ -722,7 +722,7 @@ func TestInitOrderInfo(t *testing.T) {
 
 func TestMultiFileInitOrder(t *testing.T) {
 	fset := token.NewFileSet()
-	mustParse := func(src string) *ast.File {
+	mustParse := func src {
 		f, err := parser.ParseFile(fset, "main", src, 0)
 		if err != nil {
 			t.Fatal(err)
@@ -805,7 +805,7 @@ func TestSelection(t *testing.T) {
 	fset := token.NewFileSet()
 	imports := make(testImporter)
 	conf := Config{Importer: imports}
-	makePkg := func(path, src string) {
+	makePkg := func path, src {
 		f, err := parser.ParseFile(fset, path+".go", src, 0)
 		if err != nil {
 			t.Fatal(err)
@@ -966,10 +966,10 @@ func TestIssue8518(t *testing.T) {
 	fset := token.NewFileSet()
 	imports := make(testImporter)
 	conf := Config{
-		Error:    func(err error) { t.Log(err) }, // don't exit after first error
+		Error:    func err { t.Log(err) }, // don't exit after first error
 		Importer: imports,
 	}
-	makePkg := func(path, src string) {
+	makePkg := func path, src {
 		f, err := parser.ParseFile(fset, path, src, 0)
 		if err != nil {
 			t.Fatal(err)
@@ -1076,7 +1076,7 @@ func TestScopeLookupParent(t *testing.T) {
 	fset := token.NewFileSet()
 	imports := make(testImporter)
 	conf := Config{Importer: imports}
-	mustParse := func(src string) *ast.File {
+	mustParse := func src {
 		f, err := parser.ParseFile(fset, "dummy.go", src, parser.ParseComments)
 		if err != nil {
 			t.Fatal(err)
@@ -1084,7 +1084,7 @@ func TestScopeLookupParent(t *testing.T) {
 		return f
 	}
 	var info Info
-	makePkg := func(path string, files ...*ast.File) {
+	makePkg := func path, files {
 		var err error
 		imports[path], err = conf.Check(path, fset, files, &info)
 		if err != nil {
@@ -1224,7 +1224,7 @@ func TestIssue15305(t *testing.T) {
 		t.Fatal(err)
 	}
 	conf := Config{
-		Error: func(err error) {}, // allow errors
+		Error: func err {}, // allow errors
 	}
 	info := &Info{
 		Types: make(map[ast.Expr]TypeAndValue),
@@ -1270,7 +1270,7 @@ func TestCompositeLitTypes(t *testing.T) {
 			t.Fatalf("%s: %v", test.lit, err)
 		}
 
-		cmptype := func(x ast.Expr, want string) {
+		cmptype := func x, want {
 			tv, ok := info.Types[x]
 			if !ok {
 				t.Errorf("%s: no Types entry found", test.lit)
@@ -1391,7 +1391,7 @@ func f(x T) T { return foo.F(x) }
 	for _, compiler := range []string{"gc", "gccgo", "source"} {
 		errcount := 0
 		conf := Config{
-			Error: func(err error) {
+			Error: func err {
 				// we should only see the import error
 				if errcount > 0 || !strings.Contains(err.Error(), "could not import") {
 					t.Errorf("for %s importer, got unexpected error: %v", compiler, err)

@@ -36,7 +36,7 @@ func gofmtFlags(filename string, maxLines int) string {
 	// initialize scanner
 	var s scanner.Scanner
 	s.Init(f)
-	s.Error = func(*scanner.Scanner, string) {}       // ignore errors
+	s.Error = func {}                                 // ignore errors
 	s.Mode = scanner.GoTokens &^ scanner.SkipComments // want comments
 
 	// look for //gofmt comment

@@ -24,7 +24,7 @@ import (
 
 var (
 	reservedNames = []string{"(anonymous namespace)", "operator()"}
-	bracketRx     = func() *regexp.Regexp {
+	bracketRx     = func {
 		var quotedNames []string
 		for _, name := range append(reservedNames, "(") {
 			quotedNames = append(quotedNames, regexp.QuoteMeta(name))

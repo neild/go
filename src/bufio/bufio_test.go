@@ -80,7 +80,7 @@ type readMaker struct {
 }
 
 var readMakers = []readMaker{
-	{"full", func(r io.Reader) io.Reader { return r }},
+	{"full", func r { return r }},
 	{"byte", iotest.OneByteReader},
 	{"half", iotest.HalfReader},
 	{"data+err", iotest.DataErrReader},
@@ -124,12 +124,12 @@ type bufReader struct {
 }
 
 var bufreaders = []bufReader{
-	{"1", func(b *Reader) string { return reads(b, 1) }},
-	{"2", func(b *Reader) string { return reads(b, 2) }},
-	{"3", func(b *Reader) string { return reads(b, 3) }},
-	{"4", func(b *Reader) string { return reads(b, 4) }},
-	{"5", func(b *Reader) string { return reads(b, 5) }},
-	{"7", func(b *Reader) string { return reads(b, 7) }},
+	{"1", func b { return reads(b, 1) }},
+	{"2", func b { return reads(b, 2) }},
+	{"3", func b { return reads(b, 3) }},
+	{"4", func b { return reads(b, 4) }},
+	{"5", func b { return reads(b, 5) }},
+	{"7", func b { return reads(b, 7) }},
 	{"bytes", readBytes},
 	{"lines", readLines},
 }
@@ -183,7 +183,7 @@ func TestZeroReader(t *testing.T) {
 	r := NewReader(z)
 
 	c := make(chan error)
-	go func() {
+	go func {
 		_, err := r.ReadByte()
 		c <- err
 	}()
@@ -350,7 +350,7 @@ func TestUnreadByteOthers(t *testing.T) {
 	var readers = []func(*Reader, byte) ([]byte, error){
 		(*Reader).ReadBytes,
 		(*Reader).ReadSlice,
-		func(r *Reader, delim byte) ([]byte, error) {
+		func r, delim {
 			data, err := r.ReadString(delim)
 			return []byte(data), err
 		},
@@ -371,7 +371,7 @@ func TestUnreadByteOthers(t *testing.T) {
 		}
 
 		r := NewReaderSize(&buf, minReadBufferSize)
-		readTo := func(delim byte, want string) {
+		readTo := func delim, want {
 			data, err := read(r, delim)
 			if err != nil {
 				t.Fatalf("#%d: unexpected error reading to %c: %v", rno, delim, err)
@@ -985,13 +985,13 @@ func TestReaderWriteToErrors(t *testing.T) {
 
 func TestWriterReadFrom(t *testing.T) {
 	ws := []func(io.Writer) io.Writer{
-		func(w io.Writer) io.Writer { return onlyWriter{w} },
-		func(w io.Writer) io.Writer { return w },
+		func w { return onlyWriter{w} },
+		func w { return w },
 	}
 
 	rs := []func(io.Reader) io.Reader{
 		iotest.DataErrReader,
-		func(r io.Reader) io.Reader { return r },
+		func r { return r },
 	}
 
 	for ri, rfunc := range rs {
@@ -1112,7 +1112,7 @@ func TestNegativeRead(t *testing.T) {
 	// should panic with a description pointing at the reader, not at itself.
 	// (should NOT panic with slice index error, for example.)
 	b := NewReader(new(negativeReader))
-	defer func() {
+	defer func {
 		switch err := recover().(type) {
 		case nil:
 			t.Fatal("read did not panic")
@@ -1238,10 +1238,10 @@ func TestWriterReadFromErrNoProgress(t *testing.T) {
 
 func TestReadZero(t *testing.T) {
 	for _, size := range []int{100, 2} {
-		t.Run(fmt.Sprintf("bufsize=%d", size), func(t *testing.T) {
+		t.Run(fmt.Sprintf("bufsize=%d", size), func t {
 			r := io.MultiReader(strings.NewReader("abc"), &emptyThenNonEmptyReader{r: strings.NewReader("def"), n: 1})
 			br := NewReaderSize(r, size)
-			want := func(s string, wantErr error) {
+			want := func s, wantErr {
 				p := make([]byte, 50)
 				n, err := br.Read(p)
 				if err != wantErr || n != len(s) || string(p[:n]) != s {

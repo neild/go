@@ -28,7 +28,7 @@ func ExampleLogger_Output() {
 		buf    bytes.Buffer
 		logger = log.New(&buf, "INFO: ", log.Lshortfile)
 
-		infof = func(info string) {
+		infof = func info {
 			logger.Output(2, info)
 		}
 	)

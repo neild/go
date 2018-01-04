@@ -178,7 +178,7 @@ func TestCloneThenParse(t *testing.T) {
 
 // https://golang.org/issue/5980
 func TestFuncMapWorksAfterClone(t *testing.T) {
-	funcs := FuncMap{"customFunc": func() (string, error) {
+	funcs := FuncMap{"customFunc": func {
 		return "", errors.New("issue5980")
 	}}
 
@@ -209,7 +209,7 @@ func TestTemplateCloneExecuteRace(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 10; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			for i := 0; i < 100; i++ {
 				if err := tmpl.Execute(ioutil.Discard, "data"); err != nil {

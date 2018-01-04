@@ -1986,7 +1986,7 @@ func TestSkipArrayObjects(t *testing.T) {
 // Test semantics of pre-filled struct fields and pre-filled map fields.
 // Issue 4900.
 func TestPrefilled(t *testing.T) {
-	ptrToMap := func(m map[string]interface{}) *map[string]interface{} { return &m }
+	ptrToMap := func m { return &m }
 
 	// Values here change, cannot reuse table across runs.
 	var prefillTests = []struct {

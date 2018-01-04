@@ -13,66 +13,66 @@ import (
 
 func TestRecorder(t *testing.T) {
 	type checkFunc func(*ResponseRecorder) error
-	check := func(fns ...checkFunc) []checkFunc { return fns }
+	check := func fns { return fns }
 
-	hasStatus := func(wantCode int) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasStatus := func wantCode {
+		return func rec {
 			if rec.Code != wantCode {
 				return fmt.Errorf("Status = %d; want %d", rec.Code, wantCode)
 			}
 			return nil
 		}
 	}
-	hasResultStatus := func(want string) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasResultStatus := func want {
+		return func rec {
 			if rec.Result().Status != want {
 				return fmt.Errorf("Result().Status = %q; want %q", rec.Result().Status, want)
 			}
 			return nil
 		}
 	}
-	hasResultStatusCode := func(wantCode int) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasResultStatusCode := func wantCode {
+		return func rec {
 			if rec.Result().StatusCode != wantCode {
 				return fmt.Errorf("Result().StatusCode = %d; want %d", rec.Result().StatusCode, wantCode)
 			}
 			return nil
 		}
 	}
-	hasContents := func(want string) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasContents := func want {
+		return func rec {
 			if rec.Body.String() != want {
 				return fmt.Errorf("wrote = %q; want %q", rec.Body.String(), want)
 			}
 			return nil
 		}
 	}
-	hasFlush := func(want bool) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasFlush := func want {
+		return func rec {
 			if rec.Flushed != want {
 				return fmt.Errorf("Flushed = %v; want %v", rec.Flushed, want)
 			}
 			return nil
 		}
 	}
-	hasOldHeader := func(key, want string) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasOldHeader := func key, want {
+		return func rec {
 			if got := rec.HeaderMap.Get(key); got != want {
 				return fmt.Errorf("HeaderMap header %s = %q; want %q", key, got, want)
 			}
 			return nil
 		}
 	}
-	hasHeader := func(key, want string) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasHeader := func key, want {
+		return func rec {
 			if got := rec.Result().Header.Get(key); got != want {
 				return fmt.Errorf("final header %s = %q; want %q", key, got, want)
 			}
 			return nil
 		}
 	}
-	hasNotHeaders := func(keys ...string) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasNotHeaders := func keys {
+		return func rec {
 			for _, k := range keys {
 				v, ok := rec.Result().Header[http.CanonicalHeaderKey(k)]
 				if ok {
@@ -82,16 +82,16 @@ func TestRecorder(t *testing.T) {
 			return nil
 		}
 	}
-	hasTrailer := func(key, want string) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasTrailer := func key, want {
+		return func rec {
 			if got := rec.Result().Trailer.Get(key); got != want {
 				return fmt.Errorf("trailer %s = %q; want %q", key, got, want)
 			}
 			return nil
 		}
 	}
-	hasNotTrailers := func(keys ...string) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasNotTrailers := func keys {
+		return func rec {
 			trailers := rec.Result().Trailer
 			for _, k := range keys {
 				_, ok := trailers[http.CanonicalHeaderKey(k)]
@@ -102,8 +102,8 @@ func TestRecorder(t *testing.T) {
 			return nil
 		}
 	}
-	hasContentLength := func(length int64) checkFunc {
-		return func(rec *ResponseRecorder) error {
+	hasContentLength := func length {
+		return func rec {
 			if got := rec.Result().ContentLength; got != length {
 				return fmt.Errorf("ContentLength = %d; want %d", got, length)
 			}
@@ -118,12 +118,12 @@ func TestRecorder(t *testing.T) {
 	}{
 		{
 			"200 default",
-			func(w http.ResponseWriter, r *http.Request) {},
+			func w, r {},
 			check(hasStatus(200), hasContents("")),
 		},
 		{
 			"first code only",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				w.WriteHeader(201)
 				w.WriteHeader(202)
 				w.Write([]byte("hi"))
@@ -132,7 +132,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"write sends 200",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				w.Write([]byte("hi first"))
 				w.WriteHeader(201)
 				w.WriteHeader(202)
@@ -141,7 +141,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"write string",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				io.WriteString(w, "hi first")
 			},
 			check(
@@ -153,7 +153,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"flush",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				w.(http.Flusher).Flush() // also sends a 200
 				w.WriteHeader(201)
 			},
@@ -161,14 +161,14 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"Content-Type detection",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				io.WriteString(w, "<html>")
 			},
 			check(hasHeader("Content-Type", "text/html; charset=utf-8")),
 		},
 		{
 			"no Content-Type detection with Transfer-Encoding",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				w.Header().Set("Transfer-Encoding", "some encoding")
 				io.WriteString(w, "<html>")
 			},
@@ -176,7 +176,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"no Content-Type detection if set explicitly",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				w.Header().Set("Content-Type", "some/type")
 				io.WriteString(w, "<html>")
 			},
@@ -184,7 +184,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"Content-Type detection doesn't crash if HeaderMap is nil",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				// Act as if the user wrote new(httptest.ResponseRecorder)
 				// rather than using NewRecorder (which initializes
 				// HeaderMap)
@@ -195,7 +195,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"Header is not changed after write",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				hdr := w.Header()
 				hdr.Set("Key", "correct")
 				w.WriteHeader(200)
@@ -205,7 +205,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"Trailer headers are correctly recorded",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				w.Header().Set("Non-Trailer", "correct")
 				w.Header().Set("Trailer", "Trailer-A")
 				w.Header().Add("Trailer", "Trailer-B")
@@ -230,7 +230,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"Header set without any write", // Issue 15560
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				w.Header().Set("X-Foo", "1")
 
 				// Simulate somebody using
@@ -249,7 +249,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"HeaderMap vs FinalHeaders", // more for Issue 15560
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				h := w.Header()
 				h.Set("X-Foo", "1")
 				w.Write([]byte("hi"))
@@ -265,7 +265,7 @@ func TestRecorder(t *testing.T) {
 		},
 		{
 			"setting Content-Length header",
-			func(w http.ResponseWriter, r *http.Request) {
+			func w, r {
 				body := "Some body"
 				contentLength := fmt.Sprintf("%d", len(body))
 				w.Header().Set("Content-Length", contentLength)

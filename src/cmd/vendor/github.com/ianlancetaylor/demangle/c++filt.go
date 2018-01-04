@@ -51,7 +51,7 @@ var debug = flag.Bool("d", false, "Display debugging information for strings on 
 const symbolChars = "_$."
 
 func main() {
-	flag.Usage = func() { usage(os.Stderr, 1) }
+	flag.Usage = func { usage(os.Stderr, 1) }
 	flag.Parse()
 
 	if *help {

@@ -27,14 +27,14 @@ func doRequest(useSelect bool) (*response, error) {
 	done := make(chan struct{}, 0)
 
 	if useSelect {
-		go func() {
+		go func {
 			select {
 			case ch <- &async{resp: nil, err: myError{}}:
 			case <-done:
 			}
 		}()
 	} else {
-		go func() {
+		go func {
 			ch <- &async{resp: nil, err: myError{}}
 		}()
 	}
@@ -63,7 +63,7 @@ func testChanSendBarrier(useSelect bool) {
 	}
 	for i := 0; i < outer; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			defer wg.Done()
 			var garbage []byte
 			for j := 0; j < inner; j++ {

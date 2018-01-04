@@ -434,7 +434,7 @@ func isMacro(p string) bool {
 func allowed(pkg string) map[string]bool {
 	m := map[string]bool{}
 	var allow func(string)
-	allow = func(p string) {
+	allow = func p {
 		if m[p] {
 			return
 		}
@@ -459,7 +459,7 @@ func listStdPkgs(goroot string) ([]string, error) {
 	var pkgs []string
 
 	src := filepath.Join(goroot, "src") + string(filepath.Separator)
-	walkFn := func(path string, fi os.FileInfo, err error) error {
+	walkFn := func path, fi, err {
 		if err != nil || !fi.IsDir() || path == src {
 			return nil
 		}

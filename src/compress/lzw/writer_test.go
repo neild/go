@@ -41,7 +41,7 @@ func testFile(t *testing.T, fn string, order Order, litWidth int) {
 
 	piper, pipew := io.Pipe()
 	defer piper.Close()
-	go func() {
+	go func {
 		defer raw.Close()
 		defer pipew.Close()
 		lzww := NewWriter(pipew, order, litWidth)
@@ -145,7 +145,7 @@ func BenchmarkEncoder(b *testing.B) {
 		}
 		buf0 = nil
 		runtime.GC()
-		b.Run(fmt.Sprint("1e", e), func(b *testing.B) {
+		b.Run(fmt.Sprint("1e", e), func b {
 			b.SetBytes(int64(n))
 			for i := 0; i < b.N; i++ {
 				w := NewWriter(ioutil.Discard, LSB, 8)

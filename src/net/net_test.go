@@ -73,7 +73,7 @@ func TestCloseWrite(t *testing.T) {
 		t.Skipf("not supported on %s", runtime.GOOS)
 	}
 
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		c, err := ln.Accept()
 		if err != nil {
 			t.Error(err)
@@ -316,13 +316,13 @@ func TestAcceptIgnoreAbortedConnRequest(t *testing.T) {
 	}
 
 	syserr := make(chan error)
-	go func() {
+	go func {
 		defer close(syserr)
 		for _, err := range abortedConnRequestErrors {
 			syserr <- err
 		}
 	}()
-	sw.Set(socktest.FilterAccept, func(so *socktest.Status) (socktest.AfterFilter, error) {
+	sw.Set(socktest.FilterAccept, func so {
 		if err, ok := <-syserr; ok {
 			return nil, err
 		}
@@ -331,7 +331,7 @@ func TestAcceptIgnoreAbortedConnRequest(t *testing.T) {
 	defer sw.Set(socktest.FilterAccept, nil)
 
 	operr := make(chan error, 1)
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		defer close(operr)
 		c, err := ln.Accept()
 		if err != nil {
@@ -375,7 +375,7 @@ func TestZeroByteRead(t *testing.T) {
 			t.Fatal(err)
 		}
 		connc := make(chan Conn, 1)
-		go func() {
+		go func {
 			defer ln.Close()
 			c, err := ln.Accept()
 			if err != nil {
@@ -427,7 +427,7 @@ func withTCPConnPair(t *testing.T, peer1, peer2 func(c *TCPConn) error) {
 	}
 	defer ln.Close()
 	errc := make(chan error, 2)
-	go func() {
+	go func {
 		c1, err := ln.Accept()
 		if err != nil {
 			errc <- err
@@ -436,7 +436,7 @@ func withTCPConnPair(t *testing.T, peer1, peer2 func(c *TCPConn) error) {
 		defer c1.Close()
 		errc <- peer1(c1.(*TCPConn))
 	}()
-	go func() {
+	go func {
 		c2, err := Dial("tcp", ln.Addr().String())
 		if err != nil {
 			errc <- err
@@ -458,12 +458,12 @@ func withTCPConnPair(t *testing.T, peer1, peer2 func(c *TCPConn) error) {
 // depends on this.
 func TestReadTimeoutUnblocksRead(t *testing.T) {
 	serverDone := make(chan struct{})
-	server := func(cs *TCPConn) error {
+	server := func cs {
 		defer close(serverDone)
 		errc := make(chan error, 1)
-		go func() {
+		go func {
 			defer close(errc)
-			go func() {
+			go func {
 				// TODO: find a better way to wait
 				// until we're blocked in the cs.Read
 				// call below. Sleep is lame.
@@ -491,7 +491,7 @@ func TestReadTimeoutUnblocksRead(t *testing.T) {
 	}
 	// Do nothing in the client. Never write. Just wait for the
 	// server's half to be done.
-	client := func(*TCPConn) error {
+	client := func {
 		<-serverDone
 		return nil
 	}
@@ -501,13 +501,13 @@ func TestReadTimeoutUnblocksRead(t *testing.T) {
 // Issue 17695: verify that a blocked Read is woken up by a Close.
 func TestCloseUnblocksRead(t *testing.T) {
 	t.Parallel()
-	server := func(cs *TCPConn) error {
+	server := func cs {
 		// Give the client time to get stuck in a Read:
 		time.Sleep(20 * time.Millisecond)
 		cs.Close()
 		return nil
 	}
-	client := func(ss *TCPConn) error {
+	client := func ss {
 		n, err := ss.Read([]byte{0})
 		if n != 0 || err != io.EOF {
 			return fmt.Errorf("Read = %v, %v; want 0, EOF", n, err)

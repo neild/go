@@ -357,7 +357,7 @@ func TestFill(t *testing.T) {
 		b := m.Bounds()
 		c := color.RGBA{11, 0, 0, 255}
 		src := &image.Uniform{C: c}
-		check := func(desc string) {
+		check := func desc {
 			for y := b.Min.Y; y < b.Max.Y; y++ {
 				for x := b.Min.X; x < b.Max.X; x++ {
 					if !eq(c, m.At(x, y)) {
@@ -475,7 +475,7 @@ func TestSqDiff(t *testing.T) {
 	// for appropriate input.
 
 	// canonical sqDiff implementation
-	orig := func(x, y int32) uint32 {
+	orig := func x, y {
 		var d uint32
 		if x > y {
 			d = uint32(x - y)

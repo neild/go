@@ -175,7 +175,7 @@ func TestFiles(t *testing.T) {
 		}
 		fset.AddFile(test.filename, base, test.size)
 		j := 0
-		fset.Iterate(func(f *File) bool {
+		fset.Iterate(func f {
 			if f.Name() != tests[j].filename {
 				t.Errorf("got filename = %s; want %s", f.Name(), tests[j].filename)
 			}
@@ -227,7 +227,7 @@ func TestFileSetRace(t *testing.T) {
 	for i := 0; i < 2; i++ {
 		r := rand.New(rand.NewSource(r.Int63()))
 		stop.Add(1)
-		go func() {
+		go func {
 			for i := 0; i < 1000; i++ {
 				fset.Position(Pos(r.Int31n(max)))
 			}
@@ -247,14 +247,14 @@ func TestFileSetRace2(t *testing.T) {
 		ch   = make(chan int, 2)
 	)
 
-	go func() {
+	go func {
 		for i := 0; i < N; i++ {
 			file.AddLine(i)
 		}
 		ch <- 1
 	}()
 
-	go func() {
+	go func {
 		pos := file.Pos(0)
 		for i := 0; i < N; i++ {
 			fset.PositionFor(pos, false)

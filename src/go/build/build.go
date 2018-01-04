@@ -512,7 +512,7 @@ func (ctxt *Context) Import(path string, srcDir string, mode ImportMode) (*Packa
 		// Save error for end of function.
 		pkgerr = fmt.Errorf("import %q: unknown compiler %q", path, ctxt.Compiler)
 	}
-	setPkga := func() {
+	setPkga := func {
 		switch ctxt.Compiler {
 		case "gccgo":
 			dir, elem := pathpkg.Split(p.ImportPath)
@@ -535,7 +535,7 @@ func (ctxt *Context) Import(path string, srcDir string, mode ImportMode) (*Packa
 		// p.Dir directory may or may not exist. Gather partial information first, check if it exists later.
 		// Determine canonical import path, if any.
 		// Exclude results where the import path would include /testdata/.
-		inTestdata := func(sub string) bool {
+		inTestdata := func sub {
 			return strings.Contains(sub, "/testdata/") || strings.HasSuffix(sub, "/testdata") || strings.HasPrefix(sub, "testdata/") || sub == "testdata"
 		}
 		if ctxt.GOROOT != "" {
@@ -593,7 +593,7 @@ func (ctxt *Context) Import(path string, srcDir string, mode ImportMode) (*Packa
 
 		// Vendor directories get first chance to satisfy import.
 		if mode&IgnoreVendor == 0 && srcDir != "" {
-			searchVendor := func(root string, isGoroot bool) bool {
+			searchVendor := func root, isGoroot {
 				sub, ok := ctxt.hasSubdir(root, srcDir)
 				if !ok || !strings.HasPrefix(sub, "src/") || strings.Contains(sub, "/testdata/") {
 					return false
@@ -727,7 +727,7 @@ Found:
 		name := d.Name()
 		ext := nameExt(name)
 
-		badFile := func(err error) {
+		badFile := func err {
 			if badGoError == nil {
 				badGoError = err
 			}

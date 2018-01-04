@@ -145,7 +145,7 @@ func getPageSize() uintptr {
 
 //go:nosplit
 func futexsleep(addr *uint32, val uint32, ns int64) {
-	systemstack(func() {
+	systemstack(func {
 		futexsleep1(addr, val, ns)
 	})
 }
@@ -173,7 +173,7 @@ func futexwakeup(addr *uint32, cnt uint32) {
 		return
 	}
 
-	systemstack(func() {
+	systemstack(func {
 		print("umtx_wake_addr=", addr, " ret=", ret, "\n")
 	})
 }

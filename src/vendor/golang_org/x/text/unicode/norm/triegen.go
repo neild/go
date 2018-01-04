@@ -78,7 +78,7 @@ func (c *normCompacter) Handler() string {
 }
 
 func (c *normCompacter) Print(w io.Writer) (retErr error) {
-	p := func(f string, x ...interface{}) {
+	p := func f, x {
 		if _, err := fmt.Fprintf(w, f, x...); retErr == nil && err != nil {
 			retErr = err
 		}

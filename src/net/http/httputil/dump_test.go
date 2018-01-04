@@ -200,7 +200,7 @@ var dumpTests = []dumpTest{
 func TestDumpRequest(t *testing.T) {
 	numg0 := runtime.NumGoroutine()
 	for i, tt := range dumpTests {
-		setBody := func() {
+		setBody := func {
 			if tt.Body == nil {
 				return
 			}

@@ -255,9 +255,9 @@ type ReplaceFuncTest struct {
 }
 
 var replaceFuncTests = []ReplaceFuncTest{
-	{"[a-c]", func(s string) string { return "x" + s + "y" }, "defabcdef", "defxayxbyxcydef"},
-	{"[a-c]+", func(s string) string { return "x" + s + "y" }, "defabcdef", "defxabcydef"},
-	{"[a-c]*", func(s string) string { return "x" + s + "y" }, "defabcdef", "xydxyexyfxabcydxyexyfxy"},
+	{"[a-c]", func s { return "x" + s + "y" }, "defabcdef", "defxayxbyxcydef"},
+	{"[a-c]+", func s { return "x" + s + "y" }, "defabcdef", "defxabcydef"},
+	{"[a-c]*", func s { return "x" + s + "y" }, "defabcdef", "xydxyexyfxabcydxyexyfxy"},
 }
 
 func TestReplaceAll(t *testing.T) {
@@ -339,7 +339,7 @@ func TestReplaceAllFunc(t *testing.T) {
 				tc.pattern, tc.input, actual, tc.output)
 		}
 		// now try bytes
-		actual = string(re.ReplaceAllFunc([]byte(tc.input), func(s []byte) []byte { return []byte(tc.replacement(string(s))) }))
+		actual = string(re.ReplaceAllFunc([]byte(tc.input), func s { return []byte(tc.replacement(string(s))) }))
 		if actual != tc.output {
 			t.Errorf("%q.ReplaceFunc(%q,fn) = %q; want %q",
 				tc.pattern, tc.input, actual, tc.output)
@@ -802,7 +802,7 @@ func BenchmarkMatchParallelShared(b *testing.B) {
 	x := []byte("this is a long line that contains foo bar baz")
 	re := MustCompile("foo (ba+r)? baz")
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			re.Match(x)
 		}
@@ -813,7 +813,7 @@ func BenchmarkMatchParallelCopied(b *testing.B) {
 	x := []byte("this is a long line that contains foo bar baz")
 	re := MustCompile("foo (ba+r)? baz")
 	b.ResetTimer()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		re := re.Copy()
 		for pb.Next() {
 			re.Match(x)

@@ -58,7 +58,7 @@ func TestResolveIPAddr(t *testing.T) {
 	}
 
 	origTestHookLookupIP := testHookLookupIP
-	defer func() { testHookLookupIP = origTestHookLookupIP }()
+	defer func { testHookLookupIP = origTestHookLookupIP }()
 	testHookLookupIP = lookupLocalhost
 
 	for _, tt := range resolveIPAddrTests {

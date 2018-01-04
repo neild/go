@@ -86,7 +86,7 @@ func allocmcache() *mcache {
 }
 
 func freemcache(c *mcache) {
-	systemstack(func() {
+	systemstack(func {
 		c.releaseAll()
 		stackcache_clear(c)
 

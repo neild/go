@@ -169,7 +169,7 @@ func (e *InvalidUnmarshalError) Error() string {
 }
 
 func (d *decodeState) unmarshal(v interface{}) (err error) {
-	defer func() {
+	defer func {
 		if r := recover(); r != nil {
 			if _, ok := r.(runtime.Error); ok {
 				panic(r)

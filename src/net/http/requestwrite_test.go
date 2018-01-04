@@ -228,7 +228,7 @@ var reqWriteTests = []reqWriteTest{
 			ContentLength: 0, // as if unset by user
 		},
 
-		Body: func() io.ReadCloser { return ioutil.NopCloser(io.LimitReader(strings.NewReader("xx"), 0)) },
+		Body: func { return ioutil.NopCloser(io.LimitReader(strings.NewReader("xx"), 0)) },
 
 		WantWrite: "POST / HTTP/1.1\r\n" +
 			"Host: example.com\r\n" +
@@ -254,7 +254,7 @@ var reqWriteTests = []reqWriteTest{
 			ContentLength: 0, // as if unset by user
 		},
 
-		Body: func() io.ReadCloser { return nil },
+		Body: func { return nil },
 
 		WantWrite: "POST / HTTP/1.1\r\n" +
 			"Host: example.com\r\n" +
@@ -280,7 +280,7 @@ var reqWriteTests = []reqWriteTest{
 			ContentLength: 0, // as if unset by user
 		},
 
-		Body: func() io.ReadCloser { return ioutil.NopCloser(io.LimitReader(strings.NewReader("xx"), 1)) },
+		Body: func { return ioutil.NopCloser(io.LimitReader(strings.NewReader("xx"), 1)) },
 
 		WantWrite: "POST / HTTP/1.1\r\n" +
 			"Host: example.com\r\n" +
@@ -347,7 +347,7 @@ var reqWriteTests = []reqWriteTest{
 			ContentLength: 0, // as if unset by user
 		},
 
-		Body: func() io.ReadCloser {
+		Body: func {
 			err := errors.New("Custom reader error")
 			errReader := &errorReader{err}
 			return ioutil.NopCloser(io.MultiReader(strings.NewReader("x"), errReader))
@@ -367,7 +367,7 @@ var reqWriteTests = []reqWriteTest{
 			ContentLength: 0, // as if unset by user
 		},
 
-		Body: func() io.ReadCloser {
+		Body: func {
 			err := errors.New("Custom reader error")
 			errReader := &errorReader{err}
 			return ioutil.NopCloser(errReader)
@@ -518,7 +518,7 @@ func TestRequestWrite(t *testing.T) {
 	for i := range reqWriteTests {
 		tt := &reqWriteTests[i]
 
-		setBody := func() {
+		setBody := func {
 			if tt.Body == nil {
 				return
 			}
@@ -572,8 +572,8 @@ func TestRequestWrite(t *testing.T) {
 func TestRequestWriteTransport(t *testing.T) {
 	t.Parallel()
 
-	matchSubstr := func(substr string) func(string) error {
-		return func(written string) error {
+	matchSubstr := func substr {
+		return func written {
 			if !strings.Contains(written, substr) {
 				return fmt.Errorf("expected substring %q in request: %s", substr, written)
 			}
@@ -581,7 +581,7 @@ func TestRequestWriteTransport(t *testing.T) {
 		}
 	}
 
-	noContentLengthOrTransferEncoding := func(req string) error {
+	noContentLengthOrTransferEncoding := func req {
 		if strings.Contains(req, "Content-Length: ") {
 			return fmt.Errorf("unexpected Content-Length in request: %s", req)
 		}
@@ -591,8 +591,8 @@ func TestRequestWriteTransport(t *testing.T) {
 		return nil
 	}
 
-	all := func(checks ...func(string) error) func(string) error {
-		return func(req string) error {
+	all := func checks {
+		return func req {
 			for _, c := range checks {
 				if err := c(req); err != nil {
 					return err
@@ -665,9 +665,9 @@ func TestRequestWriteTransport(t *testing.T) {
 		{
 			method: "GET",
 			clen:   -1,
-			init: func(tt *testCase) {
+			init: func tt {
 				pr, pw := io.Pipe()
-				tt.afterReqRead = func() {
+				tt.afterReqRead = func {
 					pw.Close()
 				}
 				tt.body = ioutil.NopCloser(pr)
@@ -826,14 +826,14 @@ func dumpRequestOut(req *Request, onReadHeaders func()) ([]byte, error) {
 	dr := &delegateReader{c: make(chan io.Reader)}
 
 	t := &Transport{
-		Dial: func(net, addr string) (net.Conn, error) {
+		Dial: func net, addr {
 			return &dumpConn{io.MultiWriter(&buf, pw), dr}, nil
 		},
 	}
 	defer t.CloseIdleConnections()
 
 	// Wait for the request before replying with a dummy response:
-	go func() {
+	go func {
 		req, err := ReadRequest(bufio.NewReader(pr))
 		if err == nil {
 			if onReadHeaders != nil {

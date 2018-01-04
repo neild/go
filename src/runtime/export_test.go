@@ -49,7 +49,7 @@ func LFStackPop(head *uint64) *LFNode {
 }
 
 func GCMask(x interface{}) (ret []byte) {
-	systemstack(func() {
+	systemstack(func {
 		ret = getgcmask(x)
 	})
 	return
@@ -134,7 +134,7 @@ func RunSchedLocalQueueEmptyTest(iters int) {
 		next0 := (i & 1) == 0
 		next1 := (i & 2) == 0
 		runqput(p, &gs[0], next0)
-		go func() {
+		go func {
 			for atomic.Xadd(ready, 1); atomic.Load(ready) != 2; {
 			}
 			if runqempty(p) {
@@ -175,7 +175,7 @@ var HashLoad = &hashLoad
 
 // entry point for testing
 func GostringW(w []uint16) (s string) {
-	systemstack(func() {
+	systemstack(func {
 		s = gostringw(&w[0])
 	})
 	return
@@ -215,7 +215,7 @@ func BenchSetType(n int, x interface{}) {
 		p = slice.ptr
 	}
 	allocSize := roundupsize(size)
-	systemstack(func() {
+	systemstack(func {
 		for i := 0; i < n; i++ {
 			heapBitsSetType(uintptr(p), allocSize, size, t)
 		}
@@ -285,7 +285,7 @@ func ReadMemStatsSlow() (base, slow MemStats) {
 	stopTheWorld("ReadMemStatsSlow")
 
 	// Run on the system stack to avoid stack growth allocation.
-	systemstack(func() {
+	systemstack(func {
 		// Make sure stats don't change.
 		getg().m.mallocing++
 
@@ -408,7 +408,7 @@ func TracebackSystemstack(stk []uintptr, i int) int {
 		return gentraceback(pc, sp, 0, getg(), 0, &stk[0], len(stk), nil, nil, _TraceJumpStack)
 	}
 	n := 0
-	systemstack(func() {
+	systemstack(func {
 		n = TracebackSystemstack(stk, i-1)
 	})
 	return n

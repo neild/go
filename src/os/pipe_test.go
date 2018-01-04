@@ -147,7 +147,7 @@ func testClosedPipeRace(t *testing.T, read bool) {
 
 	// Close the read end of the pipe in a goroutine while we are
 	// writing to the write end, or vice-versa.
-	go func() {
+	go func {
 		// Give the main goroutine a chance to enter the Read or
 		// Write call. This is sloppy but the test will pass even
 		// if we close before the read/write.
@@ -252,7 +252,7 @@ func testCloseWithBlockingRead(t *testing.T, r, w *os.File) {
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	go func(c chan bool) {
+	go func c {
 		defer wg.Done()
 		// Give the other goroutine a chance to enter the Read
 		// or Write call. This is sloppy but the test will
@@ -266,7 +266,7 @@ func testCloseWithBlockingRead(t *testing.T, r, w *os.File) {
 	}(c1)
 
 	wg.Add(1)
-	go func(c chan bool) {
+	go func c {
 		defer wg.Done()
 		var b [1]byte
 		_, err := r.Read(b[:])

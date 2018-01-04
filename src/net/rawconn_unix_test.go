@@ -13,7 +13,7 @@ import (
 )
 
 func TestRawConn(t *testing.T) {
-	handler := func(ls *localServer, ln Listener) {
+	handler := func ls, ln {
 		c, err := ln.Accept()
 		if err != nil {
 			t.Error(err)
@@ -52,7 +52,7 @@ func TestRawConn(t *testing.T) {
 
 	var operr error
 	data := []byte("HELLO-R-U-THERE")
-	err = cc.Write(func(s uintptr) bool {
+	err = cc.Write(func s {
 		_, operr = syscall.Write(int(s), data)
 		if operr == syscall.EAGAIN {
 			return false
@@ -65,7 +65,7 @@ func TestRawConn(t *testing.T) {
 
 	var nr int
 	var b [32]byte
-	err = cc.Read(func(s uintptr) bool {
+	err = cc.Read(func s {
 		nr, operr = syscall.Read(int(s), b[:])
 		if operr == syscall.EAGAIN {
 			return false
@@ -79,7 +79,7 @@ func TestRawConn(t *testing.T) {
 		t.Fatalf("got %#v; want %#v", b[:nr], data)
 	}
 
-	fn := func(s uintptr) {
+	fn := func s {
 		operr = syscall.SetsockoptInt(int(s), syscall.SOL_SOCKET, syscall.SO_REUSEADDR, 1)
 	}
 	err = cc.Control(fn)
@@ -106,7 +106,7 @@ func TestRawConnListener(t *testing.T) {
 	}
 
 	called := false
-	op := func(uintptr) bool {
+	op := func {
 		called = true
 		return true
 	}
@@ -129,7 +129,7 @@ func TestRawConnListener(t *testing.T) {
 	}
 
 	var operr error
-	fn := func(s uintptr) {
+	fn := func s {
 		_, operr = syscall.GetsockoptInt(int(s), syscall.SOL_SOCKET, syscall.SO_REUSEADDR)
 	}
 	err = cc.Control(fn)

@@ -17,16 +17,16 @@ func TestCryptBlocks(t *testing.T) {
 	block, _ := aes.NewCipher(buf)
 
 	mode := cipher.NewCBCDecrypter(block, buf)
-	mustPanic(t, "crypto/cipher: input not full blocks", func() { mode.CryptBlocks(buf, buf[:3]) })
-	mustPanic(t, "crypto/cipher: output smaller than input", func() { mode.CryptBlocks(buf[:3], buf) })
+	mustPanic(t, "crypto/cipher: input not full blocks", func { mode.CryptBlocks(buf, buf[:3]) })
+	mustPanic(t, "crypto/cipher: output smaller than input", func { mode.CryptBlocks(buf[:3], buf) })
 
 	mode = cipher.NewCBCEncrypter(block, buf)
-	mustPanic(t, "crypto/cipher: input not full blocks", func() { mode.CryptBlocks(buf, buf[:3]) })
-	mustPanic(t, "crypto/cipher: output smaller than input", func() { mode.CryptBlocks(buf[:3], buf) })
+	mustPanic(t, "crypto/cipher: input not full blocks", func { mode.CryptBlocks(buf, buf[:3]) })
+	mustPanic(t, "crypto/cipher: output smaller than input", func { mode.CryptBlocks(buf[:3], buf) })
 }
 
 func mustPanic(t *testing.T, msg string, f func()) {
-	defer func() {
+	defer func {
 		err := recover()
 		if err == nil {
 			t.Errorf("function did not panic, wanted %q", msg)
@@ -55,7 +55,7 @@ func TestEmptyPlaintext(t *testing.T) {
 		pt[i], ct[i] = byte(i), byte(i)
 	}
 
-	assertEqual := func(name string, got, want []byte) {
+	assertEqual := func name, got, want {
 		if !bytes.Equal(got, want) {
 			t.Fatalf("%s: got %v, want %v", name, got, want)
 		}

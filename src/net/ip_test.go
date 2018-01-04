@@ -698,10 +698,10 @@ func TestIPAddrScope(t *testing.T) {
 }
 
 func BenchmarkIPEqual(b *testing.B) {
-	b.Run("IPv4", func(b *testing.B) {
+	b.Run("IPv4", func b {
 		benchmarkIPEqual(b, IPv4len)
 	})
-	b.Run("IPv6", func(b *testing.B) {
+	b.Run("IPv6", func b {
 		benchmarkIPEqual(b, IPv6len)
 	})
 }

@@ -73,8 +73,8 @@ func TestUnixgramLinuxAbstractLongName(t *testing.T) {
 
 	off := make(chan bool)
 	data := [5]byte{1, 2, 3, 4, 5}
-	go func() {
-		defer func() { off <- true }()
+	go func {
+		defer func { off <- true }()
 		s, err := syscall.Socket(syscall.AF_UNIX, syscall.SOCK_DGRAM, 0)
 		if err != nil {
 			t.Error(err)

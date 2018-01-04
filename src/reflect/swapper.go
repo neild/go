@@ -18,9 +18,9 @@ func Swapper(slice interface{}) func(i, j int) {
 	// Fast path for slices of size 0 and 1. Nothing to swap.
 	switch v.Len() {
 	case 0:
-		return func(i, j int) { panic("reflect: slice index out of range") }
+		return func i, j { panic("reflect: slice index out of range") }
 	case 1:
-		return func(i, j int) {
+		return func i, j {
 			if i != 0 || j != 0 {
 				panic("reflect: slice index out of range")
 			}
@@ -35,33 +35,33 @@ func Swapper(slice interface{}) func(i, j int) {
 	if hasPtr {
 		if size == ptrSize {
 			ps := *(*[]unsafe.Pointer)(v.ptr)
-			return func(i, j int) { ps[i], ps[j] = ps[j], ps[i] }
+			return func i, j { ps[i], ps[j] = ps[j], ps[i] }
 		}
 		if typ.Kind() == String {
 			ss := *(*[]string)(v.ptr)
-			return func(i, j int) { ss[i], ss[j] = ss[j], ss[i] }
+			return func i, j { ss[i], ss[j] = ss[j], ss[i] }
 		}
 	} else {
 		switch size {
 		case 8:
 			is := *(*[]int64)(v.ptr)
-			return func(i, j int) { is[i], is[j] = is[j], is[i] }
+			return func i, j { is[i], is[j] = is[j], is[i] }
 		case 4:
 			is := *(*[]int32)(v.ptr)
-			return func(i, j int) { is[i], is[j] = is[j], is[i] }
+			return func i, j { is[i], is[j] = is[j], is[i] }
 		case 2:
 			is := *(*[]int16)(v.ptr)
-			return func(i, j int) { is[i], is[j] = is[j], is[i] }
+			return func i, j { is[i], is[j] = is[j], is[i] }
 		case 1:
 			is := *(*[]int8)(v.ptr)
-			return func(i, j int) { is[i], is[j] = is[j], is[i] }
+			return func i, j { is[i], is[j] = is[j], is[i] }
 		}
 	}
 
 	s := (*sliceHeader)(v.ptr)
 	tmp := unsafe_New(typ) // swap scratch space
 
-	return func(i, j int) {
+	return func i, j {
 		if uint(i) >= uint(s.Len) || uint(j) >= uint(s.Len) {
 			panic("reflect: slice index out of range")
 		}

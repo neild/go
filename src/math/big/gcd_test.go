@@ -23,10 +23,10 @@ func runGCD(b *testing.B, aSize, bSize uint) {
 	if isRaceBuilder && (aSize > 1000 || bSize > 1000) {
 		b.Skip("skipping on race builder")
 	}
-	b.Run("WithoutXY", func(b *testing.B) {
+	b.Run("WithoutXY", func b {
 		runGCDExt(b, aSize, bSize, false)
 	})
-	b.Run("WithXY", func(b *testing.B) {
+	b.Run("WithXY", func b {
 		runGCDExt(b, aSize, bSize, true)
 	})
 }

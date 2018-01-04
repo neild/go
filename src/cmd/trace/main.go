@@ -61,7 +61,7 @@ var (
 )
 
 func main() {
-	flag.Usage = func() {
+	flag.Usage = func {
 		fmt.Fprintln(os.Stderr, usageMessage)
 		os.Exit(2)
 	}
@@ -158,7 +158,7 @@ func parseEvents() ([]*trace.Event, error) {
 }
 
 func parseTrace() (trace.ParseResult, error) {
-	loader.once.Do(func() {
+	loader.once.Do(func {
 		tracef, err := os.Open(traceFile)
 		if err != nil {
 			loader.err = fmt.Errorf("failed to open trace file: %v", err)

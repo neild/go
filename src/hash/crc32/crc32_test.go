@@ -99,18 +99,18 @@ func testCrossCheck(t *testing.T, crcFunc1, crcFunc2 func(crc uint32, b []byte) 
 // TestSimple tests the simple generic algorithm.
 func TestSimple(t *testing.T) {
 	tab := simpleMakeTable(IEEE)
-	testGoldenIEEE(t, func(b []byte) uint32 {
+	testGoldenIEEE(t, func b {
 		return simpleUpdate(0, tab, b)
 	})
 
 	tab = simpleMakeTable(Castagnoli)
-	testGoldenCastagnoli(t, func(b []byte) uint32 {
+	testGoldenCastagnoli(t, func b {
 		return simpleUpdate(0, tab, b)
 	})
 }
 
 func TestGoldenMarshal(t *testing.T) {
-	t.Run("IEEE", func(t *testing.T) {
+	t.Run("IEEE", func t {
 		for _, g := range golden {
 			h := New(IEEETable)
 			h2 := New(IEEETable)
@@ -141,7 +141,7 @@ func TestGoldenMarshal(t *testing.T) {
 			}
 		}
 	})
-	t.Run("Castagnoli", func(t *testing.T) {
+	t.Run("Castagnoli", func t {
 		table := MakeTable(Castagnoli)
 		for _, g := range golden {
 			h := New(table)
@@ -192,23 +192,23 @@ func TestMarshalTableMismatch(t *testing.T) {
 // TestSimple tests the slicing-by-8 algorithm.
 func TestSlicing(t *testing.T) {
 	tab := slicingMakeTable(IEEE)
-	testGoldenIEEE(t, func(b []byte) uint32 {
+	testGoldenIEEE(t, func b {
 		return slicingUpdate(0, tab, b)
 	})
 
 	tab = slicingMakeTable(Castagnoli)
-	testGoldenCastagnoli(t, func(b []byte) uint32 {
+	testGoldenCastagnoli(t, func b {
 		return slicingUpdate(0, tab, b)
 	})
 
 	// Cross-check various polys against the simple algorithm.
 	for _, poly := range []uint32{IEEE, Castagnoli, Koopman, 0xD5828281} {
 		t1 := simpleMakeTable(poly)
-		f1 := func(crc uint32, b []byte) uint32 {
+		f1 := func crc, b {
 			return simpleUpdate(crc, t1, b)
 		}
 		t2 := slicingMakeTable(poly)
-		f2 := func(crc uint32, b []byte) uint32 {
+		f2 := func crc, b {
 			return slicingUpdate(crc, t2, b)
 		}
 		testCrossCheck(t, f1, f2)
@@ -221,7 +221,7 @@ func TestArchIEEE(t *testing.T) {
 	}
 	archInitIEEE()
 	slicingTable := slicingMakeTable(IEEE)
-	testCrossCheck(t, archUpdateIEEE, func(crc uint32, b []byte) uint32 {
+	testCrossCheck(t, archUpdateIEEE, func crc, b {
 		return slicingUpdate(crc, slicingTable, b)
 	})
 }
@@ -232,7 +232,7 @@ func TestArchCastagnoli(t *testing.T) {
 	}
 	archInitCastagnoli()
 	slicingTable := slicingMakeTable(Castagnoli)
-	testCrossCheck(t, archUpdateCastagnoli, func(crc uint32, b []byte) uint32 {
+	testCrossCheck(t, archUpdateCastagnoli, func crc, b {
 		return slicingUpdate(crc, slicingTable, b)
 	})
 }
@@ -243,7 +243,7 @@ func TestGolden(t *testing.T) {
 	// Some implementations have special code to deal with misaligned
 	// data; test that as well.
 	for delta := 1; delta <= 7; delta++ {
-		testGoldenIEEE(t, func(b []byte) uint32 {
+		testGoldenIEEE(t, func b {
 			ieee := NewIEEE()
 			d := delta
 			if d >= len(b) {
@@ -260,7 +260,7 @@ func TestGolden(t *testing.T) {
 		t.Errorf("nil Castagnoli Table")
 	}
 
-	testGoldenCastagnoli(t, func(b []byte) uint32 {
+	testGoldenCastagnoli(t, func b {
 		castagnoli := New(castagnoliTab)
 		castagnoli.Write(b)
 		return castagnoli.Sum32()
@@ -269,7 +269,7 @@ func TestGolden(t *testing.T) {
 	// Some implementations have special code to deal with misaligned
 	// data; test that as well.
 	for delta := 1; delta <= 7; delta++ {
-		testGoldenCastagnoli(t, func(b []byte) uint32 {
+		testGoldenCastagnoli(t, func b {
 			castagnoli := New(castagnoliTab)
 			d := delta
 			if d >= len(b) {
@@ -289,15 +289,15 @@ func BenchmarkCRC32(b *testing.B) {
 }
 
 func benchmarkAll(h hash.Hash32) func(b *testing.B) {
-	return func(b *testing.B) {
+	return func b {
 		for _, size := range []int{15, 40, 512, 1 << 10, 4 << 10, 32 << 10} {
 			name := fmt.Sprint(size)
 			if size >= 1024 {
 				name = fmt.Sprintf("%dkB", size/1024)
 			}
-			b.Run("size="+name, func(b *testing.B) {
+			b.Run("size="+name, func b {
 				for align := 0; align <= 1; align++ {
-					b.Run(fmt.Sprintf("align=%d", align), func(b *testing.B) {
+					b.Run(fmt.Sprintf("align=%d", align), func b {
 						benchmark(b, h, int64(size), int64(align))
 					})
 				}

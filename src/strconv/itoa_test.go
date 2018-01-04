@@ -218,7 +218,7 @@ func BenchmarkAppendIntSmall(b *testing.B) {
 
 func BenchmarkAppendUintVarlen(b *testing.B) {
 	for _, test := range varlenUints {
-		b.Run(test.out, func(b *testing.B) {
+		b.Run(test.out, func b {
 			dst := make([]byte, 0, 30)
 			for j := 0; j < b.N; j++ {
 				dst = AppendUint(dst[:0], test.in, 10)

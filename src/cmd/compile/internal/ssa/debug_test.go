@@ -151,7 +151,7 @@ func TestNexting(t *testing.T) {
 // subTest creates a subtest that compiles basename.go with the specified gcflags and additional compiler arguments,
 // then runs the debugger on the resulting binary, with any comment-specified actions matching tag triggered.
 func subTest(t *testing.T, tag string, basename string, gcflags string, moreargs ...string) {
-	t.Run(tag, func(t *testing.T) {
+	t.Run(tag, func t {
 		testNexting(t, basename, tag, gcflags, moreargs...)
 	})
 }
@@ -161,7 +161,7 @@ func subTest(t *testing.T, tag string, basename string, gcflags string, moreargs
 func optSubTest(t *testing.T, tag string, basename string, gcflags string, moreargs ...string) {
 	// If optimized test is run with unoptimized libraries (compiled with -N -l), it is very likely to fail.
 	// This occurs in the noopt builders (for example).
-	t.Run(tag, func(t *testing.T) {
+	t.Run(tag, func t {
 		if *force || optimizedLibs {
 			testNexting(t, basename, tag, gcflags, moreargs...)
 		} else {
@@ -628,7 +628,7 @@ func (s *gdbState) stepnext(ss string) bool {
 	// Look for //gdb-<tag>=(v1,v2,v3) and print v1, v2, v3
 	vars := varsToPrint(excerpt, "//"+s.tag()+"=(")
 	for _, v := range vars {
-		response := printVariableAndNormalize(v, func(v string) string {
+		response := printVariableAndNormalize(v, func v {
 			return s.ioState.writeReadExpect("p "+v+"\n", "[(]gdb[)] ").String()
 		})
 		s.ioState.history.addVar(response)
@@ -742,7 +742,7 @@ func newIoState(cmd *exec.Cmd) *ioState {
 
 	s.outChan = make(chan string, 1)
 	s.errChan = make(chan string, 1)
-	go func() {
+	go func {
 		buffer := make([]byte, 4096)
 		for {
 			n, err := s.stdout.Read(buffer)
@@ -761,7 +761,7 @@ func newIoState(cmd *exec.Cmd) *ioState {
 		s.stdout.Close()
 	}()
 
-	go func() {
+	go func {
 		buffer := make([]byte, 4096)
 		for {
 			n, err := s.stderr.Read(buffer)

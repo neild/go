@@ -61,7 +61,7 @@ var parseMACTests = []struct {
 }
 
 func TestParseMAC(t *testing.T) {
-	match := func(err error, s string) bool {
+	match := func err, s {
 		if s == "" {
 			return err == nil
 		}

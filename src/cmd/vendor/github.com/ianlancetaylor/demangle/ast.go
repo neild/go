@@ -142,7 +142,7 @@ func (t *Typed) print(ps *printState) {
 	// We are printing a typed name, so ignore the current set of
 	// inner names to print.  Pass down our name as the one to use.
 	holdInner := ps.inner
-	defer func() { ps.inner = holdInner }()
+	defer func { ps.inner = holdInner }()
 
 	ps.inner = []AST{t}
 	ps.print(t.Type)
@@ -269,7 +269,7 @@ func (t *Template) print(ps *printState) {
 	// Inner types apply to the template as a whole, they don't
 	// cross over into the template.
 	holdInner := ps.inner
-	defer func() { ps.inner = holdInner }()
+	defer func { ps.inner = holdInner }()
 
 	ps.inner = nil
 	ps.print(t.Name)
@@ -2138,7 +2138,7 @@ type Fold struct {
 
 func (f *Fold) print(ps *printState) {
 	op, _ := f.Op.(*Operator)
-	printOp := func() {
+	printOp := func {
 		if op != nil {
 			ps.writeString(op.Name)
 		} else {

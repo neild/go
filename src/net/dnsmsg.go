@@ -314,15 +314,15 @@ func (rr *dnsRR_AAAA) Walk(f func(v interface{}, name, tag string) bool) bool {
 
 // Map of constructors for each RR wire type.
 var rr_mk = map[int]func() dnsRR{
-	dnsTypeCNAME: func() dnsRR { return new(dnsRR_CNAME) },
-	dnsTypeMX:    func() dnsRR { return new(dnsRR_MX) },
-	dnsTypeNS:    func() dnsRR { return new(dnsRR_NS) },
-	dnsTypePTR:   func() dnsRR { return new(dnsRR_PTR) },
-	dnsTypeSOA:   func() dnsRR { return new(dnsRR_SOA) },
-	dnsTypeTXT:   func() dnsRR { return new(dnsRR_TXT) },
-	dnsTypeSRV:   func() dnsRR { return new(dnsRR_SRV) },
-	dnsTypeA:     func() dnsRR { return new(dnsRR_A) },
-	dnsTypeAAAA:  func() dnsRR { return new(dnsRR_AAAA) },
+	dnsTypeCNAME: func { return new(dnsRR_CNAME) },
+	dnsTypeMX:    func { return new(dnsRR_MX) },
+	dnsTypeNS:    func { return new(dnsRR_NS) },
+	dnsTypePTR:   func { return new(dnsRR_PTR) },
+	dnsTypeSOA:   func { return new(dnsRR_SOA) },
+	dnsTypeTXT:   func { return new(dnsRR_TXT) },
+	dnsTypeSRV:   func { return new(dnsRR_SRV) },
+	dnsTypeA:     func { return new(dnsRR_A) },
+	dnsTypeAAAA:  func { return new(dnsRR_AAAA) },
 }
 
 // Pack a domain name s into msg[off:].
@@ -446,7 +446,7 @@ Loop:
 // packStruct packs a structure into msg at specified offset off, and
 // returns off1 such that msg[off:off1] is the encoded data.
 func packStruct(any dnsStruct, msg []byte, off int) (off1 int, ok bool) {
-	ok = any.Walk(func(field interface{}, name, tag string) bool {
+	ok = any.Walk(func field, name, tag {
 		switch fv := field.(type) {
 		default:
 			println("net: dns: unknown packing type")
@@ -505,7 +505,7 @@ func packStruct(any dnsStruct, msg []byte, off int) (off1 int, ok bool) {
 // unpackStruct decodes msg[off:] into the given structure, and
 // returns off1 such that msg[off:off1] is the encoded data.
 func unpackStruct(any dnsStruct, msg []byte, off int) (off1 int, ok bool) {
-	ok = any.Walk(func(field interface{}, name, tag string) bool {
+	ok = any.Walk(func field, name, tag {
 		switch fv := field.(type) {
 		default:
 			println("net: dns: unknown packing type")
@@ -569,7 +569,7 @@ func unpackStruct(any dnsStruct, msg []byte, off int) (off1 int, ok bool) {
 func printStruct(any dnsStruct) string {
 	s := "{"
 	i := 0
-	any.Walk(func(val interface{}, name, tag string) bool {
+	any.Walk(func val, name, tag {
 		i++
 		if i > 1 {
 			s += ", "

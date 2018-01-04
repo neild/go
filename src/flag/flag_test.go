@@ -37,7 +37,7 @@ func TestEverything(t *testing.T) {
 
 	m := make(map[string]*Flag)
 	desired := "0"
-	visitor := func(f *Flag) {
+	visitor := func f {
 		if len(f.Name) > 5 && f.Name[0:5] == "test_" {
 			m[f.Name] = f
 			ok := false
@@ -88,7 +88,7 @@ func TestEverything(t *testing.T) {
 	}
 	// Now test they're visited in sort order.
 	var flagNames []string
-	Visit(func(f *Flag) { flagNames = append(flagNames, f.Name) })
+	Visit(func f { flagNames = append(flagNames, f.Name) })
 	if !sort.StringsAreSorted(flagNames) {
 		t.Errorf("flag names not sorted: %v", flagNames)
 	}
@@ -105,7 +105,7 @@ func TestGet(t *testing.T) {
 	Float64("test_float64", 6, "float64 value")
 	Duration("test_duration", 7, "time.Duration value")
 
-	visitor := func(f *Flag) {
+	visitor := func f {
 		if len(f.Name) > 5 && f.Name[0:5] == "test_" {
 			g, ok := f.Value.(Getter)
 			if !ok {
@@ -140,7 +140,7 @@ func TestGet(t *testing.T) {
 
 func TestUsage(t *testing.T) {
 	called := false
-	ResetForTesting(func() { called = true })
+	ResetForTesting(func { called = true })
 	if CommandLine.Parse([]string{"-x"}) == nil {
 		t.Error("parse did not fail for unknown flag")
 	}
@@ -216,7 +216,7 @@ func testParse(f *FlagSet, t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
-	ResetForTesting(func() { t.Error("bad parse") })
+	ResetForTesting(func { t.Error("bad parse") })
 	testParse(CommandLine, t)
 }
 
@@ -256,7 +256,7 @@ func TestUserDefined(t *testing.T) {
 func TestUserDefinedForCommandLine(t *testing.T) {
 	const help = "HELP"
 	var result string
-	ResetForTesting(func() { result = help })
+	ResetForTesting(func { result = help })
 	Usage()
 	if result != help {
 		t.Fatalf("got %q; expected %q", result, help)
@@ -318,9 +318,9 @@ func TestSetOutput(t *testing.T) {
 // This tests that one can reset the flags. This still works but not well, and is
 // superseded by FlagSet.
 func TestChangingArgs(t *testing.T) {
-	ResetForTesting(func() { t.Fatal("bad parse") })
+	ResetForTesting(func { t.Fatal("bad parse") })
 	oldArgs := os.Args
-	defer func() { os.Args = oldArgs }()
+	defer func { os.Args = oldArgs }()
 	os.Args = []string{"cmd", "-before", "subcmd", "-after", "args"}
 	before := Bool("before", false, "")
 	if err := CommandLine.Parse(os.Args[1:]); err != nil {
@@ -341,7 +341,7 @@ func TestChangingArgs(t *testing.T) {
 func TestHelp(t *testing.T) {
 	var helpCalled = false
 	fs := NewFlagSet("help test", ContinueOnError)
-	fs.Usage = func() { helpCalled = true }
+	fs.Usage = func { helpCalled = true }
 	var flag bool
 	fs.BoolVar(&flag, "flag", false, "regular flag")
 	// Regular flag invocation should work
@@ -447,7 +447,7 @@ func TestUsageOutput(t *testing.T) {
 	ResetForTesting(DefaultUsage)
 	var buf bytes.Buffer
 	CommandLine.SetOutput(&buf)
-	defer func(old []string) { os.Args = old }(os.Args)
+	defer func old { os.Args = old }(os.Args)
 	os.Args = []string{"app", "-i=1", "-unknown"}
 	Parse()
 	const want = "flag provided but not defined: -i\nUsage of app:\n"

@@ -112,7 +112,7 @@ func TestEchoFileRace(t *testing.T) {
 		t.Fatalf("Start: %v", err)
 	}
 	wrote := make(chan bool)
-	go func() {
+	go func {
 		defer close(wrote)
 		fmt.Fprint(stdin, "echo\n")
 	}()
@@ -169,7 +169,7 @@ func TestExitStatus(t *testing.T) {
 }
 
 func TestPipes(t *testing.T) {
-	check := func(what string, err error) {
+	check := func what, err {
 		if err != nil {
 			t.Fatalf("%s: %v", what, err)
 		}
@@ -185,7 +185,7 @@ func TestPipes(t *testing.T) {
 
 	outbr := bufio.NewReader(stdout)
 	errbr := bufio.NewReader(stderr)
-	line := func(what string, br *bufio.Reader) string {
+	line := func what, br {
 		line, _, err := br.ReadLine()
 		if err != nil {
 			t.Fatalf("%s: %v", what, err)
@@ -223,7 +223,7 @@ const stdinCloseTestString = "Some test string."
 
 // Issue 6270.
 func TestStdinClose(t *testing.T) {
-	check := func(what string, err error) {
+	check := func what, err {
 		if err != nil {
 			t.Fatalf("%s: %v", what, err)
 		}
@@ -238,7 +238,7 @@ func TestStdinClose(t *testing.T) {
 		t.Error("can't access methods of underlying *os.File")
 	}
 	check("Start", cmd.Start())
-	go func() {
+	go func {
 		_, err := io.Copy(stdin, strings.NewReader(stdinCloseTestString))
 		check("Copy", err)
 		// Before the fix, this next line would race with cmd.Wait.
@@ -262,7 +262,7 @@ func TestStdinCloseRace(t *testing.T) {
 	if err := cmd.Start(); err != nil {
 		t.Fatalf("Start: %v", err)
 	}
-	go func() {
+	go func {
 		// We don't check the error return of Kill. It is
 		// possible that the process has already exited, in
 		// which case Kill will return an error "process
@@ -271,7 +271,7 @@ func TestStdinCloseRace(t *testing.T) {
 		// doesn't matter whether this Kill succeeds or not.
 		cmd.Process.Kill()
 	}()
-	go func() {
+	go func {
 		// Send the wrong string, so that the child fails even
 		// if the other goroutine doesn't manage to kill it first.
 		// This test is to check that the race detector does not
@@ -294,7 +294,7 @@ func TestPipeLookPathLeak(t *testing.T) {
 
 	// Reading /proc/self/fd is more reliable than calling lsof, so try that
 	// first.
-	numOpenFDs := func() (int, []byte, error) {
+	numOpenFDs := func {
 		fds, err := ioutil.ReadDir("/proc/self/fd")
 		if err != nil {
 			return 0, nil, err
@@ -306,7 +306,7 @@ func TestPipeLookPathLeak(t *testing.T) {
 		// We encountered a problem reading /proc/self/fd (we might be on
 		// a platform that doesn't have it). Fall back onto lsof.
 		t.Logf("using lsof because: %v", err)
-		numOpenFDs = func() (int, []byte, error) {
+		numOpenFDs = func {
 			// Android's stock lsof does not obey the -p option,
 			// so extra filtering is needed.
 			// https://golang.org/issue/10206
@@ -486,7 +486,7 @@ func TestExtraFilesFDShuffle(t *testing.T) {
 		pipes[i].w = w
 		w.WriteString(data[i])
 		c.ExtraFiles = append(c.ExtraFiles, pipes[i].r)
-		defer func() {
+		defer func {
 			r.Close()
 			w.Close()
 		}()
@@ -506,7 +506,7 @@ func TestExtraFilesFDShuffle(t *testing.T) {
 		t.Fatalf("Run: %v", err)
 	}
 	ch := make(chan string, 1)
-	go func(ch chan string) {
+	go func ch {
 		buf := make([]byte, 512)
 		n, err := stderr.Read(buf)
 		if err != nil {
@@ -564,7 +564,7 @@ func TestExtraFiles(t *testing.T) {
 
 	// Force TLS root certs to be loaded (which might involve
 	// cgo), to make sure none of that potential C code leaks fds.
-	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {}))
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func w, r {}))
 	// quiet expected TLS handshake error "remote error: bad certificate"
 	ts.Config.ErrorLog = log.New(ioutil.Discard, "", 0)
 	ts.StartTLS()
@@ -609,21 +609,21 @@ func TestExtraFilesRace(t *testing.T) {
 	if runtime.GOOS == "windows" {
 		t.Skip("no operating system support; skipping")
 	}
-	listen := func() net.Listener {
+	listen := func {
 		ln, err := net.Listen("tcp", "127.0.0.1:0")
 		if err != nil {
 			t.Fatal(err)
 		}
 		return ln
 	}
-	listenerFile := func(ln net.Listener) *os.File {
+	listenerFile := func ln {
 		f, err := ln.(*net.TCPListener).File()
 		if err != nil {
 			t.Fatal(err)
 		}
 		return f
 	}
-	runCommand := func(c *exec.Cmd, out chan<- string) {
+	runCommand := func c, out {
 		bout, err := c.CombinedOutput()
 		if err != nil {
 			out <- "ERROR:" + err.Error()
@@ -833,7 +833,7 @@ func TestHelperProcess(*testing.T) {
 		response := ""
 		for i, r := range pipes {
 			ch := make(chan string, 1)
-			go func(c chan string) {
+			go func c {
 				buf := make([]byte, 10)
 				n, err := r.Read(buf)
 				if err != nil {
@@ -902,8 +902,8 @@ func TestIgnorePipeErrorOnSuccess(t *testing.T) {
 		t.Skipf("skipping test on %q", runtime.GOOS)
 	}
 
-	testWith := func(r io.Reader) func(*testing.T) {
-		return func(t *testing.T) {
+	testWith := func r {
+		return func t {
 			cmd := helperCommand(t, "echo", "foo")
 			var out bytes.Buffer
 			cmd.Stdin = r
@@ -935,7 +935,7 @@ func TestClosePipeOnCopyError(t *testing.T) {
 	cmd := exec.Command("yes")
 	cmd.Stdout = new(badWriter)
 	c := make(chan int, 1)
-	go func() {
+	go func {
 		err := cmd.Run()
 		if err == nil {
 			t.Errorf("yes completed successfully")
@@ -990,7 +990,7 @@ func TestContext(t *testing.T) {
 		t.Fatalf("ReadFull = %d, %v, %q", n, err, buf[:n])
 	}
 	waitErr := make(chan error, 1)
-	go func() {
+	go func {
 		waitErr <- c.Wait()
 	}()
 	cancel()
@@ -1020,7 +1020,7 @@ func TestContextCancel(t *testing.T) {
 		t.Fatal(err)
 	}
 	readDone := make(chan struct{})
-	go func() {
+	go func {
 		defer close(readDone)
 		var a [1024]byte
 		for {

@@ -125,35 +125,35 @@ func TestCheckValid(t *testing.T) {
 		wantErr  string
 	}{
 		{
-			mutateFn: func(p *Profile) { p.SampleType = nil },
+			mutateFn: func p { p.SampleType = nil },
 			wantErr:  "missing sample type information",
 		},
 		{
-			mutateFn: func(p *Profile) { p.Sample[0] = nil },
+			mutateFn: func p { p.Sample[0] = nil },
 			wantErr:  "profile has nil sample",
 		},
 		{
-			mutateFn: func(p *Profile) { p.Sample[0].Value = append(p.Sample[0].Value, 0) },
+			mutateFn: func p { p.Sample[0].Value = append(p.Sample[0].Value, 0) },
 			wantErr:  "sample has 3 values vs. 2 types",
 		},
 		{
-			mutateFn: func(p *Profile) { p.Sample[0].Location[0] = nil },
+			mutateFn: func p { p.Sample[0].Location[0] = nil },
 			wantErr:  "sample has nil location",
 		},
 		{
-			mutateFn: func(p *Profile) { p.Location[0] = nil },
+			mutateFn: func p { p.Location[0] = nil },
 			wantErr:  "profile has nil location",
 		},
 		{
-			mutateFn: func(p *Profile) { p.Mapping = append(p.Mapping, nil) },
+			mutateFn: func p { p.Mapping = append(p.Mapping, nil) },
 			wantErr:  "profile has nil mapping",
 		},
 		{
-			mutateFn: func(p *Profile) { p.Function[0] = nil },
+			mutateFn: func p { p.Function[0] = nil },
 			wantErr:  "profile has nil function",
 		},
 	} {
-		t.Run(tc.wantErr, func(t *testing.T) {
+		t.Run(tc.wantErr, func t {
 			p := p.Copy()
 			tc.mutateFn(p)
 			if err := p.CheckValid(); err == nil {
@@ -659,7 +659,7 @@ func TestNumLabelMerge(t *testing.T) {
 			},
 		},
 	} {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.name, func t {
 			prof, err := Merge(tc.profs)
 			if err != nil {
 				t.Errorf("merge error: %v", err)
@@ -822,7 +822,7 @@ func TestTagFilter(t *testing.T) {
 		count            int
 	}
 
-	countTags := func(p *Profile) map[string]bool {
+	countTags := func p {
 		tags := make(map[string]bool)
 
 		for _, s := range p.Sample {
@@ -996,7 +996,7 @@ func parallel(n int, fn func()) {
 	var wg sync.WaitGroup
 	wg.Add(n)
 	for i := 0; i < n; i++ {
-		go func() {
+		go func {
 			fn()
 			wg.Done()
 		}()
@@ -1006,12 +1006,12 @@ func parallel(n int, fn func()) {
 
 func TestThreadSafety(t *testing.T) {
 	src := testProfile1.Copy()
-	parallel(4, func() { src.Copy() })
-	parallel(4, func() {
+	parallel(4, func { src.Copy() })
+	parallel(4, func {
 		var b bytes.Buffer
 		src.WriteUncompressed(&b)
 	})
-	parallel(4, func() {
+	parallel(4, func {
 		var b bytes.Buffer
 		src.Write(&b)
 	})

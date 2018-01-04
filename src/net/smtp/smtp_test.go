@@ -293,7 +293,7 @@ func TestNewClient(t *testing.T) {
 
 	var cmdbuf bytes.Buffer
 	bcmdbuf := bufio.NewWriter(&cmdbuf)
-	out := func() string {
+	out := func {
 		bcmdbuf.Flush()
 		return cmdbuf.String()
 	}
@@ -389,7 +389,7 @@ func TestNewClientWithTLS(t *testing.T) {
 		}
 	}
 
-	go func() {
+	go func {
 		conn, err := ln.Accept()
 		if err != nil {
 			t.Errorf("server: accept: %v", err)
@@ -545,7 +545,7 @@ func TestSendMail(t *testing.T) {
 
 	// prevent data race on bcmdbuf
 	var done = make(chan struct{})
-	go func(data []string) {
+	go func data {
 
 		defer close(done)
 
@@ -686,7 +686,7 @@ func TestTLSClient(t *testing.T) {
 	ln := newLocalListener(t)
 	defer ln.Close()
 	errc := make(chan error)
-	go func() {
+	go func {
 		errc <- sendMail(ln.Addr().String())
 	}()
 	conn, err := ln.Accept()
@@ -707,7 +707,7 @@ func TestTLSConnState(t *testing.T) {
 	defer ln.Close()
 	clientDone := make(chan bool)
 	serverDone := make(chan bool)
-	go func() {
+	go func {
 		defer close(serverDone)
 		c, err := ln.Accept()
 		if err != nil {
@@ -719,7 +719,7 @@ func TestTLSConnState(t *testing.T) {
 			t.Errorf("server error: %v", err)
 		}
 	}()
-	go func() {
+	go func {
 		defer close(clientDone)
 		c, err := Dial(ln.Addr().String())
 		if err != nil {
@@ -824,7 +824,7 @@ func serverHandleTLS(c net.Conn, t *testing.T) error {
 func init() {
 	testRootCAs := x509.NewCertPool()
 	testRootCAs.AppendCertsFromPEM(localhostCert)
-	testHookStartTLS = func(config *tls.Config) {
+	testHookStartTLS = func config {
 		config.RootCAs = testRootCAs
 	}
 }

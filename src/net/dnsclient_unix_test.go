@@ -44,7 +44,7 @@ var dnsTransportFallbackTests = []struct {
 
 func TestDNSTransportFallback(t *testing.T) {
 	fake := fakeDNSServer{
-		rh: func(n, _ string, q *dnsMsg, _ time.Time) (*dnsMsg, error) {
+		rh: func n, _, q, _ {
 			r := &dnsMsg{
 				dnsMsgHdr: dnsMsgHdr{
 					id:       q.id,
@@ -99,7 +99,7 @@ var specialDomainNameTests = []struct {
 }
 
 func TestSpecialDomainName(t *testing.T) {
-	fake := fakeDNSServer{func(_, _ string, q *dnsMsg, _ time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func _, _, q, _ {
 		r := &dnsMsg{
 			dnsMsgHdr: dnsMsgHdr{
 				id:       q.id,
@@ -177,7 +177,7 @@ func TestAvoidDNSName(t *testing.T) {
 	}
 }
 
-var fakeDNSServerSuccessful = fakeDNSServer{func(_, _ string, q *dnsMsg, _ time.Time) (*dnsMsg, error) {
+var fakeDNSServerSuccessful = fakeDNSServer{func _, _, q, _ {
 	r := &dnsMsg{
 		dnsMsgHdr: dnsMsgHdr{
 			id:       q.id,
@@ -321,7 +321,7 @@ func TestUpdateResolvConf(t *testing.T) {
 			const N = 10
 			wg.Add(N)
 			for j := 0; j < N; j++ {
-				go func(name string) {
+				go func name {
 					defer wg.Done()
 					ips, err := r.LookupIPAddr(context.Background(), name)
 					if err != nil {
@@ -460,7 +460,7 @@ var goLookupIPWithResolverConfigTests = []struct {
 func TestGoLookupIPWithResolverConfig(t *testing.T) {
 	defer dnsWaitGroup.Wait()
 
-	fake := fakeDNSServer{func(n, s string, q *dnsMsg, _ time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func n, s, q, _ {
 		switch s {
 		case "[2001:4860:4860::8888]:53", "8.8.8.8:53":
 			break
@@ -554,7 +554,7 @@ func TestGoLookupIPWithResolverConfig(t *testing.T) {
 func TestGoLookupIPOrderFallbackToFile(t *testing.T) {
 	defer dnsWaitGroup.Wait()
 
-	fake := fakeDNSServer{func(n, s string, q *dnsMsg, tm time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func n, s, q, tm {
 		r := &dnsMsg{
 			dnsMsgHdr: dnsMsgHdr{
 				id:       q.id,
@@ -575,7 +575,7 @@ func TestGoLookupIPOrderFallbackToFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Redirect host file lookups.
-	defer func(orig string) { testHookHostsPath = orig }(testHookHostsPath)
+	defer func orig { testHookHostsPath = orig }(testHookHostsPath)
 	testHookHostsPath = "testdata/hosts"
 
 	for _, order := range []hostLookupOrder{hostLookupFilesDNS, hostLookupDNSFiles} {
@@ -624,7 +624,7 @@ func TestErrorForOriginalNameWhenSearching(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fake := fakeDNSServer{func(_, _ string, q *dnsMsg, _ time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func _, _, q, _ {
 		r := &dnsMsg{
 			dnsMsgHdr: dnsMsgHdr{
 				id:       q.id,
@@ -679,7 +679,7 @@ func TestIgnoreLameReferrals(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	fake := fakeDNSServer{func(_, s string, q *dnsMsg, _ time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func _, s, q, _ {
 		t.Log(s, q)
 		r := &dnsMsg{
 			dnsMsgHdr: dnsMsgHdr{
@@ -828,7 +828,7 @@ func (f *fakeDNSConn) SetDeadline(t time.Time) error {
 // UDP round-tripper algorithm should ignore invalid DNS responses (issue 13281).
 func TestIgnoreDNSForgeries(t *testing.T) {
 	c, s := Pipe()
-	go func() {
+	go func {
 		b := make([]byte, 512)
 		n, err := s.Read(b)
 		if err != nil {
@@ -918,7 +918,7 @@ func TestRetryTimeout(t *testing.T) {
 
 	var deadline0 time.Time
 
-	fake := fakeDNSServer{func(_, s string, q *dnsMsg, deadline time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func _, s, q, deadline {
 		t.Log(s, q, deadline)
 
 		if deadline.IsZero() {
@@ -979,7 +979,7 @@ func testRotate(t *testing.T, rotate bool, nameservers, wantServers []string) {
 	}
 
 	var usedServers []string
-	fake := fakeDNSServer{func(_, s string, q *dnsMsg, deadline time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func _, s, q, deadline {
 		usedServers = append(usedServers, s)
 		return mockTXTResponse(q), nil
 	}}
@@ -1054,7 +1054,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 		resolveTimeout
 	)
 
-	makeTempError := func(err string) error {
+	makeTempError := func err {
 		return &DNSError{
 			Err:         err,
 			Name:        name,
@@ -1062,7 +1062,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 			IsTemporary: true,
 		}
 	}
-	makeTimeout := func() error {
+	makeTimeout := func {
 		return &DNSError{
 			Err:       poll.ErrTimeout.Error(),
 			Name:      name,
@@ -1070,7 +1070,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 			IsTimeout: true,
 		}
 	}
-	makeNxDomain := func() error {
+	makeNxDomain := func {
 		return &DNSError{
 			Err:    errNoSuchHost.Error(),
 			Name:   name,
@@ -1087,14 +1087,14 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 	}{
 		{
 			desc: "No errors",
-			resolveWhich: func(quest *dnsQuestion) resolveWhichEnum {
+			resolveWhich: func quest {
 				return resolveOK
 			},
 			wantIPs: []string{ip4, ip6},
 		},
 		{
 			desc: "searchX error fails in strict mode",
-			resolveWhich: func(quest *dnsQuestion) resolveWhichEnum {
+			resolveWhich: func quest {
 				if quest.Name == searchX {
 					return resolveTimeout
 				}
@@ -1105,7 +1105,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 		},
 		{
 			desc: "searchX IPv4-only timeout fails in strict mode",
-			resolveWhich: func(quest *dnsQuestion) resolveWhichEnum {
+			resolveWhich: func quest {
 				if quest.Name == searchX && quest.Qtype == dnsTypeA {
 					return resolveTimeout
 				}
@@ -1116,7 +1116,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 		},
 		{
 			desc: "searchX IPv6-only servfail fails in strict mode",
-			resolveWhich: func(quest *dnsQuestion) resolveWhichEnum {
+			resolveWhich: func quest {
 				if quest.Name == searchX && quest.Qtype == dnsTypeAAAA {
 					return resolveServfail
 				}
@@ -1127,7 +1127,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 		},
 		{
 			desc: "searchY error always fails",
-			resolveWhich: func(quest *dnsQuestion) resolveWhichEnum {
+			resolveWhich: func quest {
 				if quest.Name == searchY {
 					return resolveTimeout
 				}
@@ -1138,7 +1138,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 		},
 		{
 			desc: "searchY IPv4-only socket error fails in strict mode",
-			resolveWhich: func(quest *dnsQuestion) resolveWhichEnum {
+			resolveWhich: func quest {
 				if quest.Name == searchY && quest.Qtype == dnsTypeA {
 					return resolveOpError
 				}
@@ -1149,7 +1149,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 		},
 		{
 			desc: "searchY IPv6-only timeout fails in strict mode",
-			resolveWhich: func(quest *dnsQuestion) resolveWhichEnum {
+			resolveWhich: func quest {
 				if quest.Name == searchY && quest.Qtype == dnsTypeAAAA {
 					return resolveTimeout
 				}
@@ -1161,7 +1161,7 @@ func TestStrictErrorsLookupIP(t *testing.T) {
 	}
 
 	for i, tt := range cases {
-		fake := fakeDNSServer{func(_, s string, q *dnsMsg, deadline time.Time) (*dnsMsg, error) {
+		fake := fakeDNSServer{func _, s, q, deadline {
 			t.Log(s, q)
 
 			switch tt.resolveWhich(&q.question[0]) {
@@ -1295,7 +1295,7 @@ func TestStrictErrorsLookupTXT(t *testing.T) {
 	const searchY = "test.y.golang.org."
 	const txt = "Hello World"
 
-	fake := fakeDNSServer{func(_, s string, q *dnsMsg, deadline time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func _, s, q, deadline {
 		t.Log(s, q)
 
 		switch q.question[0].Name {
@@ -1337,7 +1337,7 @@ func TestStrictErrorsLookupTXT(t *testing.T) {
 func TestDNSGoroutineRace(t *testing.T) {
 	defer dnsWaitGroup.Wait()
 
-	fake := fakeDNSServer{func(n, s string, q *dnsMsg, t time.Time) (*dnsMsg, error) {
+	fake := fakeDNSServer{func n, s, q, t {
 		time.Sleep(10 * time.Microsecond)
 		return nil, poll.ErrTimeout
 	}}

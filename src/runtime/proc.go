@@ -125,7 +125,7 @@ func main() {
 	// Allow newproc to start new Ms.
 	mainStarted = true
 
-	systemstack(func() {
+	systemstack(func {
 		newm(sysmon, nil)
 	})
 
@@ -148,7 +148,7 @@ func main() {
 
 	// Defer unlock so that runtime.Goexit during init does the unlock too.
 	needUnlock := true
-	defer func() {
+	defer func {
 		if needUnlock {
 			unlockOSThread()
 		}
@@ -298,7 +298,7 @@ func goparkunlock(lock *mutex, reason string, traceEv byte, traceskip int) {
 }
 
 func goready(gp *g, traceskip int) {
-	systemstack(func() {
+	systemstack(func {
 		ready(gp, traceskip, true)
 	})
 }
@@ -771,7 +771,7 @@ func castogscanstatus(gp *g, oldval, newval uint32) bool {
 //go:nosplit
 func casgstatus(gp *g, oldval, newval uint32) {
 	if (oldval&_Gscan != 0) || (newval&_Gscan != 0) || oldval == newval {
-		systemstack(func() {
+		systemstack(func {
 			print("runtime: casgstatus: oldval=", hex(oldval), " newval=", hex(newval), "\n")
 			throw("casgstatus: bad incoming values")
 		})
@@ -782,7 +782,7 @@ func casgstatus(gp *g, oldval, newval uint32) {
 		// _Grunning or _Grunning|_Gscan; either way,
 		// we own gp.gcscanvalid, so it's safe to read.
 		// gp.gcscanvalid must not be true when we are running.
-		systemstack(func() {
+		systemstack(func {
 			print("runtime: casgstatus ", hex(oldval), "->", hex(newval), " gp.status=", hex(gp.atomicstatus), " gp.gcscanvalid=true\n")
 			throw("casgstatus")
 		})
@@ -796,7 +796,7 @@ func casgstatus(gp *g, oldval, newval uint32) {
 	// GC time to finish and change the state to oldval.
 	for i := 0; !atomic.Cas(&gp.atomicstatus, oldval, newval); i++ {
 		if oldval == _Gwaiting && gp.atomicstatus == _Grunnable {
-			systemstack(func() {
+			systemstack(func {
 				throw("casgstatus: waiting for Gwaiting but is Grunnable")
 			})
 		}
@@ -970,7 +970,7 @@ func stopTheWorld(reason string) {
 
 // startTheWorld undoes the effects of stopTheWorld.
 func startTheWorld() {
-	systemstack(func() { startTheWorldWithSema(false) })
+	systemstack(func { startTheWorldWithSema(false) })
 	// worldsema must be held over startTheWorldWithSema to ensure
 	// gomaxprocs cannot change while worldsema is held.
 	semrelease(&worldsema)
@@ -2789,7 +2789,7 @@ func reentersyscall(pc, sp uintptr) {
 	_g_.syscallpc = pc
 	casgstatus(_g_, _Grunning, _Gsyscall)
 	if _g_.syscallsp < _g_.stack.lo || _g_.stack.hi < _g_.syscallsp {
-		systemstack(func() {
+		systemstack(func {
 			print("entersyscall inconsistent ", hex(_g_.syscallsp), " [", hex(_g_.stack.lo), ",", hex(_g_.stack.hi), "]\n")
 			throw("entersyscall")
 		})
@@ -2886,14 +2886,14 @@ func entersyscallblock(dummy int32) {
 		sp1 := sp
 		sp2 := _g_.sched.sp
 		sp3 := _g_.syscallsp
-		systemstack(func() {
+		systemstack(func {
 			print("entersyscallblock inconsistent ", hex(sp1), " ", hex(sp2), " ", hex(sp3), " [", hex(_g_.stack.lo), ",", hex(_g_.stack.hi), "]\n")
 			throw("entersyscallblock")
 		})
 	}
 	casgstatus(_g_, _Grunning, _Gsyscall)
 	if _g_.syscallsp < _g_.stack.lo || _g_.stack.hi < _g_.syscallsp {
-		systemstack(func() {
+		systemstack(func {
 			print("entersyscallblock inconsistent ", hex(sp), " ", hex(_g_.sched.sp), " ", hex(_g_.syscallsp), " [", hex(_g_.stack.lo), ",", hex(_g_.stack.hi), "]\n")
 			throw("entersyscallblock")
 		})
@@ -2932,7 +2932,7 @@ func exitsyscall(dummy int32) {
 		// throw calls print which may try to grow the stack,
 		// but throwsplit == true so the stack can not be grown;
 		// use systemstack to avoid that possible problem.
-		systemstack(func() {
+		systemstack(func {
 			throw("exitsyscall: syscall frame is no longer valid")
 		})
 	}
@@ -2941,7 +2941,7 @@ func exitsyscall(dummy int32) {
 	oldp := _g_.m.p.ptr()
 	if exitsyscallfast() {
 		if _g_.m.mcache == nil {
-			systemstack(func() {
+			systemstack(func {
 				throw("lost mcache")
 			})
 		}
@@ -2990,7 +2990,7 @@ func exitsyscall(dummy int32) {
 	mcall(exitsyscall0)
 
 	if _g_.m.mcache == nil {
-		systemstack(func() {
+		systemstack(func {
 			throw("lost mcache")
 		})
 	}
@@ -3030,7 +3030,7 @@ func exitsyscallfast() bool {
 	_g_.m.p = 0
 	if sched.pidle != 0 {
 		var ok bool
-		systemstack(func() {
+		systemstack(func {
 			ok = exitsyscallfast_pidle()
 			if ok && trace.enabled {
 				if oldp != nil {
@@ -3068,7 +3068,7 @@ func exitsyscallfast_reacquired() {
 			// The p was retaken and then enter into syscall again (since _g_.m.syscalltick has changed).
 			// traceGoSysBlock for this syscall was already emitted,
 			// but here we effectively retake the p from the new syscall running on the same p.
-			systemstack(func() {
+			systemstack(func {
 				// Denote blocking of the new syscall.
 				traceGoSysBlock(_g_.m.p.ptr())
 				// Denote completion of the current syscall.
@@ -3216,7 +3216,7 @@ func malg(stacksize int32) *g {
 	newg := new(g)
 	if stacksize >= 0 {
 		stacksize = round2(_StackSystem + stacksize)
-		systemstack(func() {
+		systemstack(func {
 			newg.stack = stackalloc(uint32(stacksize))
 		})
 		newg.stackguard0 = newg.stack.lo + _StackGuard
@@ -3235,7 +3235,7 @@ func malg(stacksize int32) *g {
 func newproc(siz int32, fn *funcval) {
 	argp := add(unsafe.Pointer(&fn), sys.PtrSize)
 	pc := getcallerpc()
-	systemstack(func() {
+	systemstack(func {
 		newproc1(fn, (*uint8)(argp), siz, pc)
 	})
 }
@@ -3418,7 +3418,7 @@ retry:
 		_p_.gfreecnt--
 		if gp.stack.lo == 0 {
 			// Stack was deallocated in gfput. Allocate a new one.
-			systemstack(func() {
+			systemstack(func {
 				gp.stack = stackalloc(_FixedStack)
 			})
 			gp.stackguard0 = gp.stack.lo + _StackGuard

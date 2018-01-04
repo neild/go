@@ -245,7 +245,7 @@ func (s *ss) errorString(err string) {
 }
 
 func (s *ss) Token(skipSpace bool, f func(rune) bool) (tok []byte, err error) {
-	defer func() {
+	defer func {
 		if e := recover(); e != nil {
 			if se, ok := e.(scanError); ok {
 				err = se.err
@@ -376,7 +376,7 @@ func (r *readRune) UnreadRune() error {
 }
 
 var ssFree = sync.Pool{
-	New: func() interface{} { return new(ss) },
+	New: func { return new(ss) },
 }
 
 // newScanState allocates a new ss struct or grab a cached one.

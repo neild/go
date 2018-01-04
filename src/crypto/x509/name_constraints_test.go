@@ -1564,7 +1564,7 @@ func makeConstraintsLeafCert(leaf leafSpec, key *ecdsa.PrivateKey, parent *Certi
 }
 
 func customConstraintsExtension(typeNum int, constraint []byte, isExcluded bool) pkix.Extension {
-	appendConstraint := func(contents []byte, tag uint8) []byte {
+	appendConstraint := func contents, tag {
 		contents = append(contents, tag|32 /* constructed */ |0x80 /* context-specific */)
 		contents = append(contents, byte(4+len(constraint)) /* length */)
 		contents = append(contents, 0x30 /* SEQUENCE */)
@@ -1620,7 +1620,7 @@ func addConstraintsToTemplate(constraints constraintsSpec, template *Certificate
 		return dnsNames, ips, emailAddrs, uriDomains, err
 	}
 
-	handleSpecialConstraint := func(constraint string, isExcluded bool) bool {
+	handleSpecialConstraint := func constraint, isExcluded {
 		switch {
 		case constraint == "unknown:":
 			template.ExtraExtensions = append(template.ExtraExtensions, customConstraintsExtension(9 /* undefined GeneralName type */, []byte{1}, isExcluded))
@@ -1689,7 +1689,7 @@ func parseEKUs(ekuStrs []string) (ekus []ExtKeyUsage, unknowns []asn1.ObjectIden
 
 func TestConstraintCases(t *testing.T) {
 	privateKeys := sync.Pool{
-		New: func() interface{} {
+		New: func {
 			priv, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 			if err != nil {
 				panic(err)
@@ -1802,7 +1802,7 @@ func TestConstraintCases(t *testing.T) {
 		}
 
 		if logInfo {
-			certAsPEM := func(cert *Certificate) string {
+			certAsPEM := func cert {
 				var buf bytes.Buffer
 				pem.Encode(&buf, &pem.Block{Type: "CERTIFICATE", Bytes: cert.Raw})
 				return string(buf.Bytes())
@@ -1925,12 +1925,12 @@ func TestRFC2821Parsing(t *testing.T) {
 }
 
 func TestBadNamesInConstraints(t *testing.T) {
-	constraintParseError := func(err error) bool {
+	constraintParseError := func err {
 		str := err.Error()
 		return strings.Contains(str, "failed to parse ") && strings.Contains(str, "constraint")
 	}
 
-	encodingError := func(err error) bool {
+	encodingError := func err {
 		return strings.Contains(err.Error(), "cannot be encoded as an IA5String")
 	}
 

@@ -88,7 +88,7 @@ func ExampleTemplate_parsefiles() {
 	})
 
 	// Clean up after the test; another quirk of running as an example.
-	defer func(dirs ...string) {
+	defer func dirs {
 		for _, dir := range dirs {
 			os.RemoveAll(dir)
 		}

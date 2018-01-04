@@ -62,7 +62,7 @@ func init() {
 	var cmd base.Command
 	work.AddBuildFlags(&cmd)
 	cmd.Flag.StringVar(&vetTool, "vettool", "", "path to vet tool binary") // for cmd/vet tests; undocumented for now
-	cmd.Flag.VisitAll(func(f *flag.Flag) {
+	cmd.Flag.VisitAll(func f {
 		vetFlagDefn = append(vetFlagDefn, &cmdflag.Defn{
 			Name:  f.Name,
 			Value: f.Value,

@@ -83,7 +83,7 @@ var (
 type Xs string
 
 func (x *Xs) Scan(state ScanState, verb rune) error {
-	tok, err := state.Token(true, func(r rune) bool { return r == verb })
+	tok, err := state.Token(true, func r { return r == verb })
 	if err != nil {
 		return err
 	}
@@ -445,16 +445,16 @@ var readers = []struct {
 	name string
 	f    func(string) io.Reader
 }{
-	{"StringReader", func(s string) io.Reader {
+	{"StringReader", func s {
 		return strings.NewReader(s)
 	}},
-	{"ReaderOnly", func(s string) io.Reader {
+	{"ReaderOnly", func s {
 		return struct{ io.Reader }{strings.NewReader(s)}
 	}},
-	{"OneByteReader", func(s string) io.Reader {
+	{"OneByteReader", func s {
 		return iotest.OneByteReader(strings.NewReader(s))
 	}},
-	{"DataErrReader", func(s string) io.Reader {
+	{"DataErrReader", func s {
 		return iotest.DataErrReader(strings.NewReader(s))
 	}},
 }
@@ -489,7 +489,7 @@ func testScan(t *testing.T, f func(string) io.Reader, scan func(r io.Reader, a .
 
 func TestScan(t *testing.T) {
 	for _, r := range readers {
-		t.Run(r.name, func(t *testing.T) {
+		t.Run(r.name, func t {
 			testScan(t, r.f, Fscan)
 		})
 	}
@@ -497,7 +497,7 @@ func TestScan(t *testing.T) {
 
 func TestScanln(t *testing.T) {
 	for _, r := range readers {
-		t.Run(r.name, func(t *testing.T) {
+		t.Run(r.name, func t {
 			testScan(t, r.f, Fscanln)
 		})
 	}
@@ -632,7 +632,7 @@ func testScanfMulti(t *testing.T, f func(string) io.Reader) {
 
 func TestScanfMulti(t *testing.T) {
 	for _, r := range readers {
-		t.Run(r.name, func(t *testing.T) {
+		t.Run(r.name, func t {
 			testScanfMulti(t, r.f)
 		})
 	}
@@ -1097,7 +1097,7 @@ func TestHexBytes(t *testing.T) {
 	if n != 1 || err != nil {
 		t.Errorf("simple: got count, err = %d, %v; expected 1, nil", n, err)
 	}
-	check := func(msg string, x []byte) {
+	check := func msg, x {
 		if len(x) != 4 {
 			t.Errorf("%s: bad length %d", msg, len(x))
 		}

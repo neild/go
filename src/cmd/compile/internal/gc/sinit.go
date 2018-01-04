@@ -709,7 +709,7 @@ func fixedlit(ctxt initContext, kind initKind, n *Node, var_ *Node, init *Nodes)
 	switch n.Op {
 	case OARRAYLIT, OSLICELIT:
 		var k int64
-		splitnode = func(r *Node) (*Node, *Node) {
+		splitnode = func r {
 			if r.Op == OKEY {
 				k = nonnegintconst(r.Left)
 				r = r.Right
@@ -719,7 +719,7 @@ func fixedlit(ctxt initContext, kind initKind, n *Node, var_ *Node, init *Nodes)
 			return a, r
 		}
 	case OSTRUCTLIT:
-		splitnode = func(r *Node) (*Node, *Node) {
+		splitnode = func r {
 			if r.Op != OSTRUCTKEY {
 				Fatalf("fixedlit: rhs not OSTRUCTKEY: %v", r)
 			}

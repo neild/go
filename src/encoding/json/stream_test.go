@@ -268,7 +268,7 @@ func BenchmarkEncoderEncode(b *testing.B) {
 		X, Y string
 	}
 	v := &T{"foo", "bar"}
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			if err := NewEncoder(ioutil.Discard).Encode(v); err != nil {
 				b.Fatal(err)
@@ -398,7 +398,7 @@ func TestDecodeInStream(t *testing.T) {
 func TestHTTPDecoding(t *testing.T) {
 	const raw = `{ "foo": "bar" }`
 
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func w, r {
 		w.Write([]byte(raw))
 	}))
 	defer ts.Close()

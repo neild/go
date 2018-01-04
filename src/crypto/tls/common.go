@@ -542,7 +542,7 @@ func ticketKeyFromBytes(b [32]byte) (key ticketKey) {
 func (c *Config) Clone() *Config {
 	// Running serverInit ensures that it's safe to read
 	// SessionTicketsDisabled.
-	c.serverInitOnce.Do(func() { c.serverInit(nil) })
+	c.serverInitOnce.Do(func { c.serverInit(nil) })
 
 	var sessionTicketKeys []ticketKey
 	c.mutex.RLock()

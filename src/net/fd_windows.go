@@ -100,8 +100,8 @@ func (fd *netFD) connect(ctx context.Context, la, ra syscall.Sockaddr) (syscall.
 	// to exist, otherwise our caller might cancel the context and
 	// cause fd.setWriteDeadline(aLongTimeAgo) to cancel a successful dial.
 	done := make(chan bool) // must be unbuffered
-	defer func() { done <- true }()
-	go func() {
+	defer func { done <- true }()
+	go func {
 		select {
 		case <-ctx.Done():
 			// Force the runtime's poller to immediately give
@@ -189,7 +189,7 @@ func (fd *netFD) writeTo(buf []byte, sa syscall.Sockaddr) (int, error) {
 }
 
 func (fd *netFD) accept() (*netFD, error) {
-	s, rawsa, rsan, errcall, err := fd.pfd.Accept(func() (syscall.Handle, error) {
+	s, rawsa, rsan, errcall, err := fd.pfd.Accept(func {
 		return sysSocket(fd.family, fd.sotype, 0)
 	})
 

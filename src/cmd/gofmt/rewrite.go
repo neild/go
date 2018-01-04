@@ -28,7 +28,7 @@ func initRewrite() {
 	}
 	pattern := parseExpr(f[0], "pattern")
 	replace := parseExpr(f[1], "replacement")
-	rewrite = func(p *ast.File) *ast.File { return rewriteFile(pattern, replace, p) }
+	rewrite = func p { return rewriteFile(pattern, replace, p) }
 }
 
 // parseExpr parses s as an expression.
@@ -61,7 +61,7 @@ func rewriteFile(pattern, replace ast.Expr, p *ast.File) *ast.File {
 	repl := reflect.ValueOf(replace)
 
 	var rewriteVal func(val reflect.Value) reflect.Value
-	rewriteVal = func(val reflect.Value) reflect.Value {
+	rewriteVal = func val {
 		// don't bother if val is invalid to start with
 		if !val.IsValid() {
 			return reflect.Value{}
@@ -87,7 +87,7 @@ func set(x, y reflect.Value) {
 	if !x.CanSet() || !y.IsValid() {
 		return
 	}
-	defer func() {
+	defer func {
 		if x := recover(); x != nil {
 			if s, ok := x.(string); ok &&
 				(strings.Contains(s, "type mismatch") || strings.Contains(s, "not assignable")) {

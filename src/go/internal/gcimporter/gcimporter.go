@@ -125,7 +125,7 @@ func Import(packages map[string]*types.Package, path, srcDir string, lookup func
 		if err != nil {
 			return nil, err
 		}
-		defer func() {
+		defer func {
 			if err != nil {
 				// add file name to error
 				err = fmt.Errorf("%s: %v", filename, err)
@@ -133,7 +133,7 @@ func Import(packages map[string]*types.Package, path, srcDir string, lookup func
 		}()
 		rc = f
 	}
-	defer func() {
+	defer func {
 		rc.Close()
 	}()
 

@@ -7,7 +7,7 @@ package types
 import "testing"
 
 func TestIsAlias(t *testing.T) {
-	check := func(obj *TypeName, want bool) {
+	check := func obj, want {
 		if got := obj.IsAlias(); got != want {
 			t.Errorf("%v: got IsAlias = %v; want %v", obj, got, want)
 		}

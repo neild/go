@@ -302,7 +302,7 @@ func ProxyFromEnvironment(req *Request) (*url.URL, error) {
 // ProxyURL returns a proxy function (for use in a Transport)
 // that always returns the same URL.
 func ProxyURL(fixedURL *url.URL) func(*Request) (*url.URL, error) {
-	return func(*Request) (*url.URL, error) {
+	return func {
 		return fixedURL, nil
 	}
 }
@@ -911,7 +911,7 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (*persistC
 		// set request canceler to some non-nil function so we
 		// can detect whether it was cleared between now and when
 		// we enter roundTrip
-		t.setReqCanceler(req, func(error) {})
+		t.setReqCanceler(req, func {})
 		return pc, nil
 	}
 
@@ -926,9 +926,9 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (*persistC
 	testHookPrePendingDial := testHookPrePendingDial
 	testHookPostPendingDial := testHookPostPendingDial
 
-	handlePendingDial := func() {
+	handlePendingDial := func {
 		testHookPrePendingDial()
-		go func() {
+		go func {
 			if v := <-dialc; v.err == nil {
 				t.putOrCloseIdleConn(v.pc)
 			}
@@ -937,9 +937,9 @@ func (t *Transport) getConn(treq *transportRequest, cm connectMethod) (*persistC
 	}
 
 	cancelc := make(chan error, 1)
-	t.setReqCanceler(req, func(err error) { cancelc <- err })
+	t.setReqCanceler(req, func err { cancelc <- err })
 
-	go func() {
+	go func {
 		pc, err := t.dialConn(ctx, cm)
 		dialc <- dialRes{pc, err}
 	}()
@@ -1043,11 +1043,11 @@ func (pconn *persistConn) addTLS(name string, trace *httptrace.ClientTrace) erro
 	errc := make(chan error, 2)
 	var timer *time.Timer // for canceling TLS handshake
 	if d := pconn.t.TLSHandshakeTimeout; d != 0 {
-		timer = time.AfterFunc(d, func() {
+		timer = time.AfterFunc(d, func {
 			errc <- tlsHandshakeTimeoutError{}
 		})
 	}
-	go func() {
+	go func {
 		if trace != nil && trace.TLSHandshakeStart != nil {
 			trace.TLSHandshakeStart()
 		}
@@ -1090,7 +1090,7 @@ func (t *Transport) dialConn(ctx context.Context, cm connectMethod) (*persistCon
 		writeLoopDone: make(chan struct{}),
 	}
 	trace := httptrace.ContextClientTrace(ctx)
-	wrapErr := func(err error) error {
+	wrapErr := func err {
 		if cm.proxyURL != nil {
 			// Return a typed error, per Issue 16997
 			return &net.OpError{Op: "proxyconnect", Net: "tcp", Err: err}
@@ -1166,7 +1166,7 @@ func (t *Transport) dialConn(ctx context.Context, cm connectMethod) (*persistCon
 	case cm.targetScheme == "http":
 		pconn.isProxy = true
 		if pa := cm.proxyAuth(); pa != "" {
-			pconn.mutateHeaderFunc = func(h Header) {
+			pconn.mutateHeaderFunc = func h {
 				h.Set("Proxy-Authorization", pa)
 			}
 		}
@@ -1551,12 +1551,12 @@ func (pc *persistConn) mapRoundTripError(req *transportRequest, startBytesWritte
 
 func (pc *persistConn) readLoop() {
 	closeErr := errReadLoopExiting // default value, if not changed below
-	defer func() {
+	defer func {
 		pc.close(closeErr)
 		pc.t.removeIdleConn(pc)
 	}()
 
-	tryPutIdleConn := func(trace *httptrace.ClientTrace) bool {
+	tryPutIdleConn := func trace {
 		if err := pc.t.tryPutIdleConn(pc); err != nil {
 			closeErr = err
 			if trace != nil && trace.PutIdleConn != nil && err != errKeepAlivesDisabled {
@@ -1662,13 +1662,13 @@ func (pc *persistConn) readLoop() {
 		waitForBodyRead := make(chan bool, 2)
 		body := &bodyEOFSignal{
 			body: resp.Body,
-			earlyCloseFn: func() error {
+			earlyCloseFn: func {
 				waitForBodyRead <- false
 				<-eofc // will be closed by deferred call at the end of the function
 				return nil
 
 			},
-			fn: func(err error) error {
+			fn: func err {
 				isEOF := err == io.EOF
 				waitForBodyRead <- isEOF
 				if isEOF {
@@ -1782,7 +1782,7 @@ func (pc *persistConn) waitForContinue(continueCh <-chan struct{}) func() bool {
 	if continueCh == nil {
 		return nil
 	}
-	return func() bool {
+	return func {
 		timer := time.NewTimer(pc.t.ExpectContinueTimeout)
 		defer timer.Stop()
 
@@ -1987,7 +1987,7 @@ func (pc *persistConn) roundTrip(req *transportRequest) (resp *Response, err err
 	gone := make(chan struct{})
 	defer close(gone)
 
-	defer func() {
+	defer func {
 		if err != nil {
 			pc.t.setReqCanceler(req.Request, nil)
 		}

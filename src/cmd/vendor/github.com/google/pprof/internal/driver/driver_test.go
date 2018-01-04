@@ -94,7 +94,7 @@ func TestParse(t *testing.T) {
 	}
 
 	baseVars := pprofVariables
-	defer func() { pprofVariables = baseVars }()
+	defer func { pprofVariables = baseVars }()
 	for _, tc := range testcase {
 		// Reset the pprof variables before processing
 		pprofVariables = baseVars.makeCopy()
@@ -1053,7 +1053,7 @@ func TestTagFilter(t *testing.T) {
 		},
 	}
 	for _, test := range tagFilterTests {
-		t.Run(test.desc, func(*testing.T) {
+		t.Run(test.desc, func {
 			filter, err := compileTagFilter(test.desc, test.value, nil, &proftest.TestUI{T: t}, nil)
 			if err != nil {
 				t.Fatalf("tagFilter %s:%v", test.desc, err)
@@ -1179,7 +1179,7 @@ func TestIdentifyNumLabelUnits(t *testing.T) {
 		},
 	}
 	for _, test := range tagFilterTests {
-		t.Run(test.desc, func(*testing.T) {
+		t.Run(test.desc, func {
 			p := profile.Profile{Sample: make([]*profile.Sample, len(test.tagVals))}
 			for i, numLabel := range test.tagVals {
 				s := profile.Sample{
@@ -1342,7 +1342,7 @@ func TestNumericTagFilter(t *testing.T) {
 		},
 	}
 	for _, test := range tagFilterTests {
-		t.Run(test.desc, func(*testing.T) {
+		t.Run(test.desc, func {
 			wantErrMsg := strings.Join([]string{"(", test.desc, ":Interpreted '", test.value[strings.Index(test.value, "=")+1:], "' as range, not regexp", ")"}, "")
 			filter, err := compileTagFilter(test.desc, test.value, test.identifiedUnits, &proftest.TestUI{T: t,
 				AllowRx: wantErrMsg}, nil)
@@ -1382,7 +1382,7 @@ func (testSymbolzMergeFetcher) Fetch(s string, d, t time.Duration) (*profile.Pro
 func TestSymbolzAfterMerge(t *testing.T) {
 	baseVars := pprofVariables
 	pprofVariables = baseVars.makeCopy()
-	defer func() { pprofVariables = baseVars }()
+	defer func { pprofVariables = baseVars }()
 
 	f := baseFlags()
 	f.args = []string{

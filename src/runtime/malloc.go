@@ -552,7 +552,7 @@ func (c *mcache) nextFree(spc spanClass) (v gclinkptr, s *mspan, shouldhelpgc bo
 			println("runtime: s.allocCount=", s.allocCount, "s.nelems=", s.nelems)
 			throw("s.allocCount != s.nelems && freeIndex == s.nelems")
 		}
-		systemstack(func() {
+		systemstack(func {
 			c.refill(spc)
 		})
 		shouldhelpgc = true
@@ -717,7 +717,7 @@ func mallocgc(size uintptr, typ *_type, needzero bool) unsafe.Pointer {
 	} else {
 		var s *mspan
 		shouldhelpgc = true
-		systemstack(func() {
+		systemstack(func {
 			s = largeAlloc(size, needzero, noscan)
 		})
 		s.freeindex = 1
@@ -946,7 +946,7 @@ var globalAlloc struct {
 // Consider marking persistentalloc'd types go:notinheap.
 func persistentalloc(size, align uintptr, sysStat *uint64) unsafe.Pointer {
 	var p *notInHeap
-	systemstack(func() {
+	systemstack(func {
 		p = persistentalloc1(size, align, sysStat)
 	})
 	return unsafe.Pointer(p)

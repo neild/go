@@ -14,7 +14,7 @@ import (
 )
 
 func ExampleResponseRecorder() {
-	handler := func(w http.ResponseWriter, r *http.Request) {
+	handler := func w, r {
 		io.WriteString(w, "<html><body>Hello World!</body></html>")
 	}
 
@@ -36,7 +36,7 @@ func ExampleResponseRecorder() {
 }
 
 func ExampleServer() {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewServer(http.HandlerFunc(func w, r {
 		fmt.Fprintln(w, "Hello, client")
 	}))
 	defer ts.Close()
@@ -56,7 +56,7 @@ func ExampleServer() {
 }
 
 func ExampleNewTLSServer() {
-	ts := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	ts := httptest.NewTLSServer(http.HandlerFunc(func w, r {
 		fmt.Fprintln(w, "Hello, client")
 	}))
 	defer ts.Close()

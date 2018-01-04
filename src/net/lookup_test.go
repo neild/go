@@ -443,11 +443,11 @@ func TestDNSFlood(t *testing.T) {
 	c := make(chan error, 2*N)
 	for i := 0; i < N; i++ {
 		name := fmt.Sprintf("%d.net-test.golang.org", i)
-		go func() {
+		go func {
 			_, err := DefaultResolver.LookupIPAddr(ctxHalfTimeout, name)
 			c <- err
 		}()
-		go func() {
+		go func {
 			_, err := DefaultResolver.LookupIPAddr(ctxTimeout, name)
 			c <- err
 		}()

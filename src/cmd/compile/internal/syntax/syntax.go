@@ -64,7 +64,7 @@ type FilenameHandler func(name string) string
 //
 // The Mode argument is currently ignored.
 func Parse(base *src.PosBase, src io.Reader, errh ErrorHandler, pragh PragmaHandler, fileh FilenameHandler, mode Mode) (_ *File, first error) {
-	defer func() {
+	defer func {
 		if p := recover(); p != nil {
 			if err, ok := p.(Error); ok {
 				first = err

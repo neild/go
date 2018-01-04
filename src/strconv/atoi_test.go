@@ -481,10 +481,10 @@ func TestNumError(t *testing.T) {
 }
 
 func BenchmarkParseInt(b *testing.B) {
-	b.Run("Pos", func(b *testing.B) {
+	b.Run("Pos", func b {
 		benchmarkParseInt(b, 1)
 	})
-	b.Run("Neg", func(b *testing.B) {
+	b.Run("Neg", func b {
 		benchmarkParseInt(b, -1)
 	})
 }
@@ -503,7 +503,7 @@ func benchmarkParseInt(b *testing.B, neg int) {
 		{"63bit", 1<<63 - 1},
 	}
 	for _, cs := range cases {
-		b.Run(cs.name, func(b *testing.B) {
+		b.Run(cs.name, func b {
 			s := fmt.Sprintf("%d", cs.num*int64(neg))
 			for i := 0; i < b.N; i++ {
 				out, _ := ParseInt(s, 10, 64)
@@ -514,10 +514,10 @@ func benchmarkParseInt(b *testing.B, neg int) {
 }
 
 func BenchmarkAtoi(b *testing.B) {
-	b.Run("Pos", func(b *testing.B) {
+	b.Run("Pos", func b {
 		benchmarkAtoi(b, 1)
 	})
-	b.Run("Neg", func(b *testing.B) {
+	b.Run("Neg", func b {
 		benchmarkAtoi(b, -1)
 	})
 }
@@ -535,7 +535,7 @@ func benchmarkAtoi(b *testing.B, neg int) {
 		}...)
 	}
 	for _, cs := range cases {
-		b.Run(cs.name, func(b *testing.B) {
+		b.Run(cs.name, func b {
 			s := fmt.Sprintf("%d", cs.num*int64(neg))
 			for i := 0; i < b.N; i++ {
 				out, _ := Atoi(s)

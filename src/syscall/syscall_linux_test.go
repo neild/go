@@ -85,7 +85,7 @@ func TestLinuxDeathSignal(t *testing.T) {
 	if got, err := chldPipe.ReadString('\n'); got == "start\n" {
 		syscall.Kill(cmd.Process.Pid, syscall.SIGTERM)
 
-		go func() {
+		go func {
 			time.Sleep(5 * time.Second)
 			chldStdin.Close()
 		}()
@@ -124,7 +124,7 @@ func deathSignalParent() {
 func deathSignalChild() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGUSR1)
-	go func() {
+	go func {
 		<-c
 		fmt.Println("ok")
 		os.Exit(0)

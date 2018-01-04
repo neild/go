@@ -12,8 +12,8 @@ import (
 
 func TestWithClientTrace(t *testing.T) {
 	var buf bytes.Buffer
-	connectStart := func(b byte) func(network, addr string) {
-		return func(network, addr string) {
+	connectStart := func b {
+		return func network, addr {
 			buf.WriteByte(b)
 		}
 	}
@@ -40,8 +40,8 @@ func TestCompose(t *testing.T) {
 	var buf bytes.Buffer
 	var testNum int
 
-	connectStart := func(b byte) func(network, addr string) {
-		return func(network, addr string) {
+	connectStart := func b {
+		return func network, addr {
 			if addr != "addr" {
 				t.Errorf(`%d. args for %q case = %q, %q; want addr of "addr"`, testNum, b, network, addr)
 			}

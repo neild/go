@@ -114,7 +114,7 @@ func (v *Map) String() string {
 	var b bytes.Buffer
 	fmt.Fprintf(&b, "{")
 	first := true
-	v.Do(func(kv KeyValue) {
+	v.Do(func kv {
 		if !first {
 			fmt.Fprintf(&b, ", ")
 		}
@@ -130,7 +130,7 @@ func (v *Map) Init() *Map {
 	v.keysMu.Lock()
 	defer v.keysMu.Unlock()
 	v.keys = v.keys[:0]
-	v.m.Range(func(k, _ interface{}) bool {
+	v.m.Range(func k, _ {
 		v.m.Delete(k)
 		return true
 	})
@@ -316,7 +316,7 @@ func expvarHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	fmt.Fprintf(w, "{\n")
 	first := true
-	Do(func(kv KeyValue) {
+	Do(func kv {
 		if !first {
 			fmt.Fprintf(w, ",\n")
 		}

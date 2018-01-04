@@ -384,7 +384,7 @@ func getempty() *workbuf {
 			unlock(&work.wbufSpans.lock)
 		}
 		if s == nil {
-			systemstack(func() {
+			systemstack(func {
 				s = mheap_.allocManual(workbufAlloc/pageSize, &memstats.gc_sys)
 			})
 			if s == nil {
@@ -533,7 +533,7 @@ func freeSomeWbufs(preemptible bool) bool {
 		unlock(&work.wbufSpans.lock)
 		return false
 	}
-	systemstack(func() {
+	systemstack(func {
 		gp := getg().m.curg
 		for i := 0; i < batchSize && !(preemptible && gp.preempt); i++ {
 			span := work.wbufSpans.free.first

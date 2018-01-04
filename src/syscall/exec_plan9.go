@@ -481,7 +481,7 @@ func startProcess(argv0 string, argv []string, attr *ProcAttr) (pid int, err err
 	}
 
 	forkc := make(chan forkRet, 1)
-	go func() {
+	go func {
 		runtime.LockOSThread()
 		var ret forkRet
 

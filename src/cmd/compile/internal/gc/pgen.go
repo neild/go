@@ -275,7 +275,7 @@ func compileFunctions() {
 			// Compile the longest functions first,
 			// since they're most likely to be the slowest.
 			// This helps avoid stragglers.
-			obj.SortSlice(compilequeue, func(i, j int) bool {
+			obj.SortSlice(compilequeue, func i, j {
 				return compilequeue[i].Nbody.Len() > compilequeue[j].Nbody.Len()
 			})
 		}
@@ -284,7 +284,7 @@ func compileFunctions() {
 		c := make(chan *Node, nBackendWorkers)
 		for i := 0; i < nBackendWorkers; i++ {
 			wg.Add(1)
-			go func(worker int) {
+			go func worker {
 				for fn := range c {
 					compileSSA(fn, worker)
 				}
@@ -754,13 +754,13 @@ func createComplexVar(debugInfo *ssa.FuncDebug, n *Node, parts []varPart) *dwarf
 		block int
 		loc   int
 	}
-	findLoc := func(part varPart, id locID) *ssa.VarLoc {
+	findLoc := func part, id {
 		if id.block >= len(debugInfo.Blocks) {
 			return nil
 		}
 		return debugInfo.Blocks[id.block].Variables[part.slot].Locations[id.loc]
 	}
-	nextLoc := func(part varPart, id locID) (locID, *ssa.VarLoc) {
+	nextLoc := func part, id {
 		// Check if there's another loc in this block
 		id.loc++
 		if b := debugInfo.Blocks[id.block]; b != nil && id.loc < len(b.Variables[part.slot].Locations) {
@@ -787,7 +787,7 @@ func createComplexVar(debugInfo *ssa.FuncDebug, n *Node, parts []varPart) *dwarf
 	}
 
 	// findBoundaryAfter finds the next beginning or end of a piece after currentPC.
-	findBoundaryAfter := func(currentPC int64) int64 {
+	findBoundaryAfter := func currentPC {
 		min := int64(math.MaxInt64)
 		for _, part := range parts {
 			// For each part, find the first PC greater than current. Doesn't

@@ -39,7 +39,7 @@ func semacreate(mp *m) {
 	if mp.waitsema != 0 {
 		return
 	}
-	systemstack(func() {
+	systemstack(func {
 		mp.waitsema = mach_semcreate()
 	})
 }
@@ -432,7 +432,7 @@ func semasleep1(ns int64) int32 {
 //go:nosplit
 func semasleep(ns int64) int32 {
 	var r int32
-	systemstack(func() {
+	systemstack(func {
 		r = semasleep1(ns)
 	})
 	return r
@@ -453,7 +453,7 @@ func mach_semrelease(sem uint32) {
 		// because it is called from Go code.
 		// If we're going to die, start that process on the system stack
 		// to avoid a Go stack split.
-		systemstack(func() { macherror(r, "semaphore_signal") })
+		systemstack(func { macherror(r, "semaphore_signal") })
 	}
 }
 

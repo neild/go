@@ -165,7 +165,7 @@ func semawakeup(mp *m) {
 	ret := lwp_unpark(int32(mp.procid), unsafe.Pointer(&mp.waitsemacount))
 	if ret != 0 && ret != _ESRCH {
 		// semawakeup can be called on signal stack.
-		systemstack(func() {
+		systemstack(func {
 			print("thrwakeup addr=", &mp.waitsemacount, " sem=", mp.waitsemacount, " ret=", ret, "\n")
 		})
 	}

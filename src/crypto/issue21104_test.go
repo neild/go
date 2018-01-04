@@ -47,7 +47,7 @@ func test(t *testing.T, name string, cipherText []byte, xor func([]byte, []byte)
 	want := "abcdefghij"
 	plainText := []byte(want)
 	shorterLen := len(cipherText) / 2
-	defer func() {
+	defer func {
 		err := recover()
 		if err == nil {
 			t.Errorf("%v XORKeyStream expected to panic on len(dst) < len(src), but didn't", name)

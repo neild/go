@@ -30,7 +30,7 @@ func TestGoroutineProfile(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 4; i++ {
 		wg.Add(1)
-		go func() {
+		go func {
 			for atomic.LoadUint32(&stop) == 0 {
 				syscall.Close(-1)
 			}

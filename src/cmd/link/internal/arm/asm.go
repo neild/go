@@ -76,7 +76,7 @@ func gentext(ctxt *ld.Link) {
 	initfunc.Type = sym.STEXT
 	initfunc.Attr |= sym.AttrLocal
 	initfunc.Attr |= sym.AttrReachable
-	o := func(op uint32) {
+	o := func op {
 		initfunc.AddUint32(ctxt.Arch, op)
 	}
 	o(0xe59f0004)

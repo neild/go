@@ -3365,7 +3365,7 @@ func walkcompare(n *Node, init *Nodes) *Node {
 		andor = OOROR
 	}
 	var expr *Node
-	compare := func(el, er *Node) {
+	compare := func el, er {
 		a := nod(n.Op, el, er)
 		if expr == nil {
 			expr = a
@@ -3516,7 +3516,7 @@ func walkinrange(n *Node, init *Nodes) *Node {
 		opr = brcom(opr)
 	}
 
-	cmpdir := func(o Op) int {
+	cmpdir := func o {
 		switch o {
 		case OLE, OLT:
 			return -1

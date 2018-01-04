@@ -210,7 +210,7 @@ func vdso_parse_symbols(info *vdso_info, version int32) {
 		return
 	}
 
-	apply := func(symIndex uint32, k symbol_key) bool {
+	apply := func symIndex, k {
 		sym := &info.symtab[symIndex]
 		typ := _ELF_ST_TYPE(sym.st_info)
 		bind := _ELF_ST_BIND(sym.st_info)

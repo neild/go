@@ -56,7 +56,7 @@ func writeHeapProto(w io.Writer, p []runtime.MemProfileRecord, rate int64) error
 		if values[0] > 0 {
 			blockSize = values[1] / values[0]
 		}
-		b.pbSample(values, locs, func() {
+		b.pbSample(values, locs, func {
 			if blockSize != 0 {
 				b.pbLabel(tagSample_Label, "bytes", "", blockSize)
 			}

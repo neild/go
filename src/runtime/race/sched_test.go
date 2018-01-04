@@ -23,7 +23,7 @@ func TestRandomScheduling(t *testing.T) {
 	for i := 0; i < N; i++ {
 		c := make(chan int, N)
 		for j := 0; j < N; j++ {
-			go func(j int) {
+			go func j {
 				c <- j
 			}(j)
 		}

@@ -76,7 +76,7 @@ func (p *parser) init(fset *token.FileSet, filename string, src []byte, mode Mod
 	if mode&ParseComments != 0 {
 		m = scanner.ScanComments
 	}
-	eh := func(pos token.Position, msg string) { p.errors.Add(pos, msg) }
+	eh := func pos, msg { p.errors.Add(pos, msg) }
 	p.scanner.Init(p.file, src, eh, m)
 
 	p.mode = mode
@@ -518,7 +518,7 @@ func syncDecl(p *parser) {
 // later on.
 //
 func (p *parser) safePos(pos token.Pos) (res token.Pos) {
-	defer func() {
+	defer func {
 		if recover() != nil {
 			res = token.Pos(p.file.Base() + p.file.Size()) // EOF position
 		}

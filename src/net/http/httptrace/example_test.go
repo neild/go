@@ -14,10 +14,10 @@ import (
 func Example() {
 	req, _ := http.NewRequest("GET", "http://example.com", nil)
 	trace := &httptrace.ClientTrace{
-		GotConn: func(connInfo httptrace.GotConnInfo) {
+		GotConn: func connInfo {
 			fmt.Printf("Got Conn: %+v\n", connInfo)
 		},
-		DNSDone: func(dnsInfo httptrace.DNSDoneInfo) {
+		DNSDone: func dnsInfo {
 			fmt.Printf("DNS Info: %+v\n", dnsInfo)
 		},
 	}

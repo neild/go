@@ -84,7 +84,7 @@ func (pkg *Package) check(fs *token.FileSet, astFiles []*ast.File) []error {
 		Importer: stdImporter,
 		// By providing a Config with our own error function, it will continue
 		// past the first error. We collect them all for printing later.
-		Error: func(e error) {
+		Error: func e {
 			allErrors = append(allErrors, e)
 		},
 

@@ -26,7 +26,7 @@ func TestGZIPFilesHaveZeroMTimes(t *testing.T) {
 		t.Fatal("error evaluating GOROOT: ", err)
 	}
 	var files []string
-	err = filepath.Walk(goroot, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(goroot, func path, info, err {
 		if err != nil {
 			return err
 		}

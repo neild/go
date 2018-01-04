@@ -21,7 +21,7 @@ func isTerminal(fd uintptr) bool {
 }
 
 func init() {
-	stdOutErrAreTerminals = func() bool {
+	stdOutErrAreTerminals = func {
 		return isTerminal(1) && isTerminal(2)
 	}
 }

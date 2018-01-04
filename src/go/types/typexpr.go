@@ -123,7 +123,7 @@ func (check *Checker) typExpr(e ast.Expr, def *Named, path []*TypeName) (T Type)
 	if trace {
 		check.trace(e.Pos(), "%s", e)
 		check.indent++
-		defer func() {
+		defer func {
 			check.indent--
 			check.trace(e.Pos(), "=> %s", T)
 		}()
@@ -302,7 +302,7 @@ func (check *Checker) typExprInternal(e ast.Expr, def *Named, path []*TypeName) 
 		//
 		// Delay this check because it requires fully setup types;
 		// it is safe to continue in any case (was issue 6667).
-		check.delay(func() {
+		check.delay(func {
 			if !Comparable(typ.key) {
 				check.errorf(e.Key.Pos(), "invalid map key type %s", typ.key)
 			}
@@ -631,7 +631,7 @@ func (check *Checker) structType(styp *Struct, e *ast.StructType, path []*TypeNa
 	// current field typ and tag
 	var typ Type
 	var tag string
-	add := func(ident *ast.Ident, anonymous bool, pos token.Pos) {
+	add := func ident, anonymous, pos {
 		if tag != "" && tags == nil {
 			tags = make([]string, len(fields))
 		}

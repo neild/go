@@ -64,7 +64,7 @@ func genFunction(size int) []bloc {
 	elemType := types.Types[types.TINT64]
 	ptrType := elemType.PtrTo()
 
-	valn := func(s string, m, n int) string { return fmt.Sprintf("%s%d-%d", s, m, n) }
+	valn := func s, m, n { return fmt.Sprintf("%s%d-%d", s, m, n) }
 	blocs = append(blocs,
 		Bloc("entry",
 			Valu(valn("store", 0, 4), OpInitMem, types.TypeMem, 0, nil),

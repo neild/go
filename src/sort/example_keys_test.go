@@ -63,16 +63,16 @@ var planets = []Planet{
 // ExampleSortKeys demonstrates a technique for sorting a struct type using programmable sort criteria.
 func Example_sortKeys() {
 	// Closures that order the Planet structure.
-	name := func(p1, p2 *Planet) bool {
+	name := func p1, p2 {
 		return p1.name < p2.name
 	}
-	mass := func(p1, p2 *Planet) bool {
+	mass := func p1, p2 {
 		return p1.mass < p2.mass
 	}
-	distance := func(p1, p2 *Planet) bool {
+	distance := func p1, p2 {
 		return p1.distance < p2.distance
 	}
-	decreasingDistance := func(p1, p2 *Planet) bool {
+	decreasingDistance := func p1, p2 {
 		return distance(p2, p1)
 	}
 

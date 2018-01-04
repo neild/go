@@ -55,7 +55,7 @@ type importer struct {
 // Import populates imp from the serialized package data read from in.
 func Import(imp *types.Pkg, in *bufio.Reader) {
 	inimport = true
-	defer func() { inimport = false }()
+	defer func { inimport = false }()
 
 	p := importer{
 		in:       in,

@@ -25,12 +25,12 @@ func TestChan(t *testing.T) {
 			// Ensure that receive from empty chan blocks.
 			c := make(chan int, chanCap)
 			recv1 := false
-			go func() {
+			go func {
 				_ = <-c
 				recv1 = true
 			}()
 			recv2 := false
-			go func() {
+			go func {
 				_, _ = <-c
 				recv2 = true
 			}()
@@ -60,7 +60,7 @@ func TestChan(t *testing.T) {
 				c <- i
 			}
 			sent := uint32(0)
-			go func() {
+			go func {
 				c <- 0
 				atomic.StoreUint32(&sent, 1)
 			}()
@@ -102,7 +102,7 @@ func TestChan(t *testing.T) {
 			// Ensure that close unblocks receive.
 			c := make(chan int, chanCap)
 			done := make(chan bool)
-			go func() {
+			go func {
 				v, ok := <-c
 				done <- v == 0 && ok == false
 			}()
@@ -117,7 +117,7 @@ func TestChan(t *testing.T) {
 			// Send 100 integers,
 			// ensure that we receive them non-corrupted in FIFO order.
 			c := make(chan int, chanCap)
-			go func() {
+			go func {
 				for i := 0; i < 100; i++ {
 					c <- i
 				}
@@ -130,7 +130,7 @@ func TestChan(t *testing.T) {
 			}
 
 			// Same, but using recv2.
-			go func() {
+			go func {
 				for i := 0; i < 100; i++ {
 					c <- i
 				}
@@ -150,7 +150,7 @@ func TestChan(t *testing.T) {
 			const P = 4
 			const L = 1000
 			for p := 0; p < P; p++ {
-				go func() {
+				go func {
 					for i := 0; i < L; i++ {
 						c <- i
 					}
@@ -158,7 +158,7 @@ func TestChan(t *testing.T) {
 			}
 			done := make(chan map[int]int)
 			for p := 0; p < P; p++ {
-				go func() {
+				go func {
 					recv := make(map[int]int)
 					for i := 0; i < L; i++ {
 						v := <-c
@@ -208,7 +208,7 @@ func TestNonblockRecvRace(t *testing.T) {
 	for i := 0; i < n; i++ {
 		c := make(chan int, 1)
 		c <- 1
-		go func() {
+		go func {
 			select {
 			case <-c:
 			default:
@@ -245,7 +245,7 @@ func TestNonblockSelectRace(t *testing.T) {
 		c1 := make(chan int, 1)
 		c2 := make(chan int, 1)
 		c1 <- 1
-		go func() {
+		go func {
 			select {
 			case <-c1:
 			case <-c2:
@@ -277,7 +277,7 @@ func TestNonblockSelectRace2(t *testing.T) {
 		c1 := make(chan int, 1)
 		c2 := make(chan int)
 		c1 <- 1
-		go func() {
+		go func {
 			select {
 			case <-c1:
 			case <-c2:
@@ -308,7 +308,7 @@ func TestSelfSelect(t *testing.T) {
 		c := make(chan int, chanCap)
 		for p := 0; p < 2; p++ {
 			p := p
-			go func() {
+			go func {
 				defer wg.Done()
 				for i := 0; i < 1000; i++ {
 					if p == 0 || i%2 == 0 {
@@ -358,20 +358,20 @@ func TestSelectStress(t *testing.T) {
 	wg.Add(10)
 	for k := 0; k < 4; k++ {
 		k := k
-		go func() {
+		go func {
 			for i := 0; i < N; i++ {
 				c[k] <- 0
 			}
 			wg.Done()
 		}()
-		go func() {
+		go func {
 			for i := 0; i < N; i++ {
 				<-c[k]
 			}
 			wg.Done()
 		}()
 	}
-	go func() {
+	go func {
 		var n [4]int
 		c1 := c
 		for i := 0; i < 4*N; i++ {
@@ -400,7 +400,7 @@ func TestSelectStress(t *testing.T) {
 		}
 		wg.Done()
 	}()
-	go func() {
+	go func {
 		var n [4]int
 		c1 := c
 		for i := 0; i < 4*N; i++ {
@@ -449,7 +449,7 @@ func TestSelectFairness(t *testing.T) {
 	done := make(chan byte)
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go func() {
+	go func {
 		defer wg.Done()
 		for {
 			var b byte
@@ -514,7 +514,7 @@ func TestPseudoRandomSend(t *testing.T) {
 		l := make([]int, n)
 		var m sync.Mutex
 		m.Lock()
-		go func() {
+		go func {
 			for i := 0; i < n; i++ {
 				runtime.Gosched()
 				l[i] = <-c
@@ -553,7 +553,7 @@ func TestMultiConsumer(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < nwork; i++ {
 		wg.Add(1)
-		go func(w int) {
+		go func w {
 			for v := range q {
 				// mess with the fifo-ish nature of range
 				if pn[w%len(pn)] == v {
@@ -567,7 +567,7 @@ func TestMultiConsumer(t *testing.T) {
 
 	// feeder & closer
 	expect := 0
-	go func() {
+	go func {
 		for i := 0; i < niter; i++ {
 			v := pn[i%len(pn)]
 			expect += v
@@ -600,7 +600,7 @@ func TestShrinkStackDuringBlockedSend(t *testing.T) {
 	c := make(chan int)
 	done := make(chan struct{})
 
-	go func() {
+	go func {
 		for i := 0; i < n; i++ {
 			c <- i
 			// use lots of stack, briefly.
@@ -631,7 +631,7 @@ func TestSelectDuplicateChannel(t *testing.T) {
 	e := make(chan int)
 
 	// goroutine A
-	go func() {
+	go func {
 		select {
 		case <-c:
 		case <-c:
@@ -642,7 +642,7 @@ func TestSelectDuplicateChannel(t *testing.T) {
 	time.Sleep(time.Millisecond) // make sure goroutine A gets queued first on c
 
 	// goroutine B
-	go func() {
+	go func {
 		<-c
 	}()
 	time.Sleep(time.Millisecond) // make sure goroutine B gets queued on c before continuing
@@ -662,7 +662,7 @@ func TestSelectStackAdjust(t *testing.T) {
 	ready1 := make(chan bool)
 	ready2 := make(chan bool)
 
-	f := func(ready chan bool, dup bool) {
+	f := func ready, dup {
 		// Temporarily grow the stack to 10K.
 		stackGrowthRecursive((10 << 10) / (128 * 8))
 
@@ -733,43 +733,43 @@ done:
 type struct0 struct{}
 
 func BenchmarkMakeChan(b *testing.B) {
-	b.Run("Byte", func(b *testing.B) {
+	b.Run("Byte", func b {
 		var x chan byte
 		for i := 0; i < b.N; i++ {
 			x = make(chan byte, 8)
 		}
 		close(x)
 	})
-	b.Run("Int", func(b *testing.B) {
+	b.Run("Int", func b {
 		var x chan int
 		for i := 0; i < b.N; i++ {
 			x = make(chan int, 8)
 		}
 		close(x)
 	})
-	b.Run("Ptr", func(b *testing.B) {
+	b.Run("Ptr", func b {
 		var x chan *byte
 		for i := 0; i < b.N; i++ {
 			x = make(chan *byte, 8)
 		}
 		close(x)
 	})
-	b.Run("Struct", func(b *testing.B) {
-		b.Run("0", func(b *testing.B) {
+	b.Run("Struct", func b {
+		b.Run("0", func b {
 			var x chan struct0
 			for i := 0; i < b.N; i++ {
 				x = make(chan struct0, 8)
 			}
 			close(x)
 		})
-		b.Run("32", func(b *testing.B) {
+		b.Run("32", func b {
 			var x chan struct32
 			for i := 0; i < b.N; i++ {
 				x = make(chan struct32, 8)
 			}
 			close(x)
 		})
-		b.Run("40", func(b *testing.B) {
+		b.Run("40", func b {
 			var x chan struct40
 			for i := 0; i < b.N; i++ {
 				x = make(chan struct40, 8)
@@ -781,7 +781,7 @@ func BenchmarkMakeChan(b *testing.B) {
 
 func BenchmarkChanNonblocking(b *testing.B) {
 	myc := make(chan int)
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			select {
 			case <-myc:
@@ -792,7 +792,7 @@ func BenchmarkChanNonblocking(b *testing.B) {
 }
 
 func BenchmarkSelectUncontended(b *testing.B) {
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		myc1 := make(chan int, 1)
 		myc2 := make(chan int, 1)
 		myc1 <- 0
@@ -812,8 +812,8 @@ func BenchmarkSelectSyncContended(b *testing.B) {
 	myc2 := make(chan int)
 	myc3 := make(chan int)
 	done := make(chan int)
-	b.RunParallel(func(pb *testing.PB) {
-		go func() {
+	b.RunParallel(func pb {
+		go func {
 			for {
 				select {
 				case myc1 <- 0:
@@ -839,7 +839,7 @@ func BenchmarkSelectAsyncContended(b *testing.B) {
 	procs := runtime.GOMAXPROCS(0)
 	myc1 := make(chan int, procs)
 	myc2 := make(chan int, procs)
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		myc1 <- 0
 		for pb.Next() {
 			select {
@@ -857,7 +857,7 @@ func BenchmarkSelectNonblock(b *testing.B) {
 	myc2 := make(chan int)
 	myc3 := make(chan int, 1)
 	myc4 := make(chan int, 1)
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			select {
 			case <-myc1:
@@ -881,7 +881,7 @@ func BenchmarkSelectNonblock(b *testing.B) {
 
 func BenchmarkChanUncontended(b *testing.B) {
 	const C = 100
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		myc := make(chan int, C)
 		for pb.Next() {
 			for i := 0; i < C; i++ {
@@ -897,7 +897,7 @@ func BenchmarkChanUncontended(b *testing.B) {
 func BenchmarkChanContended(b *testing.B) {
 	const C = 100
 	myc := make(chan int, C*runtime.GOMAXPROCS(0))
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			for i := 0; i < C; i++ {
 				myc <- 0
@@ -916,7 +916,7 @@ func benchmarkChanSync(b *testing.B, work int) {
 	c := make(chan bool, procs)
 	myc := make(chan int)
 	for p := 0; p < procs; p++ {
-		go func() {
+		go func {
 			for {
 				i := atomic.AddInt32(&N, -1)
 				if i < 0 {
@@ -959,7 +959,7 @@ func benchmarkChanProdCons(b *testing.B, chanSize, localWork int) {
 	c := make(chan bool, 2*procs)
 	myc := make(chan int, chanSize)
 	for p := 0; p < procs; p++ {
-		go func() {
+		go func {
 			foo := 0
 			for atomic.AddInt32(&N, -1) >= 0 {
 				for g := 0; g < CallsPerSched; g++ {
@@ -973,7 +973,7 @@ func benchmarkChanProdCons(b *testing.B, chanSize, localWork int) {
 			myc <- 0
 			c <- foo == 42
 		}()
-		go func() {
+		go func {
 			foo := 0
 			for {
 				v := <-myc
@@ -1026,7 +1026,7 @@ func BenchmarkSelectProdCons(b *testing.B) {
 	myc := make(chan int, 128)
 	myclose := make(chan bool)
 	for p := 0; p < procs; p++ {
-		go func() {
+		go func {
 			// Producer: sends to myc.
 			foo := 0
 			// Intended to not fire during benchmarking.
@@ -1048,7 +1048,7 @@ func BenchmarkSelectProdCons(b *testing.B) {
 			myc <- 0
 			c <- foo == 42
 		}()
-		go func() {
+		go func {
 			// Consumer: receives from myc.
 			foo := 0
 			// Intended to not fire during benchmarking.
@@ -1079,7 +1079,7 @@ func BenchmarkSelectProdCons(b *testing.B) {
 }
 
 func BenchmarkChanCreation(b *testing.B) {
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			myc := make(chan int, 1)
 			myc <- 0
@@ -1091,7 +1091,7 @@ func BenchmarkChanCreation(b *testing.B) {
 func BenchmarkChanSem(b *testing.B) {
 	type Empty struct{}
 	myc := make(chan Empty, runtime.GOMAXPROCS(0))
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			myc <- Empty{}
 			<-myc
@@ -1108,7 +1108,7 @@ func BenchmarkChanPopular(b *testing.B) {
 	for j := 0; j < n; j++ {
 		d := make(chan bool)
 		a = append(a, d)
-		go func() {
+		go func {
 			for i := 0; i < b.N; i++ {
 				select {
 				case <-c:

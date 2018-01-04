@@ -129,7 +129,7 @@ func main() {
 
 	for _, cmd := range base.Commands {
 		if cmd.Name() == args[0] && cmd.Runnable() {
-			cmd.Flag.Usage = func() { cmd.Usage() }
+			cmd.Flag.Usage = func { cmd.Usage() }
 			if cmd.CustomFlags {
 				args = args[1:]
 			} else {

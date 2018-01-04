@@ -725,7 +725,7 @@ func callers(skip int, pcbuf []uintptr) int {
 	pc := getcallerpc()
 	gp := getg()
 	var n int
-	systemstack(func() {
+	systemstack(func {
 		n = gentraceback(pc, sp, 0, gp, skip, &pcbuf[0], len(pcbuf), nil, nil, 0)
 	})
 	return n

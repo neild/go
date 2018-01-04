@@ -11,7 +11,7 @@ import (
 
 func TestRectangle(t *testing.T) {
 	// in checks that every point in f is in g.
-	in := func(f, g Rectangle) error {
+	in := func f, g {
 		if !f.In(g) {
 			return fmt.Errorf("f=%s, f.In(%s): got false, want true", f, g)
 		}

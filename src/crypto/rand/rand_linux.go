@@ -24,7 +24,7 @@ const maxGetRandomRead = (1 << 25) - 1
 // batched returns a function that calls f to populate a []byte by chunking it
 // into subslices of, at most, readMax bytes.
 func batched(f func([]byte) bool, readMax int) func([]byte) bool {
-	return func(buf []byte) bool {
+	return func buf {
 		for len(buf) > readMax {
 			if !f(buf[:readMax]) {
 				return false

@@ -95,7 +95,7 @@ var escapeString string
 func BenchmarkSliceByteToString(b *testing.B) {
 	buf := []byte{'!'}
 	for n := 0; n < 8; n++ {
-		b.Run(strconv.Itoa(len(buf)), func(b *testing.B) {
+		b.Run(strconv.Itoa(len(buf)), func b {
 			for i := 0; i < b.N; i++ {
 				escapeString = string(buf)
 			}
@@ -111,9 +111,9 @@ var stringdata = []struct{ name, data string }{
 }
 
 func BenchmarkRuneIterate(b *testing.B) {
-	b.Run("range", func(b *testing.B) {
+	b.Run("range", func b {
 		for _, sd := range stringdata {
-			b.Run(sd.name, func(b *testing.B) {
+			b.Run(sd.name, func b {
 				for i := 0; i < b.N; i++ {
 					for range sd.data {
 					}
@@ -121,9 +121,9 @@ func BenchmarkRuneIterate(b *testing.B) {
 			})
 		}
 	})
-	b.Run("range1", func(b *testing.B) {
+	b.Run("range1", func b {
 		for _, sd := range stringdata {
-			b.Run(sd.name, func(b *testing.B) {
+			b.Run(sd.name, func b {
 				for i := 0; i < b.N; i++ {
 					for _ = range sd.data {
 					}
@@ -131,9 +131,9 @@ func BenchmarkRuneIterate(b *testing.B) {
 			})
 		}
 	})
-	b.Run("range2", func(b *testing.B) {
+	b.Run("range2", func b {
 		for _, sd := range stringdata {
-			b.Run(sd.name, func(b *testing.B) {
+			b.Run(sd.name, func b {
 				for i := 0; i < b.N; i++ {
 					for _, _ = range sd.data {
 					}
@@ -188,7 +188,7 @@ func TestLargeStringConcat(t *testing.T) {
 func TestCompareTempString(t *testing.T) {
 	s := strings.Repeat("x", sizeNoStack)
 	b := []byte(s)
-	n := testing.AllocsPerRun(1000, func() {
+	n := testing.AllocsPerRun(1000, func {
 		if string(b) != s {
 			t.Fatalf("strings are not equal: '%v' and '%v'", string(b), s)
 		}
@@ -236,7 +236,7 @@ func TestIntString(t *testing.T) {
 
 func TestIntStringAllocs(t *testing.T) {
 	unknown := '0'
-	n := testing.AllocsPerRun(1000, func() {
+	n := testing.AllocsPerRun(1000, func {
 		s1 := string(unknown)
 		s2 := string(unknown + 1)
 		if s1 == s2 {
@@ -250,7 +250,7 @@ func TestIntStringAllocs(t *testing.T) {
 
 func TestRangeStringCast(t *testing.T) {
 	s := strings.Repeat("x", sizeNoStack)
-	n := testing.AllocsPerRun(1000, func() {
+	n := testing.AllocsPerRun(1000, func {
 		for i, c := range []byte(s) {
 			if c != s[i] {
 				t.Fatalf("want '%c' at pos %v, got '%c'", s[i], i, c)

@@ -47,7 +47,7 @@ func (check *Checker) objDecl(obj Object, def *Named, path []*TypeName) {
 	if trace {
 		check.trace(obj.Pos(), "-- declaring %s", obj.Name())
 		check.indent++
-		defer func() {
+		defer func {
 			check.indent--
 			check.trace(obj.Pos(), "=> %s", obj)
 		}()
@@ -60,7 +60,7 @@ func (check *Checker) objDecl(obj Object, def *Named, path []*TypeName) {
 	}
 
 	// save/restore current context and setup object context
-	defer func(ctxt context) {
+	defer func ctxt {
 		check.context = ctxt
 	}(check.context)
 	check.context = context{
@@ -102,7 +102,7 @@ func (check *Checker) constDecl(obj *Const, typ, init ast.Expr) {
 	// use the correct value of iota
 	assert(check.iota == nil)
 	check.iota = obj.val
-	defer func() { check.iota = nil }()
+	defer func { check.iota = nil }()
 
 	// provide valid constant value under all circumstances
 	obj.val = constant.MakeUnknown()

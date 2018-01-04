@@ -109,7 +109,7 @@ func TestGrowth(t *testing.T) {
 func TestVerifyPanic(t *testing.T) {
 	os.Setenv("GODEBUG", "gocacheverify=1")
 	initEnv()
-	defer func() {
+	defer func {
 		os.Unsetenv("GODEBUG")
 		verify = false
 	}()
@@ -134,7 +134,7 @@ func TestVerifyPanic(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer func() {
+	defer func {
 		if err := recover(); err != nil {
 			t.Log(err)
 			return
@@ -155,7 +155,7 @@ func TestCacheLog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open: %v", err)
 	}
-	c.now = func() time.Time { return time.Unix(1e9, 0) }
+	c.now = func { return time.Unix(1e9, 0) }
 
 	id := ActionID(dummyID(1))
 	c.Get(id)
@@ -166,7 +166,7 @@ func TestCacheLog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Open #2: %v", err)
 	}
-	c.now = func() time.Time { return time.Unix(1e9+1, 0) }
+	c.now = func { return time.Unix(1e9+1, 0) }
 	c.Get(id)
 
 	id2 := ActionID(dummyID(2))
@@ -212,9 +212,9 @@ func TestCacheTrim(t *testing.T) {
 	}
 	const start = 1000000000
 	now := int64(start)
-	c.now = func() time.Time { return time.Unix(now, 0) }
+	c.now = func { return time.Unix(now, 0) }
 
-	checkTime := func(name string, mtime int64) {
+	checkTime := func name, mtime {
 		t.Helper()
 		file := filepath.Join(c.dir, name[:2], name)
 		info, err := os.Stat(file)

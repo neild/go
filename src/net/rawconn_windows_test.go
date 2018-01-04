@@ -22,7 +22,7 @@ func TestRawConn(t *testing.T) {
 	}
 
 	var operr error
-	fn := func(s uintptr) {
+	fn := func s {
 		operr = syscall.SetsockoptInt(syscall.Handle(s), syscall.SOL_SOCKET, syscall.SO_REUSEADDR, 1)
 	}
 	err = cc.Control(fn)
@@ -49,7 +49,7 @@ func TestRawConnListener(t *testing.T) {
 	}
 
 	called := false
-	op := func(uintptr) bool {
+	op := func {
 		called = true
 		return true
 	}
@@ -72,7 +72,7 @@ func TestRawConnListener(t *testing.T) {
 	}
 
 	var operr error
-	fn := func(s uintptr) {
+	fn := func s {
 		var v, l int32
 		l = int32(unsafe.Sizeof(v))
 		operr = syscall.Getsockopt(syscall.Handle(s), syscall.SOL_SOCKET, syscall.SO_REUSEADDR, (*byte)(unsafe.Pointer(&v)), &l)

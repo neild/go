@@ -83,7 +83,7 @@ func TestServerContentType_h2(t *testing.T) { testServerContentType(t, h2Mode) }
 func testServerContentType(t *testing.T, h2 bool) {
 	setParallel(t)
 	defer afterTest(t)
-	cst := newClientServerTest(t, h2, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, h2, HandlerFunc(func w, r {
 		i, _ := strconv.Atoi(r.FormValue("i"))
 		tt := sniffTests[i]
 		n, err := w.Write(tt.data)
@@ -127,7 +127,7 @@ func TestServerIssue5953_h1(t *testing.T) { testServerIssue5953(t, h1Mode) }
 func TestServerIssue5953_h2(t *testing.T) { testServerIssue5953(t, h2Mode) }
 func testServerIssue5953(t *testing.T, h2 bool) {
 	defer afterTest(t)
-	cst := newClientServerTest(t, h2, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, h2, HandlerFunc(func w, r {
 		w.Header()["Content-Type"] = []string{""}
 		fmt.Fprintf(w, "<html><head></head><body>hi</body></html>")
 	}))
@@ -156,7 +156,7 @@ func testContentTypeWithCopy(t *testing.T, h2 bool) {
 		expected = "text/html; charset=utf-8"
 	)
 
-	cst := newClientServerTest(t, h2, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, h2, HandlerFunc(func w, r {
 		// Use io.Copy from a bytes.Buffer to trigger ReadFrom.
 		buf := bytes.NewBuffer([]byte(input))
 		n, err := io.Copy(w, buf)
@@ -187,7 +187,7 @@ func TestSniffWriteSize_h2(t *testing.T) { testSniffWriteSize(t, h2Mode) }
 func testSniffWriteSize(t *testing.T, h2 bool) {
 	setParallel(t)
 	defer afterTest(t)
-	cst := newClientServerTest(t, h2, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, h2, HandlerFunc(func w, r {
 		size, _ := strconv.Atoi(r.FormValue("size"))
 		written, err := io.WriteString(w, strings.Repeat("a", size))
 		if err != nil {

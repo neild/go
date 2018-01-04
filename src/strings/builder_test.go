@@ -89,7 +89,7 @@ func TestBuilderGrow(t *testing.T) {
 		var b Builder
 		b.Grow(growLen)
 		p := bytes.Repeat([]byte{'a'}, growLen)
-		allocs := numAllocs(func() { b.Write(p) })
+		allocs := numAllocs(func { b.Write(p) })
 		if allocs > 0 {
 			t.Errorf("growLen=%d: allocation occurred during write", growLen)
 		}
@@ -109,30 +109,30 @@ func TestBuilderWrite2(t *testing.T) {
 	}{
 		{
 			"Write",
-			func(b *Builder) (int, error) { return b.Write([]byte(s0)) },
+			func b { return b.Write([]byte(s0)) },
 			len(s0),
 			s0,
 		},
 		{
 			"WriteRune",
-			func(b *Builder) (int, error) { return b.WriteRune('a') },
+			func b { return b.WriteRune('a') },
 			1,
 			"a",
 		},
 		{
 			"WriteRuneWide",
-			func(b *Builder) (int, error) { return b.WriteRune('世') },
+			func b { return b.WriteRune('世') },
 			3,
 			"世",
 		},
 		{
 			"WriteString",
-			func(b *Builder) (int, error) { return b.WriteString(s0) },
+			func b { return b.WriteString(s0) },
 			len(s0),
 			s0,
 		},
 	} {
-		t.Run(tt.name, func(t *testing.T) {
+		t.Run(tt.name, func t {
 			var b Builder
 			n, err := tt.fn(&b)
 			if err != nil {
@@ -170,7 +170,7 @@ func TestBuilderAllocs(t *testing.T) {
 	var b Builder
 	b.Grow(5)
 	var s string
-	allocs := numAllocs(func() {
+	allocs := numAllocs(func {
 		b.WriteString("hello")
 		s = b.String()
 	})
@@ -200,7 +200,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "String",
 			wantPanic: false,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.WriteByte('x')
 				b := a
@@ -210,7 +210,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "Len",
 			wantPanic: false,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.WriteByte('x')
 				b := a
@@ -220,7 +220,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "Reset",
 			wantPanic: false,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.WriteByte('x')
 				b := a
@@ -231,7 +231,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "Write",
 			wantPanic: true,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.Write([]byte("x"))
 				b := a
@@ -241,7 +241,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "WriteByte",
 			wantPanic: true,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.WriteByte('x')
 				b := a
@@ -251,7 +251,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "WriteString",
 			wantPanic: true,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.WriteString("x")
 				b := a
@@ -261,7 +261,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "WriteRune",
 			wantPanic: true,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.WriteRune('x')
 				b := a
@@ -271,7 +271,7 @@ func TestBuilderCopyPanic(t *testing.T) {
 		{
 			name:      "Grow",
 			wantPanic: true,
-			fn: func() {
+			fn: func {
 				var a Builder
 				a.Grow(1)
 				b := a
@@ -281,8 +281,8 @@ func TestBuilderCopyPanic(t *testing.T) {
 	}
 	for _, tt := range tests {
 		didPanic := make(chan bool)
-		go func() {
-			defer func() { didPanic <- recover() != nil }()
+		go func {
+			defer func { didPanic <- recover() != nil }()
 			tt.fn()
 		}()
 		if got := <-didPanic; got != tt.wantPanic {

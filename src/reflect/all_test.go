@@ -388,7 +388,7 @@ func TestCanSetField(t *testing.T) {
 	}}
 
 	for _, tt := range tests {
-		t.Run(tt.val.Type().Name(), func(t *testing.T) {
+		t.Run(tt.val.Type().Name(), func t {
 			for _, tc := range tt.cases {
 				f := tt.val
 				for _, i := range tc.index {
@@ -562,7 +562,7 @@ func TestInterfaceValue(t *testing.T) {
 }
 
 func TestFunctionValue(t *testing.T) {
-	var x interface{} = func() {}
+	var x interface{} = func {}
 	v := ValueOf(x)
 	if fmt.Sprint(v.Interface()) != fmt.Sprint(x) {
 		t.Fatalf("TestFunction returned wrong pointer")
@@ -669,7 +669,7 @@ func TestCopy(t *testing.T) {
 }
 
 func TestCopyString(t *testing.T) {
-	t.Run("Slice", func(t *testing.T) {
+	t.Run("Slice", func t {
 		s := bytes.Repeat([]byte{'_'}, 8)
 		val := ValueOf(s)
 
@@ -688,7 +688,7 @@ func TestCopyString(t *testing.T) {
 			t.Errorf("got n = %d, s = %s, expecting n = 8, s = %s", n, s, expecting)
 		}
 	})
-	t.Run("Array", func(t *testing.T) {
+	t.Run("Array", func t {
 		s := [...]byte{'_', '_', '_', '_', '_', '_', '_', '_'}
 		val := ValueOf(&s).Elem()
 
@@ -768,9 +768,9 @@ type DeepEqualTest struct {
 
 // Simple functions for DeepEqual tests.
 var (
-	fn1 func()             // nil.
-	fn2 func()             // nil.
-	fn3 = func() { fn1() } // Not nil.
+	fn1 func()           // nil.
+	fn2 func()           // nil.
+	fn3 = func { fn1() } // Not nil.
 )
 
 type self struct{}
@@ -1268,7 +1268,7 @@ type caseInfo struct {
 var allselect = flag.Bool("allselect", false, "exhaustive select test")
 
 func TestSelect(t *testing.T) {
-	selectWatch.once.Do(func() { go selectWatcher() })
+	selectWatch.once.Do(func { go selectWatcher() })
 
 	var x exhaustive
 	nch := 0
@@ -1331,7 +1331,7 @@ func TestSelect(t *testing.T) {
 			})
 			// Let it execute?
 			if x.Maybe() {
-				f := func() { ch.Recv() }
+				f := func { ch.Recv() }
 				info = append(info, caseInfo{desc: "blocking send", helper: f})
 			} else {
 				info = append(info, caseInfo{desc: "blocking send"})
@@ -1347,7 +1347,7 @@ func TestSelect(t *testing.T) {
 			})
 			// Let it execute?
 			if x.Maybe() {
-				f := func() { ch.Send(val) }
+				f := func { ch.Send(val) }
 				info = append(info, caseInfo{desc: "blocking recv", recv: val, helper: f})
 			} else {
 				info = append(info, caseInfo{desc: "blocking recv"})
@@ -1552,7 +1552,7 @@ func selectWatcher() {
 // It returns the values returned by Select but also returns
 // a panic value if the Select panics.
 func runSelect(cases []SelectCase, info []caseInfo) (chosen int, recv Value, recvOK bool, panicErr interface{}) {
-	defer func() {
+	defer func {
 		panicErr = recover()
 
 		selectWatch.Lock()
@@ -1633,7 +1633,7 @@ func TestFunc(t *testing.T) {
 
 func TestCallConvert(t *testing.T) {
 	v := ValueOf(new(io.ReadWriter)).Elem()
-	f := ValueOf(func(r io.Reader) io.Reader { return r })
+	f := ValueOf(func r { return r })
 	out := f.Call([]Value{v})
 	if len(out) != 1 || out[0].Type() != TypeOf(new(io.Reader)).Elem() || !out[0].IsNil() {
 		t.Errorf("expected [nil], got %v", out)
@@ -1685,9 +1685,9 @@ func TestCallReturnsEmpty(t *testing.T) {
 	// nonzero-sized frame and zero-sized return value.
 	runtime.GC()
 	var finalized uint32
-	f := func() (emptyStruct, *int) {
+	f := func {
 		i := new(int)
-		runtime.SetFinalizer(i, func(*int) { atomic.StoreUint32(&finalized, 1) })
+		runtime.SetFinalizer(i, func { atomic.StoreUint32(&finalized, 1) })
 		return emptyStruct{}, i
 	}
 	v := ValueOf(f).Call(nil)[0] // out[0] should not alias out[1]'s memory, so the finalizer should run.
@@ -1705,9 +1705,9 @@ func TestCallReturnsEmpty(t *testing.T) {
 }
 
 func BenchmarkCall(b *testing.B) {
-	fv := ValueOf(func(a, b string) {})
+	fv := ValueOf(func a, b {})
 	b.ReportAllocs()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		args := []Value{ValueOf("a"), ValueOf("b")}
 		for pb.Next() {
 			fv.Call(args)
@@ -1716,25 +1716,25 @@ func BenchmarkCall(b *testing.B) {
 }
 
 func BenchmarkCallArgCopy(b *testing.B) {
-	byteArray := func(n int) Value {
+	byteArray := func n {
 		return Zero(ArrayOf(n, TypeOf(byte(0))))
 	}
 	sizes := [...]struct {
 		fv  Value
 		arg Value
 	}{
-		{ValueOf(func(a [128]byte) {}), byteArray(128)},
-		{ValueOf(func(a [256]byte) {}), byteArray(256)},
-		{ValueOf(func(a [1024]byte) {}), byteArray(1024)},
-		{ValueOf(func(a [4096]byte) {}), byteArray(4096)},
-		{ValueOf(func(a [65536]byte) {}), byteArray(65536)},
+		{ValueOf(func a {}), byteArray(128)},
+		{ValueOf(func a {}), byteArray(256)},
+		{ValueOf(func a {}), byteArray(1024)},
+		{ValueOf(func a {}), byteArray(4096)},
+		{ValueOf(func a {}), byteArray(65536)},
 	}
 	for _, size := range sizes {
-		bench := func(b *testing.B) {
+		bench := func b {
 			args := []Value{size.arg}
 			b.SetBytes(int64(size.arg.Len()))
 			b.ResetTimer()
-			b.RunParallel(func(pb *testing.PB) {
+			b.RunParallel(func pb {
 				for pb.Next() {
 					size.fv.Call(args)
 				}
@@ -1747,7 +1747,7 @@ func BenchmarkCallArgCopy(b *testing.B) {
 
 func TestMakeFunc(t *testing.T) {
 	f := dummy
-	fv := MakeFunc(TypeOf(f), func(in []Value) []Value { return in })
+	fv := MakeFunc(TypeOf(f), func in { return in })
 	ValueOf(&f).Elem().Set(fv)
 
 	// Call g with small arguments so that there is
@@ -1764,8 +1764,8 @@ func TestMakeFunc(t *testing.T) {
 }
 
 func TestMakeFuncInterface(t *testing.T) {
-	fn := func(i int) int { return i }
-	incr := func(in []Value) []Value {
+	fn := func i { return i }
+	incr := func in {
 		return []Value{ValueOf(int(in[0].Int() + 1))}
 	}
 	fv := MakeFunc(TypeOf(fn), incr)
@@ -1783,8 +1783,8 @@ func TestMakeFuncInterface(t *testing.T) {
 
 func TestMakeFuncVariadic(t *testing.T) {
 	// Test that variadic arguments are packed into a slice and passed as last arg
-	fn := func(_ int, is ...int) []int { return nil }
-	fv := MakeFunc(TypeOf(fn), func(in []Value) []Value { return in[1:2] })
+	fn := func _, is { return nil }
+	fv := MakeFunc(TypeOf(fn), func in { return in[1:2] })
 	ValueOf(&fn).Elem().Set(fv)
 
 	r := fn(1, 2, 3)
@@ -2156,14 +2156,14 @@ type Tm4 struct {
 func (t4 Tm4) M(x int, b byte) (byte, int) { return b, x + 40 }
 
 func TestMethod5(t *testing.T) {
-	CheckF := func(name string, f func(int, byte) (byte, int), inc int) {
+	CheckF := func name, f, inc {
 		b, x := f(1000, 99)
 		if b != 99 || x != 1000+inc {
 			t.Errorf("%s(1000, 99) = %v, %v, want 99, %v", name, b, x, 1000+inc)
 		}
 	}
 
-	CheckV := func(name string, i Value, inc int) {
+	CheckV := func name, i, inc {
 		bx := i.Method(0).Call([]Value{ValueOf(1000), ValueOf(byte(99))})
 		b := bx[0].Interface()
 		x := bx[1].Interface()
@@ -2176,7 +2176,7 @@ func TestMethod5(t *testing.T) {
 
 	var TinterType = TypeOf(new(Tinter)).Elem()
 
-	CheckI := func(name string, i interface{}, inc int) {
+	CheckI := func name, i, inc {
 		v := ValueOf(i)
 		CheckV(name, v, inc)
 		CheckV("(i="+name+")", v.Convert(TinterType), inc)
@@ -2218,7 +2218,7 @@ func TestMethod5(t *testing.T) {
 
 	var tnil Tinter
 	vnil := ValueOf(&tnil).Elem()
-	shouldPanic(func() { vnil.Method(0) })
+	shouldPanic(func { vnil.Method(0) })
 }
 
 func TestInterfaceSet(t *testing.T) {
@@ -2530,7 +2530,7 @@ func TestFieldPkgPath(t *testing.T) {
 		anonymous bool
 	}
 
-	checkPkgPath := func(name string, s []pkgpathTest) {
+	checkPkgPath := func name, s {
 		for _, test := range s {
 			f := typ.FieldByIndex(test.index)
 			if got, want := f.PkgPath, test.pkgPath; got != want {
@@ -2736,7 +2736,7 @@ func BenchmarkPtrTo(b *testing.B) {
 
 	// Now benchmark calling PtrTo on it: we'll have to hit the ptrMap cache on
 	// every call.
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			PtrTo(t)
 		}
@@ -2813,7 +2813,7 @@ func noAlloc(t *testing.T, n int, f func(int)) {
 		t.Skip("skipping; GOMAXPROCS>1")
 	}
 	i := -1
-	allocs := testing.AllocsPerRun(n, func() {
+	allocs := testing.AllocsPerRun(n, func {
 		f(i)
 		i++
 	})
@@ -2823,7 +2823,7 @@ func noAlloc(t *testing.T, n int, f func(int)) {
 }
 
 func TestAllocations(t *testing.T) {
-	noAlloc(t, 100, func(j int) {
+	noAlloc(t, 100, func j {
 		var i interface{}
 		var v Value
 
@@ -2837,7 +2837,7 @@ func TestAllocations(t *testing.T) {
 		// 	panic("wrong int")
 		// }
 
-		i = func(j int) int { return j }
+		i = func j { return j }
 		v = ValueOf(i)
 		if v.Interface().(func(int) int)(j) != j {
 			panic("wrong result")
@@ -2923,9 +2923,9 @@ func TestSlice3(t *testing.T) {
 		t.Errorf("xs.Slice3(3, 5, 7)[0:4] = %v", v[0:4])
 	}
 	rv := ValueOf(&xs).Elem()
-	shouldPanic(func() { rv.Slice3(1, 2, 1) })
-	shouldPanic(func() { rv.Slice3(1, 1, 11) })
-	shouldPanic(func() { rv.Slice3(2, 2, 1) })
+	shouldPanic(func { rv.Slice3(1, 2, 1) })
+	shouldPanic(func { rv.Slice3(1, 1, 11) })
+	shouldPanic(func { rv.Slice3(2, 2, 1) })
 
 	xa := [8]int{10, 20, 30, 40, 50, 60, 70, 80}
 	v = ValueOf(&xa).Elem().Slice3(2, 5, 6).Interface().([]int)
@@ -2939,13 +2939,13 @@ func TestSlice3(t *testing.T) {
 		t.Errorf("xs.Slice(2, 5, 6)[0:4] = %v", v[0:4])
 	}
 	rv = ValueOf(&xa).Elem()
-	shouldPanic(func() { rv.Slice3(1, 2, 1) })
-	shouldPanic(func() { rv.Slice3(1, 1, 11) })
-	shouldPanic(func() { rv.Slice3(2, 2, 1) })
+	shouldPanic(func { rv.Slice3(1, 2, 1) })
+	shouldPanic(func { rv.Slice3(1, 1, 11) })
+	shouldPanic(func { rv.Slice3(2, 2, 1) })
 
 	s := "hello world"
 	rv = ValueOf(&s).Elem()
-	shouldPanic(func() { rv.Slice3(1, 2, 3) })
+	shouldPanic(func { rv.Slice3(1, 2, 3) })
 
 	rv = ValueOf(&xs).Elem()
 	rv = rv.Slice3(3, 5, 7)
@@ -2962,11 +2962,11 @@ func TestSetLenCap(t *testing.T) {
 	xa := [8]int{10, 20, 30, 40, 50, 60, 70, 80}
 
 	vs := ValueOf(&xs).Elem()
-	shouldPanic(func() { vs.SetLen(10) })
-	shouldPanic(func() { vs.SetCap(10) })
-	shouldPanic(func() { vs.SetLen(-1) })
-	shouldPanic(func() { vs.SetCap(-1) })
-	shouldPanic(func() { vs.SetCap(6) }) // smaller than len
+	shouldPanic(func { vs.SetLen(10) })
+	shouldPanic(func { vs.SetCap(10) })
+	shouldPanic(func { vs.SetLen(-1) })
+	shouldPanic(func { vs.SetCap(-1) })
+	shouldPanic(func { vs.SetCap(6) }) // smaller than len
 	vs.SetLen(5)
 	if len(xs) != 5 || cap(xs) != 8 {
 		t.Errorf("after SetLen(5), len, cap = %d, %d, want 5, 8", len(xs), cap(xs))
@@ -2979,12 +2979,12 @@ func TestSetLenCap(t *testing.T) {
 	if len(xs) != 5 || cap(xs) != 5 {
 		t.Errorf("after SetCap(5), len, cap = %d, %d, want 5, 5", len(xs), cap(xs))
 	}
-	shouldPanic(func() { vs.SetCap(4) }) // smaller than len
-	shouldPanic(func() { vs.SetLen(6) }) // bigger than cap
+	shouldPanic(func { vs.SetCap(4) }) // smaller than len
+	shouldPanic(func { vs.SetLen(6) }) // bigger than cap
 
 	va := ValueOf(&xa).Elem()
-	shouldPanic(func() { va.SetLen(8) })
-	shouldPanic(func() { va.SetCap(8) })
+	shouldPanic(func { va.SetLen(8) })
+	shouldPanic(func { va.SetCap(8) })
 }
 
 func TestVariadic(t *testing.T) {
@@ -3005,8 +3005,8 @@ func TestVariadic(t *testing.T) {
 }
 
 func TestFuncArg(t *testing.T) {
-	f1 := func(i int, f func(int) int) int { return f(i) }
-	f2 := func(i int) int { return i + 1 }
+	f1 := func i, f { return f(i) }
+	f2 := func i { return i + 1 }
 	r := ValueOf(f1).Call([]Value{ValueOf(100), ValueOf(f2)})
 	if r[0].Int() != 101 {
 		t.Errorf("function returned %d, want 101", r[0].Int())
@@ -3024,7 +3024,7 @@ func TestStructArg(t *testing.T) {
 		wantA = padded{"3", 4}
 		wantB = uint32(5)
 	)
-	f := func(a padded, b uint32) {
+	f := func a, b {
 		gotA, gotB = a, b
 	}
 	ValueOf(f).Call([]Value{ValueOf(wantA), ValueOf(wantB)})
@@ -3142,17 +3142,17 @@ func TestUnexported(t *testing.T) {
 	isValid(v.Elem().Field(1))
 	isValid(v.Elem().FieldByName("x"))
 	isValid(v.Elem().FieldByName("y"))
-	shouldPanic(func() { v.Elem().Field(0).Interface() })
-	shouldPanic(func() { v.Elem().Field(1).Interface() })
-	shouldPanic(func() { v.Elem().FieldByName("x").Interface() })
-	shouldPanic(func() { v.Elem().FieldByName("y").Interface() })
-	shouldPanic(func() { v.Type().Method(0) })
+	shouldPanic(func { v.Elem().Field(0).Interface() })
+	shouldPanic(func { v.Elem().Field(1).Interface() })
+	shouldPanic(func { v.Elem().FieldByName("x").Interface() })
+	shouldPanic(func { v.Elem().FieldByName("y").Interface() })
+	shouldPanic(func { v.Type().Method(0) })
 }
 
 func TestSetPanic(t *testing.T) {
-	ok := func(f func()) { f() }
+	ok := func f { f() }
 	bad := shouldPanic
-	clear := func(v Value) { v.Set(Zero(v.Type())) }
+	clear := func v { v.Set(Zero(v.Type())) }
 
 	type t0 struct {
 		W int
@@ -3180,59 +3180,59 @@ func TestSetPanic(t *testing.T) {
 
 	// not addressable
 	v := ValueOf(T{})
-	bad(func() { clear(v.Field(0)) })                   // .X
-	bad(func() { clear(v.Field(1)) })                   // .t1
-	bad(func() { clear(v.Field(1).Field(0)) })          // .t1.Y
-	bad(func() { clear(v.Field(1).Field(1)) })          // .t1.t0
-	bad(func() { clear(v.Field(1).Field(1).Field(0)) }) // .t1.t0.W
-	bad(func() { clear(v.Field(2)) })                   // .T2
-	bad(func() { clear(v.Field(2).Field(0)) })          // .T2.Z
-	bad(func() { clear(v.Field(2).Field(1)) })          // .T2.namedT0
-	bad(func() { clear(v.Field(2).Field(1).Field(0)) }) // .T2.namedT0.W
-	bad(func() { clear(v.Field(3)) })                   // .NamedT1
-	bad(func() { clear(v.Field(3).Field(0)) })          // .NamedT1.Y
-	bad(func() { clear(v.Field(3).Field(1)) })          // .NamedT1.t0
-	bad(func() { clear(v.Field(3).Field(1).Field(0)) }) // .NamedT1.t0.W
-	bad(func() { clear(v.Field(4)) })                   // .NamedT2
-	bad(func() { clear(v.Field(4).Field(0)) })          // .NamedT2.Z
-	bad(func() { clear(v.Field(4).Field(1)) })          // .NamedT2.namedT0
-	bad(func() { clear(v.Field(4).Field(1).Field(0)) }) // .NamedT2.namedT0.W
-	bad(func() { clear(v.Field(5)) })                   // .namedT1
-	bad(func() { clear(v.Field(5).Field(0)) })          // .namedT1.Y
-	bad(func() { clear(v.Field(5).Field(1)) })          // .namedT1.t0
-	bad(func() { clear(v.Field(5).Field(1).Field(0)) }) // .namedT1.t0.W
-	bad(func() { clear(v.Field(6)) })                   // .namedT2
-	bad(func() { clear(v.Field(6).Field(0)) })          // .namedT2.Z
-	bad(func() { clear(v.Field(6).Field(1)) })          // .namedT2.namedT0
-	bad(func() { clear(v.Field(6).Field(1).Field(0)) }) // .namedT2.namedT0.W
+	bad(func { clear(v.Field(0)) })                   // .X
+	bad(func { clear(v.Field(1)) })                   // .t1
+	bad(func { clear(v.Field(1).Field(0)) })          // .t1.Y
+	bad(func { clear(v.Field(1).Field(1)) })          // .t1.t0
+	bad(func { clear(v.Field(1).Field(1).Field(0)) }) // .t1.t0.W
+	bad(func { clear(v.Field(2)) })                   // .T2
+	bad(func { clear(v.Field(2).Field(0)) })          // .T2.Z
+	bad(func { clear(v.Field(2).Field(1)) })          // .T2.namedT0
+	bad(func { clear(v.Field(2).Field(1).Field(0)) }) // .T2.namedT0.W
+	bad(func { clear(v.Field(3)) })                   // .NamedT1
+	bad(func { clear(v.Field(3).Field(0)) })          // .NamedT1.Y
+	bad(func { clear(v.Field(3).Field(1)) })          // .NamedT1.t0
+	bad(func { clear(v.Field(3).Field(1).Field(0)) }) // .NamedT1.t0.W
+	bad(func { clear(v.Field(4)) })                   // .NamedT2
+	bad(func { clear(v.Field(4).Field(0)) })          // .NamedT2.Z
+	bad(func { clear(v.Field(4).Field(1)) })          // .NamedT2.namedT0
+	bad(func { clear(v.Field(4).Field(1).Field(0)) }) // .NamedT2.namedT0.W
+	bad(func { clear(v.Field(5)) })                   // .namedT1
+	bad(func { clear(v.Field(5).Field(0)) })          // .namedT1.Y
+	bad(func { clear(v.Field(5).Field(1)) })          // .namedT1.t0
+	bad(func { clear(v.Field(5).Field(1).Field(0)) }) // .namedT1.t0.W
+	bad(func { clear(v.Field(6)) })                   // .namedT2
+	bad(func { clear(v.Field(6).Field(0)) })          // .namedT2.Z
+	bad(func { clear(v.Field(6).Field(1)) })          // .namedT2.namedT0
+	bad(func { clear(v.Field(6).Field(1).Field(0)) }) // .namedT2.namedT0.W
 
 	// addressable
 	v = ValueOf(&T{}).Elem()
-	ok(func() { clear(v.Field(0)) })                    // .X
-	bad(func() { clear(v.Field(1)) })                   // .t1
-	ok(func() { clear(v.Field(1).Field(0)) })           // .t1.Y
-	bad(func() { clear(v.Field(1).Field(1)) })          // .t1.t0
-	ok(func() { clear(v.Field(1).Field(1).Field(0)) })  // .t1.t0.W
-	ok(func() { clear(v.Field(2)) })                    // .T2
-	ok(func() { clear(v.Field(2).Field(0)) })           // .T2.Z
-	bad(func() { clear(v.Field(2).Field(1)) })          // .T2.namedT0
-	bad(func() { clear(v.Field(2).Field(1).Field(0)) }) // .T2.namedT0.W
-	ok(func() { clear(v.Field(3)) })                    // .NamedT1
-	ok(func() { clear(v.Field(3).Field(0)) })           // .NamedT1.Y
-	bad(func() { clear(v.Field(3).Field(1)) })          // .NamedT1.t0
-	ok(func() { clear(v.Field(3).Field(1).Field(0)) })  // .NamedT1.t0.W
-	ok(func() { clear(v.Field(4)) })                    // .NamedT2
-	ok(func() { clear(v.Field(4).Field(0)) })           // .NamedT2.Z
-	bad(func() { clear(v.Field(4).Field(1)) })          // .NamedT2.namedT0
-	bad(func() { clear(v.Field(4).Field(1).Field(0)) }) // .NamedT2.namedT0.W
-	bad(func() { clear(v.Field(5)) })                   // .namedT1
-	bad(func() { clear(v.Field(5).Field(0)) })          // .namedT1.Y
-	bad(func() { clear(v.Field(5).Field(1)) })          // .namedT1.t0
-	bad(func() { clear(v.Field(5).Field(1).Field(0)) }) // .namedT1.t0.W
-	bad(func() { clear(v.Field(6)) })                   // .namedT2
-	bad(func() { clear(v.Field(6).Field(0)) })          // .namedT2.Z
-	bad(func() { clear(v.Field(6).Field(1)) })          // .namedT2.namedT0
-	bad(func() { clear(v.Field(6).Field(1).Field(0)) }) // .namedT2.namedT0.W
+	ok(func { clear(v.Field(0)) })                    // .X
+	bad(func { clear(v.Field(1)) })                   // .t1
+	ok(func { clear(v.Field(1).Field(0)) })           // .t1.Y
+	bad(func { clear(v.Field(1).Field(1)) })          // .t1.t0
+	ok(func { clear(v.Field(1).Field(1).Field(0)) })  // .t1.t0.W
+	ok(func { clear(v.Field(2)) })                    // .T2
+	ok(func { clear(v.Field(2).Field(0)) })           // .T2.Z
+	bad(func { clear(v.Field(2).Field(1)) })          // .T2.namedT0
+	bad(func { clear(v.Field(2).Field(1).Field(0)) }) // .T2.namedT0.W
+	ok(func { clear(v.Field(3)) })                    // .NamedT1
+	ok(func { clear(v.Field(3).Field(0)) })           // .NamedT1.Y
+	bad(func { clear(v.Field(3).Field(1)) })          // .NamedT1.t0
+	ok(func { clear(v.Field(3).Field(1).Field(0)) })  // .NamedT1.t0.W
+	ok(func { clear(v.Field(4)) })                    // .NamedT2
+	ok(func { clear(v.Field(4).Field(0)) })           // .NamedT2.Z
+	bad(func { clear(v.Field(4).Field(1)) })          // .NamedT2.namedT0
+	bad(func { clear(v.Field(4).Field(1).Field(0)) }) // .NamedT2.namedT0.W
+	bad(func { clear(v.Field(5)) })                   // .namedT1
+	bad(func { clear(v.Field(5).Field(0)) })          // .namedT1.Y
+	bad(func { clear(v.Field(5).Field(1)) })          // .namedT1.t0
+	bad(func { clear(v.Field(5).Field(1).Field(0)) }) // .namedT1.t0.W
+	bad(func { clear(v.Field(6)) })                   // .namedT2
+	bad(func { clear(v.Field(6).Field(0)) })          // .namedT2.Z
+	bad(func { clear(v.Field(6).Field(1)) })          // .namedT2.namedT0
+	bad(func { clear(v.Field(6).Field(1).Field(0)) }) // .namedT2.namedT0.W
 }
 
 type timp int
@@ -3267,54 +3267,54 @@ func TestCallPanic(t *testing.T) {
 		namedT1 T1 // 6
 		namedT2 T2 // 7
 	}
-	ok := func(f func()) { f() }
+	ok := func f { f() }
 	bad := shouldPanic
-	call := func(v Value) { v.Call(nil) }
+	call := func v { v.Call(nil) }
 
 	i := timp(0)
 	v := ValueOf(T{i, i, i, i, T2{i, i}, i, i, T2{i, i}})
-	ok(func() { call(v.Field(0).Method(0)) })         // .t0.W
-	bad(func() { call(v.Field(0).Elem().Method(0)) }) // .t0.W
-	bad(func() { call(v.Field(0).Method(1)) })        // .t0.w
-	bad(func() { call(v.Field(0).Elem().Method(2)) }) // .t0.w
-	ok(func() { call(v.Field(1).Method(0)) })         // .T1.Y
-	ok(func() { call(v.Field(1).Elem().Method(0)) })  // .T1.Y
-	bad(func() { call(v.Field(1).Method(1)) })        // .T1.y
-	bad(func() { call(v.Field(1).Elem().Method(2)) }) // .T1.y
+	ok(func { call(v.Field(0).Method(0)) })         // .t0.W
+	bad(func { call(v.Field(0).Elem().Method(0)) }) // .t0.W
+	bad(func { call(v.Field(0).Method(1)) })        // .t0.w
+	bad(func { call(v.Field(0).Elem().Method(2)) }) // .t0.w
+	ok(func { call(v.Field(1).Method(0)) })         // .T1.Y
+	ok(func { call(v.Field(1).Elem().Method(0)) })  // .T1.Y
+	bad(func { call(v.Field(1).Method(1)) })        // .T1.y
+	bad(func { call(v.Field(1).Elem().Method(2)) }) // .T1.y
 
-	ok(func() { call(v.Field(2).Method(0)) })         // .NamedT0.W
-	ok(func() { call(v.Field(2).Elem().Method(0)) })  // .NamedT0.W
-	bad(func() { call(v.Field(2).Method(1)) })        // .NamedT0.w
-	bad(func() { call(v.Field(2).Elem().Method(2)) }) // .NamedT0.w
+	ok(func { call(v.Field(2).Method(0)) })         // .NamedT0.W
+	ok(func { call(v.Field(2).Elem().Method(0)) })  // .NamedT0.W
+	bad(func { call(v.Field(2).Method(1)) })        // .NamedT0.w
+	bad(func { call(v.Field(2).Elem().Method(2)) }) // .NamedT0.w
 
-	ok(func() { call(v.Field(3).Method(0)) })         // .NamedT1.Y
-	ok(func() { call(v.Field(3).Elem().Method(0)) })  // .NamedT1.Y
-	bad(func() { call(v.Field(3).Method(1)) })        // .NamedT1.y
-	bad(func() { call(v.Field(3).Elem().Method(3)) }) // .NamedT1.y
+	ok(func { call(v.Field(3).Method(0)) })         // .NamedT1.Y
+	ok(func { call(v.Field(3).Elem().Method(0)) })  // .NamedT1.Y
+	bad(func { call(v.Field(3).Method(1)) })        // .NamedT1.y
+	bad(func { call(v.Field(3).Elem().Method(3)) }) // .NamedT1.y
 
-	ok(func() { call(v.Field(4).Field(0).Method(0)) })         // .NamedT2.T1.Y
-	ok(func() { call(v.Field(4).Field(0).Elem().Method(0)) })  // .NamedT2.T1.W
-	ok(func() { call(v.Field(4).Field(1).Method(0)) })         // .NamedT2.t0.W
-	bad(func() { call(v.Field(4).Field(1).Elem().Method(0)) }) // .NamedT2.t0.W
+	ok(func { call(v.Field(4).Field(0).Method(0)) })         // .NamedT2.T1.Y
+	ok(func { call(v.Field(4).Field(0).Elem().Method(0)) })  // .NamedT2.T1.W
+	ok(func { call(v.Field(4).Field(1).Method(0)) })         // .NamedT2.t0.W
+	bad(func { call(v.Field(4).Field(1).Elem().Method(0)) }) // .NamedT2.t0.W
 
-	bad(func() { call(v.Field(5).Method(0)) })        // .namedT0.W
-	bad(func() { call(v.Field(5).Elem().Method(0)) }) // .namedT0.W
-	bad(func() { call(v.Field(5).Method(1)) })        // .namedT0.w
-	bad(func() { call(v.Field(5).Elem().Method(2)) }) // .namedT0.w
+	bad(func { call(v.Field(5).Method(0)) })        // .namedT0.W
+	bad(func { call(v.Field(5).Elem().Method(0)) }) // .namedT0.W
+	bad(func { call(v.Field(5).Method(1)) })        // .namedT0.w
+	bad(func { call(v.Field(5).Elem().Method(2)) }) // .namedT0.w
 
-	bad(func() { call(v.Field(6).Method(0)) })        // .namedT1.Y
-	bad(func() { call(v.Field(6).Elem().Method(0)) }) // .namedT1.Y
-	bad(func() { call(v.Field(6).Method(0)) })        // .namedT1.y
-	bad(func() { call(v.Field(6).Elem().Method(0)) }) // .namedT1.y
+	bad(func { call(v.Field(6).Method(0)) })        // .namedT1.Y
+	bad(func { call(v.Field(6).Elem().Method(0)) }) // .namedT1.Y
+	bad(func { call(v.Field(6).Method(0)) })        // .namedT1.y
+	bad(func { call(v.Field(6).Elem().Method(0)) }) // .namedT1.y
 
-	bad(func() { call(v.Field(7).Field(0).Method(0)) })        // .namedT2.T1.Y
-	bad(func() { call(v.Field(7).Field(0).Elem().Method(0)) }) // .namedT2.T1.W
-	bad(func() { call(v.Field(7).Field(1).Method(0)) })        // .namedT2.t0.W
-	bad(func() { call(v.Field(7).Field(1).Elem().Method(0)) }) // .namedT2.t0.W
+	bad(func { call(v.Field(7).Field(0).Method(0)) })        // .namedT2.T1.Y
+	bad(func { call(v.Field(7).Field(0).Elem().Method(0)) }) // .namedT2.T1.W
+	bad(func { call(v.Field(7).Field(1).Method(0)) })        // .namedT2.t0.W
+	bad(func { call(v.Field(7).Field(1).Elem().Method(0)) }) // .namedT2.t0.W
 }
 
 func shouldPanic(f func()) {
-	defer func() {
+	defer func {
 		if recover() == nil {
 			panic("did not panic")
 		}
@@ -3926,67 +3926,67 @@ func TestArrayOf(t *testing.T) {
 	}{
 		{
 			n:          0,
-			value:      func(i int) interface{} { type Tint int; return Tint(i) },
+			value:      func i { type Tint int; return Tint(i) },
 			comparable: true,
 			want:       "[]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tint int; return Tint(i) },
+			value:      func i { type Tint int; return Tint(i) },
 			comparable: true,
 			want:       "[0 1 2 3 4 5 6 7 8 9]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tfloat float64; return Tfloat(i) },
+			value:      func i { type Tfloat float64; return Tfloat(i) },
 			comparable: true,
 			want:       "[0 1 2 3 4 5 6 7 8 9]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tstring string; return Tstring(strconv.Itoa(i)) },
+			value:      func i { type Tstring string; return Tstring(strconv.Itoa(i)) },
 			comparable: true,
 			want:       "[0 1 2 3 4 5 6 7 8 9]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tstruct struct{ V int }; return Tstruct{i} },
+			value:      func i { type Tstruct struct{ V int }; return Tstruct{i} },
 			comparable: true,
 			want:       "[{0} {1} {2} {3} {4} {5} {6} {7} {8} {9}]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tint int; return []Tint{Tint(i)} },
+			value:      func i { type Tint int; return []Tint{Tint(i)} },
 			comparable: false,
 			want:       "[[0] [1] [2] [3] [4] [5] [6] [7] [8] [9]]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tint int; return [1]Tint{Tint(i)} },
+			value:      func i { type Tint int; return [1]Tint{Tint(i)} },
 			comparable: true,
 			want:       "[[0] [1] [2] [3] [4] [5] [6] [7] [8] [9]]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tstruct struct{ V [1]int }; return Tstruct{[1]int{i}} },
+			value:      func i { type Tstruct struct{ V [1]int }; return Tstruct{[1]int{i}} },
 			comparable: true,
 			want:       "[{[0]} {[1]} {[2]} {[3]} {[4]} {[5]} {[6]} {[7]} {[8]} {[9]}]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type Tstruct struct{ V []int }; return Tstruct{[]int{i}} },
+			value:      func i { type Tstruct struct{ V []int }; return Tstruct{[]int{i}} },
 			comparable: false,
 			want:       "[{[0]} {[1]} {[2]} {[3]} {[4]} {[5]} {[6]} {[7]} {[8]} {[9]}]",
 		},
 		{
 			n:          10,
-			value:      func(i int) interface{} { type TstructUV struct{ U, V int }; return TstructUV{i, i} },
+			value:      func i { type TstructUV struct{ U, V int }; return TstructUV{i, i} },
 			comparable: true,
 			want:       "[{0 0} {1 1} {2 2} {3 3} {4 4} {5 5} {6 6} {7 7} {8 8} {9 9}]",
 		},
 		{
 			n: 10,
-			value: func(i int) interface{} {
+			value: func i {
 				type TstructUV struct {
 					U int
 					V float64
@@ -4084,7 +4084,7 @@ func TestArrayOfAlg(t *testing.T) {
 
 	at = ArrayOf(6, TypeOf([]int(nil)))
 	v1 = New(at).Elem()
-	shouldPanic(func() { _ = v1.Interface() == v1.Interface() })
+	shouldPanic(func { _ = v1.Interface() == v1.Interface() })
 }
 
 func TestArrayOfGenericAlg(t *testing.T) {
@@ -4189,7 +4189,7 @@ func TestSliceOverflow(t *testing.T) {
 	}
 	var x [S]byte
 	st := SliceOf(TypeOf(x))
-	defer func() {
+	defer func {
 		err := recover()
 		if err == nil {
 			t.Fatal("slice overflow does not panic")
@@ -4228,7 +4228,7 @@ func TestSliceOfGC(t *testing.T) {
 
 func TestStructOfFieldName(t *testing.T) {
 	// invalid field name "1nvalid"
-	shouldPanic(func() {
+	shouldPanic(func {
 		StructOf([]StructField{
 			StructField{Name: "valid", Type: TypeOf("")},
 			StructField{Name: "1nvalid", Type: TypeOf("")},
@@ -4236,7 +4236,7 @@ func TestStructOfFieldName(t *testing.T) {
 	})
 
 	// invalid field name "+"
-	shouldPanic(func() {
+	shouldPanic(func {
 		StructOf([]StructField{
 			StructField{Name: "val1d", Type: TypeOf("")},
 			StructField{Name: "+", Type: TypeOf("")},
@@ -4244,7 +4244,7 @@ func TestStructOfFieldName(t *testing.T) {
 	})
 
 	// no field name
-	shouldPanic(func() {
+	shouldPanic(func {
 		StructOf([]StructField{
 			StructField{Name: "", Type: TypeOf("")},
 		})
@@ -4371,19 +4371,19 @@ func TestStructOf(t *testing.T) {
 	}
 
 	// check duplicate names
-	shouldPanic(func() {
+	shouldPanic(func {
 		StructOf([]StructField{
 			StructField{Name: "string", Type: TypeOf("")},
 			StructField{Name: "string", Type: TypeOf("")},
 		})
 	})
-	shouldPanic(func() {
+	shouldPanic(func {
 		StructOf([]StructField{
 			StructField{Type: TypeOf("")},
 			StructField{Name: "string", Type: TypeOf("")},
 		})
 	})
-	shouldPanic(func() {
+	shouldPanic(func {
 		StructOf([]StructField{
 			StructField{Type: TypeOf("")},
 			StructField{Type: TypeOf("")},
@@ -4399,8 +4399,8 @@ func TestStructOfExportRules(t *testing.T) {
 	type ΦType struct{}
 	type φType struct{}
 
-	testPanic := func(i int, mustPanic bool, f func()) {
-		defer func() {
+	testPanic := func i, mustPanic, f {
+		defer func {
 			err := recover()
 			if err == nil && mustPanic {
 				t.Errorf("test-%d did not panic", i)
@@ -4533,7 +4533,7 @@ func TestStructOfExportRules(t *testing.T) {
 	}
 
 	for i, test := range tests {
-		testPanic(i, test.mustPanic, func() {
+		testPanic(i, test.mustPanic, func {
 			typ := StructOf([]StructField{test.field})
 			if typ == nil {
 				t.Errorf("test-%d: error creating struct type", i)
@@ -4607,7 +4607,7 @@ func TestStructOfAlg(t *testing.T) {
 
 	st = StructOf([]StructField{{Name: "X", Tag: "x", Type: TypeOf([]int(nil))}})
 	v1 = New(st).Elem()
-	shouldPanic(func() { _ = v1.Interface() == v1.Interface() })
+	shouldPanic(func { _ = v1.Interface() == v1.Interface() })
 }
 
 func TestStructOfGenericAlg(t *testing.T) {
@@ -4820,7 +4820,7 @@ func TestStructOfWithInterface(t *testing.T) {
 		{
 			name: "StructI",
 			typ:  PtrTo(TypeOf(StructI(want))),
-			val: ValueOf(func() interface{} {
+			val: ValueOf(func {
 				v := StructI(want)
 				return &v
 			}()),
@@ -4829,7 +4829,7 @@ func TestStructOfWithInterface(t *testing.T) {
 		{
 			name: "StructIPtr",
 			typ:  PtrTo(TypeOf(StructIPtr(want))),
-			val: ValueOf(func() interface{} {
+			val: ValueOf(func {
 				v := StructIPtr(want)
 				return &v
 			}()),
@@ -4872,8 +4872,8 @@ func TestStructOfWithInterface(t *testing.T) {
 			// When those issues are fixed, this test of panic
 			// should be removed.
 			if j == 1 && table.impl {
-				func() {
-					defer func() {
+				func {
+					defer func {
 						if err := recover(); err == nil {
 							t.Errorf("test-%d-%d did not panic", i, j)
 						}
@@ -4960,7 +4960,7 @@ func TestChanOfDir(t *testing.T) {
 
 func TestChanOfGC(t *testing.T) {
 	done := make(chan bool, 1)
-	go func() {
+	go func {
 		select {
 		case <-done:
 		case <-time.After(5 * time.Second):
@@ -4968,7 +4968,7 @@ func TestChanOfGC(t *testing.T) {
 		}
 	}()
 
-	defer func() {
+	defer func {
 		done <- true
 	}()
 
@@ -5026,7 +5026,7 @@ func TestMapOf(t *testing.T) {
 	checkSameType(t, Zero(MapOf(TypeOf(V(0)), TypeOf(K("")))).Interface(), map[V]K(nil))
 
 	// check that invalid key type panics
-	shouldPanic(func() { MapOf(TypeOf((func())(nil)), TypeOf(false)) })
+	shouldPanic(func { MapOf(TypeOf((func())(nil)), TypeOf(false)) })
 }
 
 func TestMapOfGCKeys(t *testing.T) {
@@ -5116,7 +5116,7 @@ func TestFuncOf(t *testing.T) {
 	type K string
 	type V float64
 
-	fn := func(args []Value) []Value {
+	fn := func args {
 		if len(args) != 1 {
 			t.Errorf("args == %v, want exactly one arg", args)
 		} else if args[0].Type() != TypeOf(K("")) {
@@ -5158,8 +5158,8 @@ func TestFuncOf(t *testing.T) {
 
 	// check that variadic requires last element be a slice.
 	FuncOf([]Type{TypeOf(1), TypeOf(""), SliceOf(TypeOf(false))}, nil, true)
-	shouldPanic(func() { FuncOf([]Type{TypeOf(0), TypeOf(""), TypeOf(false)}, nil, true) })
-	shouldPanic(func() { FuncOf(nil, nil, true) })
+	shouldPanic(func { FuncOf([]Type{TypeOf(0), TypeOf(""), TypeOf(false)}, nil, true) })
+	shouldPanic(func { FuncOf(nil, nil, true) })
 }
 
 type B1 struct {
@@ -5170,7 +5170,7 @@ type B1 struct {
 
 func BenchmarkFieldByName1(b *testing.B) {
 	t := TypeOf(B1{})
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			t.FieldByName("Z")
 		}
@@ -5179,7 +5179,7 @@ func BenchmarkFieldByName1(b *testing.B) {
 
 func BenchmarkFieldByName2(b *testing.B) {
 	t := TypeOf(S3{})
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			t.FieldByName("B")
 		}
@@ -5266,7 +5266,7 @@ func TestEmbed(t *testing.T) {
 
 func BenchmarkFieldByName3(b *testing.B) {
 	t := TypeOf(R0{})
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			t.FieldByName("X")
 		}
@@ -5280,7 +5280,7 @@ type S struct {
 
 func BenchmarkInterfaceBig(b *testing.B) {
 	v := ValueOf(S{})
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			v.Interface()
 		}
@@ -5293,14 +5293,14 @@ func TestAllocsInterfaceBig(t *testing.T) {
 		t.Skip("skipping malloc count in short mode")
 	}
 	v := ValueOf(S{})
-	if allocs := testing.AllocsPerRun(100, func() { v.Interface() }); allocs > 0 {
+	if allocs := testing.AllocsPerRun(100, func { v.Interface() }); allocs > 0 {
 		t.Error("allocs:", allocs)
 	}
 }
 
 func BenchmarkInterfaceSmall(b *testing.B) {
 	v := ValueOf(int64(0))
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			v.Interface()
 		}
@@ -5312,7 +5312,7 @@ func TestAllocsInterfaceSmall(t *testing.T) {
 		t.Skip("skipping malloc count in short mode")
 	}
 	v := ValueOf(int64(0))
-	if allocs := testing.AllocsPerRun(100, func() { v.Interface() }); allocs > 0 {
+	if allocs := testing.AllocsPerRun(100, func { v.Interface() }); allocs > 0 {
 		t.Error("allocs:", allocs)
 	}
 }
@@ -5414,7 +5414,7 @@ func GCFunc(args []Value) []Value {
 }
 
 func TestReflectFuncTraceback(t *testing.T) {
-	f := MakeFunc(TypeOf(func() {}), GCFunc)
+	f := MakeFunc(TypeOf(func {}), GCFunc)
 	f.Call([]Value{})
 }
 
@@ -5449,7 +5449,7 @@ func TestFieldByIndexNil(t *testing.T) {
 
 	v.FieldByName("P") // should be fine
 
-	defer func() {
+	defer func {
 		if err := recover(); err == nil {
 			t.Fatalf("no error")
 		} else if !strings.Contains(fmt.Sprint(err), "nil pointer to embedded struct") {
@@ -5543,7 +5543,7 @@ func TestCallMethodJump(t *testing.T) {
 }
 
 func TestMakeFuncStackCopy(t *testing.T) {
-	target := func(in []Value) []Value {
+	target := func in {
 		runtime.GC()
 		useStack(16)
 		return []Value{ValueOf(9)}
@@ -5599,12 +5599,12 @@ func TestInvalid(t *testing.T) {
 
 // Issue 8917.
 func TestLargeGCProg(t *testing.T) {
-	fv := ValueOf(func([256]*byte) {})
+	fv := ValueOf(func {})
 	fv.Call([]Value{ValueOf([256]*byte{})})
 }
 
 func fieldIndexRecover(t Type, i int) (recovered interface{}) {
-	defer func() {
+	defer func {
 		recovered = recover()
 	}()
 
@@ -5640,9 +5640,9 @@ func TestTypeFieldOutOfRangePanic(t *testing.T) {
 
 // Issue 9179.
 func TestCallGC(t *testing.T) {
-	f := func(a, b, c, d, e string) {
+	f := func a, b, c, d, e {
 	}
-	g := func(in []Value) []Value {
+	g := func in {
 		runtime.GC()
 		return nil
 	}
@@ -5655,9 +5655,9 @@ func TestCallGC(t *testing.T) {
 func TestKeepFuncLive(t *testing.T) {
 	// Test that we keep makeFuncImpl live as long as it is
 	// referenced on the stack.
-	typ := TypeOf(func(i int) {})
+	typ := TypeOf(func i {})
 	var f, g func(in []Value) []Value
-	f = func(in []Value) []Value {
+	f = func in {
 		clobber()
 		i := int(in[0].Int())
 		if i > 0 {
@@ -5675,7 +5675,7 @@ func TestKeepFuncLive(t *testing.T) {
 		}
 		return nil
 	}
-	g = func(in []Value) []Value {
+	g = func in {
 		clobber()
 		i := int(in[0].Int())
 		MakeFunc(typ, f).Interface().(func(i int))(i)
@@ -5691,7 +5691,7 @@ func (i UnExportedFirst) unexported() {}
 
 // Issue 21177
 func TestMethodByNameUnExportedFirst(t *testing.T) {
-	defer func() {
+	defer func {
 		if recover() != nil {
 			t.Errorf("should not panic")
 		}
@@ -5750,14 +5750,14 @@ func init() {
 	if runtime.GOARCH == "amd64p32" {
 		argAlign = 2 * PtrSize
 	}
-	roundup := func(x uintptr, a uintptr) uintptr {
+	roundup := func x, a {
 		return (x + a - 1) / a * a
 	}
 
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			nil,
-			ValueOf(func(a, b string) string { return "" }).Type(),
+			ValueOf(func a, b { return "" }).Type(),
 			6 * PtrSize,
 			4 * PtrSize,
 			4 * PtrSize,
@@ -5774,7 +5774,7 @@ func init() {
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			nil,
-			ValueOf(func(a, b, c uint32, p *byte, d uint16) {}).Type(),
+			ValueOf(func a, b, c, p, d {}).Type(),
 			roundup(roundup(3*4, PtrSize)+PtrSize+2, argAlign),
 			roundup(3*4, PtrSize) + PtrSize + 2,
 			roundup(roundup(3*4, PtrSize)+PtrSize+2, argAlign),
@@ -5785,7 +5785,7 @@ func init() {
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			nil,
-			ValueOf(func(a map[int]int, b uintptr, c interface{}) {}).Type(),
+			ValueOf(func a, b, c {}).Type(),
 			4 * PtrSize,
 			4 * PtrSize,
 			4 * PtrSize,
@@ -5800,7 +5800,7 @@ func init() {
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			nil,
-			ValueOf(func(a S) {}).Type(),
+			ValueOf(func a {}).Type(),
 			4 * PtrSize,
 			4 * PtrSize,
 			4 * PtrSize,
@@ -5811,7 +5811,7 @@ func init() {
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			ValueOf((*byte)(nil)).Type(),
-			ValueOf(func(a uintptr, b *int) {}).Type(),
+			ValueOf(func a, b {}).Type(),
 			roundup(3*PtrSize, argAlign),
 			3 * PtrSize,
 			roundup(3*PtrSize, argAlign),
@@ -5822,7 +5822,7 @@ func init() {
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			nil,
-			ValueOf(func(a uintptr) {}).Type(),
+			ValueOf(func a {}).Type(),
 			roundup(PtrSize, argAlign),
 			PtrSize,
 			roundup(PtrSize, argAlign),
@@ -5833,7 +5833,7 @@ func init() {
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			nil,
-			ValueOf(func() uintptr { return 0 }).Type(),
+			ValueOf(func { return 0 }).Type(),
 			PtrSize,
 			0,
 			0,
@@ -5844,7 +5844,7 @@ func init() {
 	funcLayoutTests = append(funcLayoutTests,
 		funcLayoutTest{
 			ValueOf(uintptr(0)).Type(),
-			ValueOf(func(a uintptr) {}).Type(),
+			ValueOf(func a {}).Type(),
 			2 * PtrSize,
 			2 * PtrSize,
 			2 * PtrSize,
@@ -6044,7 +6044,7 @@ func TestGCBits(t *testing.T) {
 
 	hdr := make([]byte, 8/PtrSize)
 
-	verifyMapBucket := func(t *testing.T, k, e Type, m interface{}, want []byte) {
+	verifyMapBucket := func t, k, e, m, want {
 		verifyGCBits(t, MapBucketOf(k, e), want)
 		verifyGCBits(t, CachedBucketOf(TypeOf(m)), want)
 	}
@@ -6100,7 +6100,7 @@ func TestTypeOfTypeOf(t *testing.T) {
 	// Check that all the type constructors return concrete *rtype implementations.
 	// It's difficult to test directly because the reflect package is only at arm's length.
 	// The easiest thing to do is just call a function that crashes if it doesn't get an *rtype.
-	check := func(name string, typ Type) {
+	check := func name, typ {
 		if underlying := TypeOf(typ).String(); underlying != "*reflect.rtype" {
 			t.Errorf("%v returned %v, not *reflect.rtype", name, underlying)
 		}
@@ -6134,7 +6134,7 @@ func TestMapAlloc(t *testing.T) {
 	m := ValueOf(make(map[int]int, 10))
 	k := ValueOf(5)
 	v := ValueOf(7)
-	allocs := testing.AllocsPerRun(100, func() {
+	allocs := testing.AllocsPerRun(100, func {
 		m.SetMapIndex(k, v)
 	})
 	if allocs > 0.5 {
@@ -6144,7 +6144,7 @@ func TestMapAlloc(t *testing.T) {
 	const size = 1000
 	tmp := 0
 	val := ValueOf(&tmp).Elem()
-	allocs = testing.AllocsPerRun(100, func() {
+	allocs = testing.AllocsPerRun(100, func {
 		mv := MakeMapWithSize(TypeOf(map[int]int{}), size)
 		// Only adding half of the capacity to not trigger re-allocations due too many overloaded buckets.
 		for i := 0; i < size/2; i++ {
@@ -6165,7 +6165,7 @@ func TestChanAlloc(t *testing.T) {
 	// use a chan *int instead.
 	c := ValueOf(make(chan *int, 1))
 	v := ValueOf(new(int))
-	allocs := testing.AllocsPerRun(100, func() {
+	allocs := testing.AllocsPerRun(100, func {
 		c.Send(v)
 		_, _ = c.Recv()
 	})
@@ -6263,7 +6263,7 @@ func TestTypeStrings(t *testing.T) {
 		want string
 	}
 	stringTests := []stringTest{
-		{TypeOf(func(int) {}), "func(int)"},
+		{TypeOf(func {}), "func(int)"},
 		{FuncOf([]Type{TypeOf(int(0))}, nil, false), "func(int)"},
 		{TypeOf(XM{}), "reflect_test.XM"},
 		{TypeOf(new(XM)), "*reflect_test.XM"},
@@ -6287,7 +6287,7 @@ func TestOffsetLock(t *testing.T) {
 	for i := 0; i < 4; i++ {
 		i := i
 		wg.Add(1)
-		go func() {
+		go func {
 			for j := 0; j < 50; j++ {
 				ResolveReflectName(fmt.Sprintf("OffsetLockName:%d:%d", i, j))
 			}
@@ -6299,7 +6299,7 @@ func TestOffsetLock(t *testing.T) {
 
 func BenchmarkNew(b *testing.B) {
 	v := TypeOf(XM{})
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			New(v)
 		}
@@ -6400,7 +6400,7 @@ func TestUnaddressableField(t *testing.T) {
 	}
 	lv := ValueOf(&localBuffer).Elem()
 	rv := ValueOf(b)
-	shouldPanic(func() {
+	shouldPanic(func {
 		lv.Set(rv)
 	})
 }

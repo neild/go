@@ -112,7 +112,7 @@ func (fd *netFD) connect(ctx context.Context, la, ra syscall.Sockaddr) (rsa sysc
 		// from connect.
 		done := make(chan struct{})
 		interruptRes := make(chan error)
-		defer func() {
+		defer func {
 			close(done)
 			if ctxErr := <-interruptRes; ctxErr != nil && ret == nil {
 				// The interrupter goroutine called SetWriteDeadline,
@@ -125,7 +125,7 @@ func (fd *netFD) connect(ctx context.Context, la, ra syscall.Sockaddr) (rsa sysc
 				fd.Close() // prevent a leak
 			}
 		}()
-		go func() {
+		go func {
 			select {
 			case <-ctx.Done():
 				// Force the runtime's poller to immediately give up

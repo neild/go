@@ -308,7 +308,7 @@ var builtins = map[string]interface{}{
 
 func testParse(doCopy bool, t *testing.T) {
 	textFormat = "%q"
-	defer func() { textFormat = "%s" }()
+	defer func { textFormat = "%s" }()
 	for _, test := range parseTests {
 		tmpl, err := New(test.name).Parse(test.input, "", "", make(map[string]*Tree), builtins)
 		switch {

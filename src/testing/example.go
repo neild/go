@@ -71,7 +71,7 @@ func runExample(eg InternalExample) (ok bool) {
 	}
 	os.Stdout = w
 	outC := make(chan string)
-	go func() {
+	go func {
 		var buf bytes.Buffer
 		_, err := io.Copy(&buf, r)
 		r.Close()
@@ -86,7 +86,7 @@ func runExample(eg InternalExample) (ok bool) {
 	ok = true
 
 	// Clean up in a deferred call so we can recover if the example panics.
-	defer func() {
+	defer func {
 		dstr := fmtDuration(time.Since(start))
 
 		// Close pipe, restore stdout, get output.

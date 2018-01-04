@@ -42,8 +42,8 @@ func allPackagesInFS(pattern string) []string {
 // MatchPackages returns a list of package paths matching pattern
 // (see go help packages for pattern syntax).
 func MatchPackages(pattern string) []string {
-	match := func(string) bool { return true }
-	treeCanMatch := func(string) bool { return true }
+	match := func { return true }
+	treeCanMatch := func { return true }
 	if !IsMetaPackage(pattern) {
 		match = matchPattern(pattern)
 		treeCanMatch = treeCanMatchPattern(pattern)
@@ -66,7 +66,7 @@ func MatchPackages(pattern string) []string {
 		if pattern == "cmd" {
 			root += "cmd" + string(filepath.Separator)
 		}
-		filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
+		filepath.Walk(root, func path, fi, err {
 			if err != nil || path == src {
 				return nil
 			}
@@ -151,7 +151,7 @@ func MatchPackagesInFS(pattern string) []string {
 	match := matchPattern(pattern)
 
 	var pkgs []string
-	filepath.Walk(dir, func(path string, fi os.FileInfo, err error) error {
+	filepath.Walk(dir, func path, fi, err {
 		if err != nil || !fi.IsDir() {
 			return nil
 		}
@@ -206,7 +206,7 @@ func treeCanMatchPattern(pattern string) func(name string) bool {
 		wildCard = true
 		pattern = pattern[:i]
 	}
-	return func(name string) bool {
+	return func name {
 		return len(name) <= len(pattern) && hasPathPrefix(pattern, name) ||
 			wildCard && strings.HasPrefix(name, pattern)
 	}
@@ -241,7 +241,7 @@ func matchPattern(pattern string) func(name string) bool {
 	const vendorChar = "\x00"
 
 	if strings.Contains(pattern, vendorChar) {
-		return func(name string) bool { return false }
+		return func name { return false }
 	}
 
 	re := regexp.QuoteMeta(pattern)
@@ -258,7 +258,7 @@ func matchPattern(pattern string) func(name string) bool {
 
 	reg := regexp.MustCompile(`^` + re + `$`)
 
-	return func(name string) bool {
+	return func name {
 		if strings.Contains(name, vendorChar) {
 			return false
 		}
@@ -282,10 +282,10 @@ func MatchPackage(pattern, cwd string) func(*Package) bool {
 		}
 		dir = filepath.Join(cwd, dir)
 		if pattern == "" {
-			return func(p *Package) bool { return p.Dir == dir }
+			return func p { return p.Dir == dir }
 		}
 		matchPath := matchPattern(pattern)
-		return func(p *Package) bool {
+		return func p {
 			// Compute relative path to dir and see if it matches the pattern.
 			rel, err := filepath.Rel(dir, p.Dir)
 			if err != nil {
@@ -299,14 +299,14 @@ func MatchPackage(pattern, cwd string) func(*Package) bool {
 			return matchPath(rel)
 		}
 	case pattern == "all":
-		return func(p *Package) bool { return true }
+		return func p { return true }
 	case pattern == "std":
-		return func(p *Package) bool { return p.Standard }
+		return func p { return p.Standard }
 	case pattern == "cmd":
-		return func(p *Package) bool { return p.Standard && strings.HasPrefix(p.ImportPath, "cmd/") }
+		return func p { return p.Standard && strings.HasPrefix(p.ImportPath, "cmd/") }
 	default:
 		matchPath := matchPattern(pattern)
-		return func(p *Package) bool { return matchPath(p.ImportPath) }
+		return func p { return matchPath(p.ImportPath) }
 	}
 }
 

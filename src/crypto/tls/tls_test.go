@@ -175,7 +175,7 @@ func TestDialTimeout(t *testing.T) {
 	complete := make(chan bool)
 	defer close(complete)
 
-	go func() {
+	go func {
 		conn, err := listener.Accept()
 		if err != nil {
 			t.Error(err)
@@ -234,7 +234,7 @@ func testConnReadNonzeroAndEOF(t *testing.T, delay time.Duration) error {
 
 	srvCh := make(chan *Conn, 1)
 	var serr error
-	go func() {
+	go func {
 		sconn, err := ln.Accept()
 		if err != nil {
 			serr = err
@@ -289,7 +289,7 @@ func TestTLSUniqueMatches(t *testing.T) {
 	defer ln.Close()
 
 	serverTLSUniques := make(chan []byte)
-	go func() {
+	go func {
 		for i := 0; i < 2; i++ {
 			sconn, err := ln.Accept()
 			if err != nil {
@@ -388,7 +388,7 @@ func TestConnCloseBreakingWrite(t *testing.T) {
 	srvCh := make(chan *Conn, 1)
 	var serr error
 	var sconn net.Conn
-	go func() {
+	go func {
 		var err error
 		sconn, err = ln.Accept()
 		if err != nil {
@@ -429,7 +429,7 @@ func TestConnCloseBreakingWrite(t *testing.T) {
 	defer sconn.Close()
 
 	connClosed := make(chan struct{})
-	conn.closeFunc = func() error {
+	conn.closeFunc = func {
 		close(connClosed)
 		return nil
 	}
@@ -443,7 +443,7 @@ func TestConnCloseBreakingWrite(t *testing.T) {
 	}
 
 	closeReturned := make(chan bool, 1)
-	go func() {
+	go func {
 		<-inWrite
 		tconn.Close() // test that this doesn't block forever.
 		closeReturned <- true
@@ -466,7 +466,7 @@ func TestConnCloseWrite(t *testing.T) {
 
 	clientDoneChan := make(chan struct{})
 
-	serverCloseWrite := func() error {
+	serverCloseWrite := func {
 		sconn, err := ln.Accept()
 		if err != nil {
 			return fmt.Errorf("accept: %v", err)
@@ -500,7 +500,7 @@ func TestConnCloseWrite(t *testing.T) {
 		return nil
 	}
 
-	clientCloseWrite := func() error {
+	clientCloseWrite := func {
 		defer close(clientDoneChan)
 
 		clientConfig := testConfig.Clone()
@@ -533,8 +533,8 @@ func TestConnCloseWrite(t *testing.T) {
 
 	errChan := make(chan error, 2)
 
-	go func() { errChan <- serverCloseWrite() }()
-	go func() { errChan <- clientCloseWrite() }()
+	go func { errChan <- serverCloseWrite() }()
+	go func { errChan <- clientCloseWrite() }()
 
 	for i := 0; i < 2; i++ {
 		select {
@@ -570,7 +570,7 @@ func TestWarningAlertFlood(t *testing.T) {
 	ln := newLocalListener(t)
 	defer ln.Close()
 
-	server := func() error {
+	server := func {
 		sconn, err := ln.Accept()
 		if err != nil {
 			return fmt.Errorf("accept: %v", err)
@@ -597,7 +597,7 @@ func TestWarningAlertFlood(t *testing.T) {
 	}
 
 	errChan := make(chan error, 1)
-	go func() { errChan <- server() }()
+	go func { errChan <- server() }()
 
 	clientConfig := testConfig.Clone()
 	conn, err := Dial("tcp", ln.Addr().String(), clientConfig)
@@ -623,23 +623,23 @@ func TestCloneFuncFields(t *testing.T) {
 	called := 0
 
 	c1 := Config{
-		Time: func() time.Time {
+		Time: func {
 			called |= 1 << 0
 			return time.Time{}
 		},
-		GetCertificate: func(*ClientHelloInfo) (*Certificate, error) {
+		GetCertificate: func {
 			called |= 1 << 1
 			return nil, nil
 		},
-		GetClientCertificate: func(*CertificateRequestInfo) (*Certificate, error) {
+		GetClientCertificate: func {
 			called |= 1 << 2
 			return nil, nil
 		},
-		GetConfigForClient: func(*ClientHelloInfo) (*Config, error) {
+		GetConfigForClient: func {
 			called |= 1 << 3
 			return nil, nil
 		},
-		VerifyPeerCertificate: func(rawCerts [][]byte, verifiedChains [][]*x509.Certificate) error {
+		VerifyPeerCertificate: func rawCerts, verifiedChains {
 			called |= 1 << 4
 			return nil
 		},
@@ -758,7 +758,7 @@ func throughput(b *testing.B, totalBytes int64, dynamicRecordSizingDisabled bool
 	// See Issue #15899.
 	const bufsize = 32 << 10
 
-	go func() {
+	go func {
 		buf := make([]byte, bufsize)
 		for i := 0; i < N; i++ {
 			sconn, err := ln.Accept()
@@ -810,7 +810,7 @@ func BenchmarkThroughput(b *testing.B) {
 	for _, mode := range []string{"Max", "Dynamic"} {
 		for size := 1; size <= 64; size <<= 1 {
 			name := fmt.Sprintf("%sPacket/%dMB", mode, size)
-			b.Run(name, func(b *testing.B) {
+			b.Run(name, func b {
 				throughput(b, int64(size<<20), mode == "Max")
 			})
 		}
@@ -851,7 +851,7 @@ func latency(b *testing.B, bps int, dynamicRecordSizingDisabled bool) {
 
 	N := b.N
 
-	go func() {
+	go func {
 		for i := 0; i < N; i++ {
 			sconn, err := ln.Accept()
 			if err != nil {
@@ -901,7 +901,7 @@ func BenchmarkLatency(b *testing.B) {
 	for _, mode := range []string{"Max", "Dynamic"} {
 		for _, kbps := range []int{200, 500, 1000, 2000, 5000} {
 			name := fmt.Sprintf("%sPacket/%dkbps", mode, kbps)
-			b.Run(name, func(b *testing.B) {
+			b.Run(name, func b {
 				latency(b, kbps*1000, mode == "Max")
 			})
 		}

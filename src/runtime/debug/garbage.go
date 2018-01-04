@@ -71,7 +71,7 @@ func ReadGCStats(stats *GCStats) {
 			// See the allocation at the top of the function.
 			sorted := stats.Pause[n : n+n]
 			copy(sorted, stats.Pause)
-			sort.Slice(sorted, func(i, j int) bool { return sorted[i] < sorted[j] })
+			sort.Slice(sorted, func i, j { return sorted[i] < sorted[j] })
 			nq := len(stats.PauseQuantiles) - 1
 			for i := 0; i < nq; i++ {
 				stats.PauseQuantiles[i] = sorted[len(sorted)*i/nq]

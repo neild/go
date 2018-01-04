@@ -423,7 +423,7 @@ func TestIssue6550(t *testing.T) {
 	}
 	defer gzip.Close()
 	done := make(chan bool, 1)
-	go func() {
+	go func {
 		_, err := io.Copy(ioutil.Discard, gzip)
 		if err == nil {
 			t.Errorf("Copy succeeded")

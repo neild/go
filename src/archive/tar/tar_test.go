@@ -798,9 +798,9 @@ func Benchmark(b *testing.B) {
 		}},
 	}}
 
-	b.Run("Writer", func(b *testing.B) {
+	b.Run("Writer", func b {
 		for _, v := range vectors {
-			b.Run(v.label, func(b *testing.B) {
+			b.Run(v.label, func b {
 				b.ReportAllocs()
 				for i := 0; i < b.N; i++ {
 					// Writing to ioutil.Discard because we want to
@@ -822,7 +822,7 @@ func Benchmark(b *testing.B) {
 		}
 	})
 
-	b.Run("Reader", func(b *testing.B) {
+	b.Run("Reader", func b {
 		for _, v := range vectors {
 			var buf bytes.Buffer
 			var r bytes.Reader
@@ -834,7 +834,7 @@ func Benchmark(b *testing.B) {
 				tw.Write(file.body)
 			}
 			tw.Close()
-			b.Run(v.label, func(b *testing.B) {
+			b.Run(v.label, func b {
 				b.ReportAllocs()
 				// Read from the byte buffer.
 				for i := 0; i < b.N; i++ {

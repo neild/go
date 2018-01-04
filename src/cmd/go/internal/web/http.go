@@ -91,7 +91,7 @@ func GetMaybeInsecure(importPath string, security SecurityMode) (urlStr string, 
 		}
 		return
 	}
-	closeBody := func(res *http.Response) {
+	closeBody := func res {
 		if res != nil {
 			res.Body.Close()
 		}

@@ -33,7 +33,7 @@ func TestSwitch(t *testing.T) {
 	var wg sync.WaitGroup
 	wg.Add(N)
 	for i := 0; i < N; i++ {
-		go func() {
+		go func {
 			defer wg.Done()
 			for _, family := range []int{syscall.AF_INET, syscall.AF_INET6} {
 				socketFunc(family, syscall.SOCK_STREAM, syscall.IPPROTO_TCP)
@@ -45,7 +45,7 @@ func TestSwitch(t *testing.T) {
 
 func TestSocket(t *testing.T) {
 	for _, f := range []socktest.Filter{
-		func(st *socktest.Status) (socktest.AfterFilter, error) { return nil, nil },
+		func st { return nil, nil },
 		nil,
 	} {
 		sw.Set(socktest.FilterSocket, f)

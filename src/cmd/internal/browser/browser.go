@@ -54,7 +54,7 @@ func Open(url string) bool {
 // If the command runs within the timeout, it's deemed successful if it exited cleanly.
 func appearsSuccessful(cmd *exec.Cmd, timeout time.Duration) bool {
 	errc := make(chan error, 1)
-	go func() {
+	go func {
 		errc <- cmd.Wait()
 	}()
 

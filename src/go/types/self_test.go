@@ -62,7 +62,7 @@ func runbench(t *testing.T, path string, ignoreFuncBodies bool) {
 		t.Fatal(err)
 	}
 
-	b := testing.Benchmark(func(b *testing.B) {
+	b := testing.Benchmark(func b {
 		for i := 0; i < b.N; i++ {
 			conf := Config{IgnoreFuncBodies: ignoreFuncBodies}
 			conf.Check(path, fset, files, nil)
@@ -71,7 +71,7 @@ func runbench(t *testing.T, path string, ignoreFuncBodies bool) {
 
 	// determine line count
 	lines := 0
-	fset.Iterate(func(f *token.File) bool {
+	fset.Iterate(func f {
 		lines += f.LineCount()
 		return true
 	})

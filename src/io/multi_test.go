@@ -21,7 +21,7 @@ func TestMultiReader(t *testing.T) {
 	var mr Reader
 	var buf []byte
 	nread := 0
-	withFooBar := func(tests func()) {
+	withFooBar := func tests {
 		r1 := strings.NewReader("foo ")
 		r2 := strings.NewReader("")
 		r3 := strings.NewReader("bar")
@@ -29,7 +29,7 @@ func TestMultiReader(t *testing.T) {
 		buf = make([]byte, 20)
 		tests()
 	}
-	expectRead := func(size int, expected string, eerr error) {
+	expectRead := func size, expected, eerr {
 		nread++
 		n, gerr := mr.Read(buf[0:size])
 		if n != len(expected) {
@@ -47,19 +47,19 @@ func TestMultiReader(t *testing.T) {
 		}
 		buf = buf[n:]
 	}
-	withFooBar(func() {
+	withFooBar(func {
 		expectRead(2, "fo", nil)
 		expectRead(5, "o ", nil)
 		expectRead(5, "bar", nil)
 		expectRead(5, "", EOF)
 	})
-	withFooBar(func() {
+	withFooBar(func {
 		expectRead(4, "foo ", nil)
 		expectRead(1, "b", nil)
 		expectRead(3, "ar", nil)
 		expectRead(1, "", EOF)
 	})
-	withFooBar(func() {
+	withFooBar(func {
 		expectRead(5, "foo ", nil)
 	})
 }
@@ -85,7 +85,7 @@ func TestMultiWriter_WriteStringSingleAlloc(t *testing.T) {
 		Writer
 	}
 	mw := MultiWriter(simpleWriter{&sink1}, simpleWriter{&sink2})
-	allocs := int(testing.AllocsPerRun(1000, func() {
+	allocs := int(testing.AllocsPerRun(1000, func {
 		WriteString(mw, "foo")
 	}))
 	if allocs != 1 {
@@ -155,7 +155,7 @@ func TestMultiWriterSingleChainFlatten(t *testing.T) {
 	n := runtime.Callers(0, pc)
 	var myDepth = callDepth(pc[:n])
 	var writeDepth int // will contain the depth from which writerFunc.Writer was called
-	var w Writer = MultiWriter(writerFunc(func(p []byte) (int, error) {
+	var w Writer = MultiWriter(writerFunc(func p {
 		n := runtime.Callers(1, pc)
 		writeDepth += callDepth(pc[:n])
 		return 0, nil
@@ -177,10 +177,10 @@ func TestMultiWriterSingleChainFlatten(t *testing.T) {
 }
 
 func TestMultiWriterError(t *testing.T) {
-	f1 := writerFunc(func(p []byte) (int, error) {
+	f1 := writerFunc(func p {
 		return len(p) / 2, ErrShortWrite
 	})
-	f2 := writerFunc(func(p []byte) (int, error) {
+	f2 := writerFunc(func p {
 		t.Errorf("MultiWriter called f2.Write")
 		return len(p), nil
 	})
@@ -241,7 +241,7 @@ func TestMultiReaderFlatten(t *testing.T) {
 	n := runtime.Callers(0, pc)
 	var myDepth = callDepth(pc[:n])
 	var readDepth int // will contain the depth from which fakeReader.Read was called
-	var r Reader = MultiReader(readerFunc(func(p []byte) (int, error) {
+	var r Reader = MultiReader(readerFunc(func p {
 		n := runtime.Callers(1, pc)
 		readDepth = callDepth(pc[:n])
 		return 0, errors.New("irrelevant")
@@ -304,11 +304,11 @@ func TestMultiReaderFreesExhaustedReaders(t *testing.T) {
 	// The closure ensures that we don't have a live reference to buf1
 	// on our stack after MultiReader is inlined (Issue 18819).  This
 	// is a work around for a limitation in liveness analysis.
-	func() {
+	func {
 		buf1 := bytes.NewReader([]byte("foo"))
 		buf2 := bytes.NewReader([]byte("bar"))
 		mr = MultiReader(buf1, buf2)
-		runtime.SetFinalizer(buf1, func(*bytes.Reader) {
+		runtime.SetFinalizer(buf1, func {
 			close(closed)
 		})
 	}()

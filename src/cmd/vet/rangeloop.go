@@ -36,7 +36,7 @@ func init() {
 func checkLoop(f *File, node ast.Node) {
 	// Find the variables updated by the loop statement.
 	var vars []*ast.Ident
-	addVar := func(expr ast.Expr) {
+	addVar := func expr {
 		if id, ok := expr.(*ast.Ident); ok {
 			vars = append(vars, id)
 		}
@@ -85,7 +85,7 @@ func checkLoop(f *File, node ast.Node) {
 	if !ok {
 		return
 	}
-	ast.Inspect(lit.Body, func(n ast.Node) bool {
+	ast.Inspect(lit.Body, func n {
 		id, ok := n.(*ast.Ident)
 		if !ok || id.Obj == nil {
 			return true

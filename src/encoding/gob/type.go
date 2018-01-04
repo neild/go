@@ -442,7 +442,7 @@ func newTypeObject(name string, ut *userTypeInfo, rt reflect.Type) (gobType, err
 	}
 	var err error
 	var type0, type1 gobType
-	defer func() {
+	defer func {
 		if err != nil {
 			delete(types, rt)
 		}

@@ -168,7 +168,7 @@ func (p *Profile) Boundaries(src []byte) (boundaries []Boundary) {
 	divisor := math.Log(float64(max))
 
 	// boundary returns a Boundary, populating the Norm field with a normalized Count.
-	boundary := func(offset int, start bool, count int) Boundary {
+	boundary := func offset, start, count {
 		b := Boundary{Offset: offset, Start: start, Count: count}
 		if !start || count == 0 {
 			return b

@@ -749,7 +749,7 @@ func (h *mheap) alloc(npage uintptr, spanclass spanClass, large bool, needzero b
 	// It might trigger stack growth, and the stack growth code needs
 	// to be able to allocate heap.
 	var s *mspan
-	systemstack(func() {
+	systemstack(func {
 		s = h.alloc_m(npage, spanclass, large)
 	})
 
@@ -960,7 +960,7 @@ func (h *mheap) lookupMaybe(v unsafe.Pointer) *mspan {
 
 // Free the span back into the heap.
 func (h *mheap) freeSpan(s *mspan, acct int32) {
-	systemstack(func() {
+	systemstack(func {
 		mp := getg().m
 		lock(&h.lock)
 		memstats.heap_scan += uint64(mp.mcache.local_scan)
@@ -1202,7 +1202,7 @@ func (h *mheap) scavenge(k int32, now, limit uint64) {
 //go:linkname runtime_debug_freeOSMemory runtime/debug.freeOSMemory
 func runtime_debug_freeOSMemory() {
 	GC()
-	systemstack(func() { mheap_.scavenge(-1, ^uint64(0), 0) })
+	systemstack(func { mheap_.scavenge(-1, ^uint64(0), 0) })
 }
 
 // Initialize a new span with the given start and npages.

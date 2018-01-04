@@ -15,7 +15,7 @@ import (
 	"testing"
 )
 
-var isReadonlyError = func(error) bool { return false }
+var isReadonlyError = func { return false }
 
 func TestMkdirAll(t *testing.T) {
 	tmpDir := TempDir()

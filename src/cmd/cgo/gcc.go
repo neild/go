@@ -926,7 +926,7 @@ func (p *Package) checkAddrArgs(f *File, args []ast.Expr, x ast.Expr) []ast.Expr
 func (p *Package) hasSideEffects(f *File, x ast.Expr) bool {
 	found := false
 	f.walk(x, ctxExpr,
-		func(f *File, x interface{}, context astContext) {
+		func f, x, context {
 			switch x.(type) {
 			case *ast.CallExpr:
 				found = true
@@ -1287,15 +1287,15 @@ func (p *Package) gccCmd() []string {
 func (p *Package) gccDebug(stdin []byte, nnames int) (d *dwarf.Data, ints []int64, floats []float64, strs []string) {
 	runGcc(stdin, p.gccCmd())
 
-	isDebugInts := func(s string) bool {
+	isDebugInts := func s {
 		// Some systems use leading _ to denote non-assembly symbols.
 		return s == "__cgodebug_ints" || s == "___cgodebug_ints"
 	}
-	isDebugFloats := func(s string) bool {
+	isDebugFloats := func s {
 		// Some systems use leading _ to denote non-assembly symbols.
 		return s == "__cgodebug_floats" || s == "___cgodebug_floats"
 	}
-	indexOfDebugStr := func(s string) int {
+	indexOfDebugStr := func s {
 		// Some systems use leading _ to denote non-assembly symbols.
 		if strings.HasPrefix(s, "___") {
 			s = s[1:]
@@ -1307,7 +1307,7 @@ func (p *Package) gccDebug(stdin []byte, nnames int) (d *dwarf.Data, ints []int6
 		}
 		return -1
 	}
-	indexOfDebugStrlen := func(s string) int {
+	indexOfDebugStrlen := func s {
 		// Some systems use leading _ to denote non-assembly symbols.
 		if strings.HasPrefix(s, "___") {
 			s = s[1:]
@@ -1325,7 +1325,7 @@ func (p *Package) gccDebug(stdin []byte, nnames int) (d *dwarf.Data, ints []int6
 	strdata := make(map[int]string, nnames)
 	strlens := make(map[int]int, nnames)
 
-	buildStrings := func() {
+	buildStrings := func {
 		for n, strlen := range strlens {
 			data := strdata[n]
 			if len(data) <= strlen {

@@ -939,7 +939,7 @@ func convertop(src *types.Type, dst *types.Type, why *string) Op {
 }
 
 func assignconv(n *Node, t *types.Type, context string) *Node {
-	return assignconvfn(n, t, func() string { return context })
+	return assignconvfn(n, t, func { return context })
 }
 
 // Convert node n for assignment to type t.

@@ -138,7 +138,7 @@ func sortSpecs(fset *token.FileSet, f *File, specs []Spec) []Spec {
 	// Reassign the import paths to have the same position sequence.
 	// Reassign each comment to abut the end of its spec.
 	// Sort the comments by new position.
-	sort.Slice(specs, func(i, j int) bool {
+	sort.Slice(specs, func i, j {
 		ipath := importPath(specs[i])
 		jpath := importPath(specs[j])
 		if ipath != jpath {
@@ -180,7 +180,7 @@ func sortSpecs(fset *token.FileSet, f *File, specs []Spec) []Spec {
 		}
 	}
 
-	sort.Slice(comments, func(i, j int) bool {
+	sort.Slice(comments, func i, j {
 		return comments[i].Pos() < comments[j].Pos()
 	})
 

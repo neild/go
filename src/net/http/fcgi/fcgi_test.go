@@ -237,10 +237,7 @@ func TestChildServeCleansUp(t *testing.T) {
 		copy(input, tt.input)
 		rc := nopWriteCloser{bytes.NewBuffer(input)}
 		done := make(chan bool)
-		c := newChild(rc, http.HandlerFunc(func(
-			w http.ResponseWriter,
-			r *http.Request,
-		) {
+		c := newChild(rc, http.HandlerFunc(func w, r {
 			// block on reading body of request
 			_, err := io.Copy(ioutil.Discard, r.Body)
 			if err != tt.err {
@@ -327,10 +324,7 @@ func TestChildServeReadsEnvVars(t *testing.T) {
 		copy(input, tt.input)
 		rc := nopWriteCloser{bytes.NewBuffer(input)}
 		done := make(chan bool)
-		c := newChild(rc, http.HandlerFunc(func(
-			w http.ResponseWriter,
-			r *http.Request,
-		) {
+		c := newChild(rc, http.HandlerFunc(func w, r {
 			env := ProcessEnv(r)
 			if _, ok := env[tt.envVar]; ok && tt.expectedFilteredOut {
 				t.Errorf("Expected environment variable %s to not be set, but set to %s",

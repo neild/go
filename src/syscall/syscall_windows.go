@@ -786,7 +786,7 @@ var connectExFunc struct {
 }
 
 func LoadConnectEx() error {
-	connectExFunc.once.Do(func() {
+	connectExFunc.once.Do(func {
 		var s Handle
 		s, connectExFunc.err = Socket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
 		if connectExFunc.err != nil {

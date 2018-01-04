@@ -60,7 +60,7 @@ func objdump(ext *ExtDis) error {
 		enc     []byte
 		text    string
 	)
-	flush := func() {
+	flush := func {
 		if addr == next {
 			if m := pcrel.FindStringSubmatch(text); m != nil {
 				targ, _ := strconv.ParseUint(m[2], 16, 64)

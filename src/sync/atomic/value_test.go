@@ -48,8 +48,8 @@ func TestValuePanic(t *testing.T) {
 	const nilErr = "sync/atomic: store of nil value into Value"
 	const badErr = "sync/atomic: store of inconsistently typed value into Value"
 	var v Value
-	func() {
-		defer func() {
+	func {
+		defer func {
 			err := recover()
 			if err != nilErr {
 				t.Fatalf("inconsistent store panic: got '%v', want '%v'", err, nilErr)
@@ -58,8 +58,8 @@ func TestValuePanic(t *testing.T) {
 		v.Store(nil)
 	}()
 	v.Store(42)
-	func() {
-		defer func() {
+	func {
+		defer func {
 			err := recover()
 			if err != badErr {
 				t.Fatalf("inconsistent store panic: got '%v', want '%v'", err, badErr)
@@ -67,8 +67,8 @@ func TestValuePanic(t *testing.T) {
 		}()
 		v.Store("foo")
 	}()
-	func() {
-		defer func() {
+	func {
+		defer func {
 			err := recover()
 			if err != nilErr {
 				t.Fatalf("inconsistent store panic: got '%v', want '%v'", err, nilErr)
@@ -95,7 +95,7 @@ func TestValueConcurrent(t *testing.T) {
 		var v Value
 		done := make(chan bool)
 		for i := 0; i < p; i++ {
-			go func() {
+			go func {
 				r := rand.New(rand.NewSource(rand.Int63()))
 			loop:
 				for j := 0; j < N; j++ {
@@ -124,7 +124,7 @@ func TestValueConcurrent(t *testing.T) {
 func BenchmarkValueRead(b *testing.B) {
 	var v Value
 	v.Store(new(int))
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			x := v.Load().(*int)
 			if *x != 0 {
@@ -140,7 +140,7 @@ func ExampleValue_config() {
 	var config Value // holds current server configuration
 	// Create initial config value and store into config.
 	config.Store(loadConfig())
-	go func() {
+	go func {
 		// Reload config every 10 seconds
 		// and update config value with the new version.
 		for {
@@ -151,7 +151,7 @@ func ExampleValue_config() {
 	// Create worker goroutines that handle incoming requests
 	// using the latest config value.
 	for i := 0; i < 10; i++ {
-		go func() {
+		go func {
 			for r := range requests() {
 				c := config.Load()
 				// Handle request r using config c.
@@ -182,7 +182,7 @@ func ExampleValue_readMostly() {
 		return m1[key]
 	}
 	// insert function can be used to update the data without further synchronization
-	insert := func(key, val string) {
+	insert := func key, val {
 		mu.Lock() // synchronize with other potential writers
 		defer mu.Unlock()
 		m1 := m.Load().(Map) // load current value of the data structure

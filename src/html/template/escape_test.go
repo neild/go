@@ -836,7 +836,7 @@ func TestEscapeSet(t *testing.T) {
 
 	// pred is a template function that returns the predecessor of a
 	// natural number for testing recursive templates.
-	fns := FuncMap{"pred": func(a ...interface{}) (interface{}, error) {
+	fns := FuncMap{"pred": func a {
 		if len(a) == 1 {
 			if i, _ := a[0].(int); i > 0 {
 				return i - 1, nil
@@ -1818,8 +1818,8 @@ func (Issue7379) SomeMethod(x int) string {
 // the discussion for issue 7379.
 func TestPipeToMethodIsEscaped(t *testing.T) {
 	tmpl := Must(New("x").Parse("<html>{{0 | .SomeMethod}}</html>\n"))
-	tryExec := func() string {
-		defer func() {
+	tryExec := func {
+		defer func {
 			panicValue := recover()
 			if panicValue != nil {
 				t.Errorf("panicked: %v\n", panicValue)

@@ -12,7 +12,7 @@ import (
 )
 
 func checker(t *testing.T) func(string, error) {
-	return func(call string, err error) {
+	return func call, err {
 		if err == nil {
 			return
 		}

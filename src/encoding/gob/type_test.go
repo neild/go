@@ -198,7 +198,7 @@ func TestStressParallel(t *testing.T) {
 	c := make(chan bool)
 	const N = 10
 	for i := 0; i < N; i++ {
-		go func() {
+		go func {
 			p := new(T2)
 			Register(p)
 			b := new(bytes.Buffer)
@@ -226,7 +226,7 @@ func TestTypeRace(t *testing.T) {
 	var wg sync.WaitGroup
 	for i := 0; i < 2; i++ {
 		wg.Add(1)
-		go func(i int) {
+		go func i {
 			defer wg.Done()
 			var buf bytes.Buffer
 			enc := NewEncoder(&buf)

@@ -59,13 +59,13 @@ type Option func(*options)
 // compatibility. It is used by most browsers when resolving domain names. This
 // option is only meaningful if combined with MapForLookup.
 func Transitional(transitional bool) Option {
-	return func(o *options) { o.transitional = true }
+	return func o { o.transitional = true }
 }
 
 // VerifyDNSLength sets whether a Profile should fail if any of the IDN parts
 // are longer than allowed by the RFC.
 func VerifyDNSLength(verify bool) Option {
-	return func(o *options) { o.verifyDNSLength = verify }
+	return func o { o.verifyDNSLength = verify }
 }
 
 // RemoveLeadingDots removes leading label separators. Leading runes that map to
@@ -74,14 +74,14 @@ func VerifyDNSLength(verify bool) Option {
 // This is the behavior suggested by the UTS #46 and is adopted by some
 // browsers.
 func RemoveLeadingDots(remove bool) Option {
-	return func(o *options) { o.removeLeadingDots = remove }
+	return func o { o.removeLeadingDots = remove }
 }
 
 // ValidateLabels sets whether to check the mandatory label validation criteria
 // as defined in Section 5.4 of RFC 5891. This includes testing for correct use
 // of hyphens ('-'), normalization, validity of runes, and the context rules.
 func ValidateLabels(enable bool) Option {
-	return func(o *options) {
+	return func o {
 		// Don't override existing mappings, but set one that at least checks
 		// normalization if it is not set.
 		if o.mapping == nil && enable {
@@ -102,7 +102,7 @@ func ValidateLabels(enable bool) Option {
 // http://www.rfc-editor.org/std/std3.txt for more details This option
 // corresponds to the UseSTD3ASCIIRules option in UTS #46.
 func StrictDomainName(use bool) Option {
-	return func(o *options) {
+	return func o {
 		o.trie = trie
 		o.useSTD3Rules = use
 		o.fromPuny = validateFromPunycode
@@ -115,13 +115,13 @@ func StrictDomainName(use bool) Option {
 // BidiRule enables the Bidi rule as defined in RFC 5893. Any application
 // that relies on proper validation of labels should include this rule.
 func BidiRule() Option {
-	return func(o *options) { o.bidirule = bidirule.ValidString }
+	return func o { o.bidirule = bidirule.ValidString }
 }
 
 // ValidateForRegistration sets validation options to verify that a given IDN is
 // properly formatted for registration as defined by Section 4 of RFC 5891.
 func ValidateForRegistration() Option {
-	return func(o *options) {
+	return func o {
 		o.mapping = validateRegistration
 		StrictDomainName(true)(o)
 		ValidateLabels(true)(o)
@@ -139,7 +139,7 @@ func ValidateForRegistration() Option {
 // The mappings include normalization and mapping case, width and other
 // compatibility mappings.
 func MapForLookup() Option {
-	return func(o *options) {
+	return func o {
 		o.mapping = validateAndMap
 		StrictDomainName(true)(o)
 		ValidateLabels(true)(o)

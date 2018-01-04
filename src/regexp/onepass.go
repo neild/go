@@ -166,7 +166,7 @@ func mergeRuneSets(leftRunes, rightRunes *[]rune, leftPC, rightPC uint32) ([]run
 	merged := make([]rune, 0)
 	next := make([]uint32, 0)
 	ok := true
-	defer func() {
+	defer func {
 		if !ok {
 			merged = nil
 			next = nil
@@ -174,7 +174,7 @@ func mergeRuneSets(leftRunes, rightRunes *[]rune, leftPC, rightPC uint32) ([]run
 	}()
 
 	ix := -1
-	extend := func(newLow *int, newArray *[]rune, pc uint32) bool {
+	extend := func newLow, newArray, pc {
 		if ix > 0 && (*newArray)[*newLow] <= merged[ix] {
 			return false
 		}

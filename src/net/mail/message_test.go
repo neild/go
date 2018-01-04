@@ -660,7 +660,7 @@ func TestAddressParser(t *testing.T) {
 	}
 
 	ap := AddressParser{WordDecoder: &mime.WordDecoder{
-		CharsetReader: func(charset string, input io.Reader) (io.Reader, error) {
+		CharsetReader: func charset, input {
 			in, err := ioutil.ReadAll(input)
 			if err != nil {
 				return nil, err

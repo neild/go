@@ -139,7 +139,7 @@ func (ls *labelScope) blockBranches(parent *block, ctxt targets, lstmt *LabeledS
 	var varName Expr
 	var fwdGotos, badGotos []*BranchStmt
 
-	recordVarDecl := func(pos src.Pos, name Expr) {
+	recordVarDecl := func pos, name {
 		varPos = pos
 		varName = name
 		// Any existing forward goto jumping over the variable
@@ -149,7 +149,7 @@ func (ls *labelScope) blockBranches(parent *block, ctxt targets, lstmt *LabeledS
 		badGotos = append(badGotos[:0], fwdGotos...)
 	}
 
-	jumpsOverVarDecl := func(fwd *BranchStmt) bool {
+	jumpsOverVarDecl := func fwd {
 		if varPos.IsKnown() {
 			for _, bad := range badGotos {
 				if fwd == bad {
@@ -160,7 +160,7 @@ func (ls *labelScope) blockBranches(parent *block, ctxt targets, lstmt *LabeledS
 		return false
 	}
 
-	innerBlock := func(ctxt targets, start src.Pos, body []Stmt) {
+	innerBlock := func ctxt, start, body {
 		// Unresolved forward gotos from the inner block
 		// become forward gotos for the current block.
 		fwdGotos = append(fwdGotos, ls.blockBranches(b, ctxt, lstmt, start, body)...)

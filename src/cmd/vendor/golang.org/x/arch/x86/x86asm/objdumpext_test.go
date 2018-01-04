@@ -65,7 +65,7 @@ func objdump(ext *ExtDis) error {
 		enc     []byte
 		text    string
 	)
-	flush := func() {
+	flush := func {
 		if addr == next {
 			switch text {
 			case "repz":

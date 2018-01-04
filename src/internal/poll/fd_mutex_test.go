@@ -62,7 +62,7 @@ func TestMutexCloseUnblock(t *testing.T) {
 	var mu FDMutex
 	mu.RWLock(true)
 	for i := 0; i < 4; i++ {
-		go func() {
+		go func {
 			if mu.RWLock(true) {
 				t.Error("broken")
 				return
@@ -94,8 +94,8 @@ func TestMutexCloseUnblock(t *testing.T) {
 }
 
 func TestMutexPanic(t *testing.T) {
-	ensurePanics := func(f func()) {
-		defer func() {
+	ensurePanics := func f {
+		defer func {
 			if recover() == nil {
 				t.Fatal("does not panic")
 			}
@@ -104,13 +104,13 @@ func TestMutexPanic(t *testing.T) {
 	}
 
 	var mu FDMutex
-	ensurePanics(func() { mu.Decref() })
-	ensurePanics(func() { mu.RWUnlock(true) })
-	ensurePanics(func() { mu.RWUnlock(false) })
+	ensurePanics(func { mu.Decref() })
+	ensurePanics(func { mu.RWUnlock(true) })
+	ensurePanics(func { mu.RWUnlock(false) })
 
-	ensurePanics(func() { mu.Incref(); mu.Decref(); mu.Decref() })
-	ensurePanics(func() { mu.RWLock(true); mu.RWUnlock(true); mu.RWUnlock(true) })
-	ensurePanics(func() { mu.RWLock(false); mu.RWUnlock(false); mu.RWUnlock(false) })
+	ensurePanics(func { mu.Incref(); mu.Decref(); mu.Decref() })
+	ensurePanics(func { mu.RWLock(true); mu.RWUnlock(true); mu.RWUnlock(true) })
+	ensurePanics(func { mu.RWLock(false); mu.RWUnlock(false); mu.RWUnlock(false) })
 
 	// ensure that it's still not broken
 	mu.Incref()
@@ -134,7 +134,7 @@ func TestMutexStress(t *testing.T) {
 	var readState [2]uint64
 	var writeState [2]uint64
 	for p := 0; p < P; p++ {
-		go func() {
+		go func {
 			r := rand.New(rand.NewSource(rand.Int63()))
 			for i := 0; i < N; i++ {
 				switch r.Intn(3) {

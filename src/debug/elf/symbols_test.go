@@ -13,7 +13,7 @@ import (
 
 // TODO: remove duplicate code
 func TestSymbols(t *testing.T) {
-	do := func(file string, ts []Symbol, getfunc func(*File) ([]Symbol, error)) {
+	do := func file, ts, getfunc {
 		var f *File
 		var err error
 		if path.Ext(file) == ".gz" {

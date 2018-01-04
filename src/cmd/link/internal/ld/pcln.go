@@ -235,7 +235,7 @@ func (ctxt *Link) pclntab() {
 	pclntabPclntabOffset = int32(8 + ctxt.Arch.PtrSize)
 
 	funcnameoff := make(map[string]int32)
-	nameToOffset := func(name string) int32 {
+	nameToOffset := func name {
 		nameoff, ok := funcnameoff[name]
 		if !ok {
 			nameoff = ftabaddstring(ctxt, ftab, name)

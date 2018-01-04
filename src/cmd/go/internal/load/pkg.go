@@ -956,7 +956,7 @@ func (p *Package) load(stk *ImportStack, bp *build.Package, err error) {
 	// Build augmented import list to add implicit dependencies.
 	// Be careful not to add imports twice, just to avoid confusion.
 	importPaths := p.Imports
-	addImport := func(path string) {
+	addImport := func path {
 		for _, p := range importPaths {
 			if path == p {
 				return
@@ -1104,7 +1104,7 @@ func (p *Package) load(stk *ImportStack, bp *build.Package, err error) {
 		// code; see issue #16050).
 	}
 
-	setError := func(msg string) {
+	setError := func msg {
 		p.Error = &PackageError{
 			ImportStack: stk.Copy(),
 			Err:         msg,
@@ -1253,7 +1253,7 @@ func PackageList(roots []*Package) []*Package {
 	seen := map[*Package]bool{}
 	all := []*Package{}
 	var walk func(*Package)
-	walk = func(p *Package) {
+	walk = func p {
 		if seen[p] {
 			return
 		}
@@ -1473,7 +1473,7 @@ func GoFilesPackage(gofiles []string) *Package {
 		}
 		dirent = append(dirent, fi)
 	}
-	ctxt.ReadDir = func(string) ([]os.FileInfo, error) { return dirent, nil }
+	ctxt.ReadDir = func { return dirent, nil }
 
 	var err error
 	if dir == "" {

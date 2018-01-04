@@ -2179,7 +2179,7 @@ const uintptrEscapesTag = "uintptr-escapes"
 func (e *EscState) esctag(fn *Node) {
 	fn.Esc = EscFuncTagged
 
-	name := func(s *types.Sym, narg int) string {
+	name := func s, narg {
 		if s != nil {
 			return s.Name
 		}

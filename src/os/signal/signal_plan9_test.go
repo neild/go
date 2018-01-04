@@ -66,7 +66,7 @@ func TestStress(t *testing.T) {
 	defer runtime.GOMAXPROCS(runtime.GOMAXPROCS(4))
 	done := make(chan bool)
 	finished := make(chan bool)
-	go func() {
+	go func {
 		sig := make(chan os.Signal, 1)
 		Notify(sig, syscall.Note("alarm"))
 		defer Stop(sig)
@@ -80,7 +80,7 @@ func TestStress(t *testing.T) {
 		}
 		finished <- true
 	}()
-	go func() {
+	go func {
 	Loop:
 		for {
 			select {

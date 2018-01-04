@@ -70,7 +70,7 @@ var ServeFileRangeTests = []struct {
 func TestServeFile(t *testing.T) {
 	setParallel(t)
 	defer afterTest(t)
-	ts := httptest.NewServer(HandlerFunc(func(w ResponseWriter, r *Request) {
+	ts := httptest.NewServer(HandlerFunc(func w, r {
 		ServeFile(w, r, "testdata/file")
 	}))
 	defer ts.Close()
@@ -243,7 +243,7 @@ func (fs *testFileSystem) Open(name string) (File, error) {
 func TestFileServerCleans(t *testing.T) {
 	defer afterTest(t)
 	ch := make(chan string, 1)
-	fs := FileServer(&testFileSystem{func(name string) (File, error) {
+	fs := FileServer(&testFileSystem{func name {
 		ch <- name
 		return nil, errors.New("file does not exist")
 	}})
@@ -376,7 +376,7 @@ func TestFileServerImplicitLeadingSlash(t *testing.T) {
 	}
 	ts := httptest.NewServer(StripPrefix("/bar/", FileServer(Dir(tempDir))))
 	defer ts.Close()
-	get := func(suffix string) string {
+	get := func suffix {
 		res, err := Get(ts.URL + suffix)
 		if err != nil {
 			t.Fatalf("Get %s: %v", suffix, err)
@@ -404,7 +404,7 @@ func TestDirJoin(t *testing.T) {
 	if err != nil {
 		t.Skip("skipping test; no /etc/hosts file")
 	}
-	test := func(d Dir, name string) {
+	test := func d, name {
 		f, err := d.Open(name)
 		if err != nil {
 			t.Fatalf("open of %s: %v", name, err)
@@ -433,7 +433,7 @@ func TestDirJoin(t *testing.T) {
 }
 
 func TestEmptyDirOpenCWD(t *testing.T) {
-	test := func(d Dir) {
+	test := func d {
 		name := "fs_test.go"
 		f, err := d.Open(name)
 		if err != nil {
@@ -449,7 +449,7 @@ func TestEmptyDirOpenCWD(t *testing.T) {
 func TestServeFileContentType(t *testing.T) {
 	defer afterTest(t)
 	const ctype = "icecream/chocolate"
-	ts := httptest.NewServer(HandlerFunc(func(w ResponseWriter, r *Request) {
+	ts := httptest.NewServer(HandlerFunc(func w, r {
 		switch r.FormValue("override") {
 		case "1":
 			w.Header().Set("Content-Type", ctype)
@@ -460,7 +460,7 @@ func TestServeFileContentType(t *testing.T) {
 		ServeFile(w, r, "testdata/file")
 	}))
 	defer ts.Close()
-	get := func(override string, want []string) {
+	get := func override, want {
 		resp, err := Get(ts.URL + "?override=" + override)
 		if err != nil {
 			t.Fatal(err)
@@ -477,7 +477,7 @@ func TestServeFileContentType(t *testing.T) {
 
 func TestServeFileMimeType(t *testing.T) {
 	defer afterTest(t)
-	ts := httptest.NewServer(HandlerFunc(func(w ResponseWriter, r *Request) {
+	ts := httptest.NewServer(HandlerFunc(func w, r {
 		ServeFile(w, r, "testdata/style.css")
 	}))
 	defer ts.Close()
@@ -494,7 +494,7 @@ func TestServeFileMimeType(t *testing.T) {
 
 func TestServeFileFromCWD(t *testing.T) {
 	defer afterTest(t)
-	ts := httptest.NewServer(HandlerFunc(func(w ResponseWriter, r *Request) {
+	ts := httptest.NewServer(HandlerFunc(func w, r {
 		ServeFile(w, r, "fs_test.go")
 	}))
 	defer ts.Close()
@@ -512,7 +512,7 @@ func TestServeFileFromCWD(t *testing.T) {
 func TestServeDirWithoutTrailingSlash(t *testing.T) {
 	e := "/testdata/"
 	defer afterTest(t)
-	ts := httptest.NewServer(HandlerFunc(func(w ResponseWriter, r *Request) {
+	ts := httptest.NewServer(HandlerFunc(func w, r {
 		ServeFile(w, r, ".")
 	}))
 	defer ts.Close()
@@ -532,7 +532,7 @@ func TestServeFileWithContentEncoding_h1(t *testing.T) { testServeFileWithConten
 func TestServeFileWithContentEncoding_h2(t *testing.T) { testServeFileWithContentEncoding(t, h2Mode) }
 func testServeFileWithContentEncoding(t *testing.T, h2 bool) {
 	defer afterTest(t)
-	cst := newClientServerTest(t, h2, HandlerFunc(func(w ResponseWriter, r *Request) {
+	cst := newClientServerTest(t, h2, HandlerFunc(func w, r {
 		w.Header().Set("Content-Encoding", "foo")
 		ServeFile(w, r, "testdata/file")
 
@@ -746,7 +746,7 @@ func TestServeContent(t *testing.T) {
 		etag        string
 	}
 	servec := make(chan serveParam, 1)
-	ts := httptest.NewServer(HandlerFunc(func(w ResponseWriter, r *Request) {
+	ts := httptest.NewServer(HandlerFunc(func w, r {
 		p := <-servec
 		if p.etag != "" {
 			w.Header().Set("ETag", p.etag)
@@ -1173,7 +1173,7 @@ func TestLinuxSendfileChild(*testing.T) {
 	}
 	mux := NewServeMux()
 	mux.Handle("/", FileServer(Dir("testdata")))
-	mux.HandleFunc("/quit", func(ResponseWriter, *Request) {
+	mux.HandleFunc("/quit", func {
 		os.Exit(0)
 	})
 	s := &Server{Handler: mux}
@@ -1198,8 +1198,8 @@ func TestFileServerNotDirError(t *testing.T) {
 		t.Errorf("StatusCode = %v; want 404", res.StatusCode)
 	}
 
-	test := func(name string, dir Dir) {
-		t.Run(name, func(t *testing.T) {
+	test := func name, dir {
+		t.Run(name, func t {
 			_, err = dir.Open("/index.html/not-a-file")
 			if err == nil {
 				t.Fatal("err == nil; want != nil")

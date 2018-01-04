@@ -34,28 +34,28 @@ func TestTraceSymbolize(t *testing.T) {
 	// on a channel, in a select or otherwise. So we kick off goroutines
 	// that need to block first in the hope that while we are executing
 	// the rest of the test, they will block.
-	go func() {
+	go func {
 		select {}
 	}()
-	go func() {
+	go func {
 		var c chan int
 		c <- 0
 	}()
-	go func() {
+	go func {
 		var c chan int
 		<-c
 	}()
 	done1 := make(chan bool)
-	go func() {
+	go func {
 		<-done1
 	}()
 	done2 := make(chan bool)
-	go func() {
+	go func {
 		done2 <- true
 	}()
 	c1 := make(chan int)
 	c2 := make(chan int)
-	go func() {
+	go func {
 		select {
 		case <-c1:
 		case <-c2:
@@ -63,17 +63,17 @@ func TestTraceSymbolize(t *testing.T) {
 	}()
 	var mu sync.Mutex
 	mu.Lock()
-	go func() {
+	go func {
 		mu.Lock()
 		mu.Unlock()
 	}()
 	var wg sync.WaitGroup
 	wg.Add(1)
-	go func() {
+	go func {
 		wg.Wait()
 	}()
 	cv := sync.NewCond(&sync.Mutex{})
-	go func() {
+	go func {
 		cv.L.Lock()
 		cv.Wait()
 		cv.L.Unlock()
@@ -82,7 +82,7 @@ func TestTraceSymbolize(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to listen: %v", err)
 	}
-	go func() {
+	go func {
 		c, err := ln.Accept()
 		if err != nil {
 			t.Errorf("failed to accept: %v", err)
@@ -97,7 +97,7 @@ func TestTraceSymbolize(t *testing.T) {
 	defer rp.Close()
 	defer wp.Close()
 	pipeReadDone := make(chan bool)
-	go func() {
+	go func {
 		var data [1]byte
 		rp.Read(data[:])
 		pipeReadDone <- true

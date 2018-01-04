@@ -120,7 +120,7 @@ func TestClean(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		allocs := testing.AllocsPerRun(100, func() { filepath.Clean(test.result) })
+		allocs := testing.AllocsPerRun(100, func { filepath.Clean(test.result) })
 		if allocs > 0 {
 			t.Errorf("Clean(%q): %v allocs, want zero", test.result, allocs)
 		}
@@ -360,7 +360,7 @@ func walkTree(n *Node, path string, f func(path string, n *Node)) {
 }
 
 func makeTree(t *testing.T) {
-	walkTree(tree, tree.name, func(path string, n *Node) {
+	walkTree(tree, tree.name, func path, n {
 		if n.entries == nil {
 			fd, err := os.Create(path)
 			if err != nil {
@@ -374,10 +374,10 @@ func makeTree(t *testing.T) {
 	})
 }
 
-func markTree(n *Node) { walkTree(n, "", func(path string, n *Node) { n.mark++ }) }
+func markTree(n *Node) { walkTree(n, "", func path, n { n.mark++ }) }
 
 func checkMarks(t *testing.T, report bool) {
-	walkTree(tree, tree.name, func(path string, n *Node) {
+	walkTree(tree, tree.name, func path, n {
 		if n.mark != 1 && report {
 			t.Errorf("node %s mark = %d; expected 1", path, n.mark)
 		}
@@ -390,7 +390,7 @@ func checkMarks(t *testing.T, report bool) {
 // are always accumulated, though.
 func mark(info os.FileInfo, err error, errors *[]error, clear bool) error {
 	name := info.Name()
-	walkTree(tree, tree.name, func(path string, n *Node) {
+	walkTree(tree, tree.name, func path, n {
 		if n.name == name {
 			n.mark++
 		}
@@ -417,7 +417,7 @@ func chtmpdir(t *testing.T) (restore func()) {
 	if err := os.Chdir(d); err != nil {
 		t.Fatalf("chtmpdir: %v", err)
 	}
-	return func() {
+	return func {
 		if err := os.Chdir(oldwd); err != nil {
 			t.Fatalf("chtmpdir: %v", err)
 		}
@@ -436,7 +436,7 @@ func TestWalk(t *testing.T) {
 	makeTree(t)
 	errors := make([]error, 0, 10)
 	clear := true
-	markFn := func(path string, info os.FileInfo, err error) error {
+	markFn := func path, info, err {
 		return mark(info, err, &errors, clear)
 	}
 	// Expect no errors.
@@ -530,7 +530,7 @@ func TestWalkSkipDirOnFile(t *testing.T) {
 	touch(t, filepath.Join(td, "dir/foo2"))
 
 	sawFoo2 := false
-	walker := func(path string, info os.FileInfo, err error) error {
+	walker := func path, info, err {
 		if strings.HasSuffix(path, "foo2") {
 			sawFoo2 = true
 		}
@@ -572,18 +572,18 @@ func TestWalkFileError(t *testing.T) {
 	}
 	touch(t, filepath.Join(dir, "baz"))
 	touch(t, filepath.Join(dir, "stat-error"))
-	defer func() {
+	defer func {
 		*filepath.LstatP = os.Lstat
 	}()
 	statErr := errors.New("some stat error")
-	*filepath.LstatP = func(path string) (os.FileInfo, error) {
+	*filepath.LstatP = func path {
 		if strings.HasSuffix(path, "stat-error") {
 			return nil, statErr
 		}
 		return os.Lstat(path)
 	}
 	got := map[string]error{}
-	err = filepath.Walk(td, func(path string, fi os.FileInfo, err error) error {
+	err = filepath.Walk(td, func path, fi, err {
 		rel, _ := filepath.Rel(td, path)
 		got[filepath.ToSlash(rel)] = err
 		return nil
@@ -793,7 +793,7 @@ func testEvalSymlinksAfterChdir(t *testing.T, wd, path, want string) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer func() {
+	defer func {
 		err := os.Chdir(cwd)
 		if err != nil {
 			t.Fatal(err)
@@ -1219,7 +1219,7 @@ func TestBug3486(t *testing.T) { // https://golang.org/issue/3486
 	ken := filepath.Join(root, "ken")
 	seenBugs := false
 	seenKen := false
-	err = filepath.Walk(root, func(pth string, info os.FileInfo, err error) error {
+	err = filepath.Walk(root, func pth, info, err {
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -1268,7 +1268,7 @@ func testWalkSymlink(t *testing.T, mklink func(target, link string) error) {
 	}
 
 	var visited []string
-	err = filepath.Walk(tmpdir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(tmpdir, func path, info, err {
 		if err != nil {
 			t.Fatal(err)
 		}

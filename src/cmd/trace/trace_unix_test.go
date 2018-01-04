@@ -33,7 +33,7 @@ func TestGoroutineInSyscall(t *testing.T) {
 	}
 
 	var wg sync.WaitGroup
-	defer func() {
+	defer func {
 		syscall.Write(p[1], []byte("a"))
 		wg.Wait()
 
@@ -41,7 +41,7 @@ func TestGoroutineInSyscall(t *testing.T) {
 		syscall.Close(p[1])
 	}()
 	wg.Add(1)
-	go func() {
+	go func {
 		var tmp [1]byte
 		syscall.Read(p[0], tmp[:])
 		wg.Done()
@@ -49,7 +49,7 @@ func TestGoroutineInSyscall(t *testing.T) {
 
 	// Start multiple timer goroutines.
 	allTimers := make([]*time.Timer, 2*runtime.GOMAXPROCS(0))
-	defer func() {
+	defer func {
 		for _, timer := range allTimers {
 			timer.Stop()
 		}
@@ -58,7 +58,7 @@ func TestGoroutineInSyscall(t *testing.T) {
 	var timerSetup sync.WaitGroup
 	for i := range allTimers {
 		timerSetup.Add(1)
-		go func(i int) {
+		go func i {
 			defer timerSetup.Done()
 			allTimers[i] = time.AfterFunc(time.Hour, nil)
 		}(i)

@@ -38,7 +38,7 @@ func TestSortingBySigLT(t *testing.T) {
 	if reflect.DeepEqual(data, want) {
 		t.Fatal("data must be shuffled")
 	}
-	obj.SortSlice(data, func(i, j int) bool { return siglt(data[i], data[j]) })
+	obj.SortSlice(data, func i, j { return siglt(data[i], data[j]) })
 	if !reflect.DeepEqual(data, want) {
 		t.Logf("want: %#v", want)
 		t.Logf("data: %#v", data)

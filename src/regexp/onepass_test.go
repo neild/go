@@ -235,7 +235,7 @@ func BenchmarkCompileOnepass(b *testing.B) {
 		if len(name) > 20 {
 			name = name[:20] + "..."
 		}
-		b.Run(name, func(b *testing.B) {
+		b.Run(name, func b {
 			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				if _, err := Compile(test.re); err != nil {

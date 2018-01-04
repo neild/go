@@ -311,7 +311,7 @@ func TestUnexportedRead(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	defer func() {
+	defer func {
 		if recover() == nil {
 			t.Fatal("did not panic")
 		}
@@ -322,7 +322,7 @@ func TestUnexportedRead(t *testing.T) {
 
 func TestReadErrorMsg(t *testing.T) {
 	var buf bytes.Buffer
-	read := func(data interface{}) {
+	read := func data {
 		err := Read(&buf, LittleEndian, data)
 		want := "binary.Read: invalid type " + reflect.TypeOf(data).String()
 		if err == nil {
@@ -371,7 +371,7 @@ func TestReadTruncated(t *testing.T) {
 }
 
 func testUint64SmallSliceLengthPanics() (panicked bool) {
-	defer func() {
+	defer func {
 		panicked = recover() != nil
 	}()
 	b := [8]byte{1, 2, 3, 4, 5, 6, 7, 8}
@@ -380,7 +380,7 @@ func testUint64SmallSliceLengthPanics() (panicked bool) {
 }
 
 func testPutUint64SmallSliceLengthPanics() (panicked bool) {
-	defer func() {
+	defer func {
 		panicked = recover() != nil
 	}()
 	b := [8]byte{}

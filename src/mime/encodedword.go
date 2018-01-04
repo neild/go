@@ -424,7 +424,7 @@ func fromHex(b byte) (byte, error) {
 }
 
 var bufPool = sync.Pool{
-	New: func() interface{} {
+	New: func {
 		return new(bytes.Buffer)
 	},
 }

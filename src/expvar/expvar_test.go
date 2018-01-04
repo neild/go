@@ -66,7 +66,7 @@ func TestInt(t *testing.T) {
 func BenchmarkIntAdd(b *testing.B) {
 	var v Int
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			v.Add(1)
 		}
@@ -76,7 +76,7 @@ func BenchmarkIntAdd(b *testing.B) {
 func BenchmarkIntSet(b *testing.B) {
 	var v Int
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			v.Set(1)
 		}
@@ -112,7 +112,7 @@ func TestFloat(t *testing.T) {
 func BenchmarkFloatAdd(b *testing.B) {
 	var f Float
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			f.Add(1.0)
 		}
@@ -122,7 +122,7 @@ func BenchmarkFloatAdd(b *testing.B) {
 func BenchmarkFloatSet(b *testing.B) {
 	var f Float
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			f.Set(1.0)
 		}
@@ -154,7 +154,7 @@ func TestString(t *testing.T) {
 func BenchmarkStringSet(b *testing.B) {
 	var s String
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			s.Set("red")
 		}
@@ -169,7 +169,7 @@ func TestMapInit(t *testing.T) {
 	colors.Add("chartreuse", 1)
 
 	n := 0
-	colors.Do(func(KeyValue) { n++ })
+	colors.Do(func { n++ })
 	if n != 3 {
 		t.Errorf("after three Add calls with distinct keys, Do should invoke f 3 times; got %v", n)
 	}
@@ -177,7 +177,7 @@ func TestMapInit(t *testing.T) {
 	colors.Init()
 
 	n = 0
-	colors.Do(func(KeyValue) { n++ })
+	colors.Do(func { n++ })
 	if n != 0 {
 		t.Errorf("after Init, Do should invoke f 0 times; got %v", n)
 	}
@@ -228,7 +228,7 @@ func BenchmarkMapSet(b *testing.B) {
 
 	v := new(Int)
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			m.Set("red", v)
 		}
@@ -250,7 +250,7 @@ func BenchmarkMapSetDifferent(b *testing.B) {
 	b.ResetTimer()
 
 	var n int32
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		i := int(atomic.AddInt32(&n, 1)-1) % len(procKeys)
 		keys := procKeys[i]
 
@@ -268,7 +268,7 @@ func BenchmarkMapSetString(b *testing.B) {
 	v := new(String)
 	v.Set("Hello, !")
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			m.Set("red", v)
 		}
@@ -276,7 +276,7 @@ func BenchmarkMapSetString(b *testing.B) {
 }
 
 func BenchmarkMapAddSame(b *testing.B) {
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			m := new(Map).Init()
 			m.Add("red", 1)
@@ -300,7 +300,7 @@ func BenchmarkMapAddDifferent(b *testing.B) {
 	b.ResetTimer()
 
 	var n int32
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		i := int(atomic.AddInt32(&n, 1)-1) % len(procKeys)
 		keys := procKeys[i]
 
@@ -315,7 +315,7 @@ func BenchmarkMapAddDifferent(b *testing.B) {
 
 func BenchmarkMapAddSameSteadyState(b *testing.B) {
 	m := new(Map).Init()
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			m.Add("red", 1)
 		}
@@ -336,7 +336,7 @@ func BenchmarkMapAddDifferentSteadyState(b *testing.B) {
 	b.ResetTimer()
 
 	var n int32
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		i := int(atomic.AddInt32(&n, 1)-1) % len(procKeys)
 		keys := procKeys[i]
 
@@ -351,7 +351,7 @@ func BenchmarkMapAddDifferentSteadyState(b *testing.B) {
 func TestFunc(t *testing.T) {
 	RemoveAll()
 	var x interface{} = []string{"a", "b"}
-	f := Func(func() interface{} { return x })
+	f := Func(func { return x })
 	if s, exp := f.String(), `["a","b"]`; s != exp {
 		t.Errorf(`f.String() = %q, want %q`, s, exp)
 	}
@@ -413,7 +413,7 @@ func BenchmarkRealworldExpvarUsage(b *testing.B) {
 	}
 	defer ln.Close()
 	done := make(chan bool)
-	go func() {
+	go func {
 		for p := 0; p < P; p++ {
 			s, err := ln.Accept()
 			if err != nil {
@@ -439,7 +439,7 @@ func BenchmarkRealworldExpvarUsage(b *testing.B) {
 	wg.Add(4 * P)
 	for p := 0; p < P; p++ {
 		// Client writer.
-		go func(c net.Conn) {
+		go func c {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {
@@ -462,7 +462,7 @@ func BenchmarkRealworldExpvarUsage(b *testing.B) {
 		pipe := make(chan byte, 128)
 
 		// Server reader.
-		go func(s net.Conn) {
+		go func s {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {
@@ -479,7 +479,7 @@ func BenchmarkRealworldExpvarUsage(b *testing.B) {
 		}(servers[p])
 
 		// Server writer.
-		go func(s net.Conn) {
+		go func s {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {
@@ -500,7 +500,7 @@ func BenchmarkRealworldExpvarUsage(b *testing.B) {
 		}(servers[p])
 
 		// Client reader.
-		go func(c net.Conn) {
+		go func c {
 			defer wg.Done()
 			var buf [1]byte
 			for i := 0; i < N; i++ {

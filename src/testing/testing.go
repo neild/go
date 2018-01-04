@@ -725,7 +725,7 @@ func tRunner(t *T, fn func(t *T)) {
 	// returned normally or because a test failure triggered
 	// a call to runtime.Goexit, record the duration and send
 	// a signal saying that the test is done.
-	defer func() {
+	defer func {
 		if t.raceErrors+race.Errors() > 0 {
 			t.Errorf("race detected during execution of test")
 		}
@@ -1058,14 +1058,14 @@ func runTests(matchString func(pat, str string) (bool, error), tests []InternalT
 				},
 				context: ctx,
 			}
-			tRunner(t, func(t *T) {
+			tRunner(t, func t {
 				for _, test := range tests {
 					t.Run(test.Name, test.F)
 				}
 				// Run catching the signal rather than the tRunner as a separate
 				// goroutine to avoid adding a goroutine during the sequential
 				// phase as this pollutes the stacktrace output when aborting.
-				go func() { <-t.signal }()
+				go func { <-t.signal }()
 			})
 			ok = ok && !t.Failed()
 			ran = ran || t.ran
@@ -1139,7 +1139,7 @@ func (m *M) before() {
 
 // after runs after all testing.
 func (m *M) after() {
-	m.afterOnce.Do(func() {
+	m.afterOnce.Do(func {
 		m.writeProfiles()
 	})
 }
@@ -1234,7 +1234,7 @@ func toOutputDir(path string) string {
 // startAlarm starts an alarm if requested.
 func (m *M) startAlarm() {
 	if *timeout > 0 {
-		m.timer = time.AfterFunc(*timeout, func() {
+		m.timer = time.AfterFunc(*timeout, func {
 			m.after()
 			debug.SetTraceback("all")
 			panic(fmt.Sprintf("test timed out after %v", *timeout))

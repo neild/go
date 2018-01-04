@@ -197,7 +197,7 @@ func main() {
 	}
 
 	fail := false
-	defer func() {
+	defer func {
 		if fail {
 			os.Exit(1)
 		}
@@ -267,7 +267,7 @@ func compareAPI(w io.Writer, features, required, optional, exception []string, a
 	sort.Strings(features)
 	sort.Strings(required)
 
-	take := func(sl *[]string) string {
+	take := func sl {
 		s := (*sl)[0]
 		*sl = (*sl)[1:]
 		return s
@@ -522,7 +522,7 @@ func (w *Walker) Import(name string) (*types.Package, error) {
 // for mismatched pushes & pops)
 func (w *Walker) pushScope(name string) (popFunc func()) {
 	w.scope = append(w.scope, name)
-	return func() {
+	return func {
 		if len(w.scope) == 0 {
 			log.Fatalf("attempt to leave scope %q with empty scope list", name)
 		}

@@ -389,7 +389,7 @@ func ordercall(n *Node, order *Order) {
 	ordercallargs(&n.List, order)
 
 	if n.Op == OCALLFUNC {
-		keepAlive := func(i int) {
+		keepAlive := func i {
 			// If the argument is really a pointer being converted to uintptr,
 			// arrange for the pointer to be kept alive until the call returns,
 			// by copying it into a temp and marking that temp

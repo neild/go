@@ -325,11 +325,11 @@ func TestConfHostLookupOrder(t *testing.T) {
 	}
 
 	origGetHostname := getHostname
-	defer func() { getHostname = origGetHostname }()
+	defer func { getHostname = origGetHostname }()
 
 	for _, tt := range tests {
 		for _, ht := range tt.hostTests {
-			getHostname = func() (string, error) { return ht.localhost, nil }
+			getHostname = func { return ht.localhost, nil }
 
 			gotOrder := tt.c.hostLookupOrder(ht.host)
 			if gotOrder != ht.want {

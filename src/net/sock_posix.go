@@ -118,7 +118,7 @@ func (fd *netFD) addrFunc() func(syscall.Sockaddr) Addr {
 			return sockaddrToUnixpacket
 		}
 	}
-	return func(syscall.Sockaddr) Addr { return nil }
+	return func { return nil }
 }
 
 func (fd *netFD) dial(ctx context.Context, laddr, raddr sockaddr) error {

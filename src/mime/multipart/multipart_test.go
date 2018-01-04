@@ -149,7 +149,7 @@ func testMultipart(t *testing.T, r io.Reader, onlyNewlines bool) {
 		t.Errorf("part 1 copy: %v", err)
 	}
 
-	adjustNewlines := func(s string) string {
+	adjustNewlines := func s {
 		if onlyNewlines {
 			return strings.Replace(s, "\r\n", "\n", -1)
 		}
@@ -363,7 +363,7 @@ Body 2
 		"MyBoundary")
 
 	var i int
-	readPart := func(hdr textproto.MIMEHeader, body string) {
+	readPart := func hdr, body {
 		part, err := reader.NextPart()
 		if part == nil || err != nil {
 			t.Fatalf("Part %d: NextPart failed: %v", i, err)

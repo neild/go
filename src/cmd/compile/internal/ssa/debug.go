@@ -77,7 +77,7 @@ func (b *BlockDebug) LocString(loc *VarLoc) string {
 	if len(storage) == 0 {
 		storage = append(storage, "!!!no storage!!!")
 	}
-	pos := func(v *Value, p *obj.Prog, pc int64) string {
+	pos := func v, p, pc {
 		if v == nil {
 			return "?"
 		}

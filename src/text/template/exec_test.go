@@ -151,11 +151,11 @@ var tVal = &T{
 	PI:                   newInt(23),
 	PS:                   newString("a string"),
 	PSI:                  newIntSlice(21, 22, 23),
-	BinaryFunc:           func(a, b string) string { return fmt.Sprintf("[%s=%s]", a, b) },
-	VariadicFunc:         func(s ...string) string { return fmt.Sprint("<", strings.Join(s, "+"), ">") },
-	VariadicFuncInt:      func(a int, s ...string) string { return fmt.Sprint(a, "=<", strings.Join(s, "+"), ">") },
-	NilOKFunc:            func(s *int) bool { return s == nil },
-	ErrFunc:              func() (string, error) { return "bla", nil },
+	BinaryFunc:           func a, b { return fmt.Sprintf("[%s=%s]", a, b) },
+	VariadicFunc:         func s { return fmt.Sprint("<", strings.Join(s, "+"), ">") },
+	VariadicFuncInt:      func a, s { return fmt.Sprint(a, "=<", strings.Join(s, "+"), ">") },
+	NilOKFunc:            func s { return s == nil },
+	ErrFunc:              func { return "bla", nil },
 	Tmpl:                 Must(New("x").Parse("test template")), // "x" is the value of .X
 }
 
@@ -613,7 +613,7 @@ func count(n int) chan string {
 		return nil
 	}
 	c := make(chan string)
-	go func() {
+	go func {
 		for i := 0; i < n; i++ {
 			c <- "abcdefghijklmnop"[i : i+1]
 		}
@@ -1265,7 +1265,7 @@ func TestBadFuncNames(t *testing.T) {
 }
 
 func testBadFuncName(name string, t *testing.T) {
-	defer func() {
+	defer func {
 		recover()
 	}()
 	New("X").Funcs(
@@ -1411,7 +1411,7 @@ func TestInterfaceValues(t *testing.T) {
 		tmpl := Must(New("tmpl").Parse(tt.text))
 		var buf bytes.Buffer
 		err := tmpl.Execute(&buf, map[string]interface{}{
-			"PlusOne": func(n int) int {
+			"PlusOne": func n {
 				return n + 1
 			},
 			"Slice": []int{0, 1, 2, 3},

@@ -18,7 +18,7 @@ func TestSetGoroutineLabels(t *testing.T) {
 	if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 		t.Errorf("Expected parent goroutine's profile labels to be empty before test, got %v", gotLabels)
 	}
-	go func() {
+	go func {
 		if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 			t.Errorf("Expected child goroutine's profile labels to be empty before test, got %v", gotLabels)
 		}
@@ -32,7 +32,7 @@ func TestSetGoroutineLabels(t *testing.T) {
 	if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 		t.Errorf("parent goroutine's profile labels: got %v, want %v", gotLabels, wantLabels)
 	}
-	go func() {
+	go func {
 		if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 			t.Errorf("child goroutine's profile labels: got %v, want %v", gotLabels, wantLabels)
 		}
@@ -46,7 +46,7 @@ func TestSetGoroutineLabels(t *testing.T) {
 	if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 		t.Errorf("Expected parent goroutine's profile labels to be empty, got %v", gotLabels)
 	}
-	go func() {
+	go func {
 		if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 			t.Errorf("Expected child goroutine's profile labels to be empty, got %v", gotLabels)
 		}
@@ -61,14 +61,14 @@ func TestDo(t *testing.T) {
 		t.Errorf("Expected parent goroutine's profile labels to be empty before Do, got %v", gotLabels)
 	}
 
-	Do(context.Background(), Labels("key1", "value1", "key2", "value2"), func(ctx context.Context) {
+	Do(context.Background(), Labels("key1", "value1", "key2", "value2"), func ctx {
 		wantLabels := map[string]string{"key1": "value1", "key2": "value2"}
 		if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 			t.Errorf("parent goroutine's profile labels: got %v, want %v", gotLabels, wantLabels)
 		}
 
 		sync := make(chan struct{})
-		go func() {
+		go func {
 			wantLabels := map[string]string{"key1": "value1", "key2": "value2"}
 			if gotLabels := getProfLabel(); !reflect.DeepEqual(gotLabels, wantLabels) {
 				t.Errorf("child goroutine's profile labels: got %v, want %v", gotLabels, wantLabels)

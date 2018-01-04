@@ -18,7 +18,7 @@ import (
 func TestMatch(t *testing.T) {
 	ctxt := Default
 	what := "default"
-	match := func(tag string, want map[string]bool) {
+	match := func tag, want {
 		m := make(map[string]bool)
 		if !ctxt.match(tag, m) {
 			t.Errorf("%s context should match %s, does not", what, tag)
@@ -27,7 +27,7 @@ func TestMatch(t *testing.T) {
 			t.Errorf("%s tags = %v, want %v", tag, m, want)
 		}
 	}
-	nomatch := func(tag string, want map[string]bool) {
+	nomatch := func tag, want {
 		m := make(map[string]bool)
 		if ctxt.match(tag, m) {
 			t.Errorf("%s context should NOT match %s, does", what, tag)
@@ -220,7 +220,7 @@ func TestMatchFile(t *testing.T) {
 			}
 			return &readNopCloser{strings.NewReader(tt.data)}, nil
 		}
-		ctxt.JoinPath = func(elem ...string) string {
+		ctxt.JoinPath = func elem {
 			return strings.Join(elem, "+")
 		}
 		match, err := ctxt.MatchFile("x", tt.name)

@@ -213,7 +213,7 @@ func download(arg string, parent *load.Package, stk *load.ImportStack, mode int)
 		// Caller is responsible for expanding vendor paths.
 		panic("internal error: download mode has useVendor set")
 	}
-	load1 := func(path string, mode int) *load.Package {
+	load1 := func path, mode {
 		if parent == nil {
 			return load.LoadPackage(path, stk)
 		}

@@ -22,7 +22,7 @@ func builderBytesEq(b *Builder, want ...byte) error {
 func TestContinuationError(t *testing.T) {
 	const errorStr = "TestContinuationError"
 	var b Builder
-	b.AddUint8LengthPrefixed(func(b *Builder) {
+	b.AddUint8LengthPrefixed(func b {
 		b.AddUint8(1)
 		panic(BuildError{Err: errors.New(errorStr)})
 	})
@@ -40,12 +40,12 @@ func TestContinuationError(t *testing.T) {
 }
 
 func TestContinuationNonError(t *testing.T) {
-	defer func() {
+	defer func {
 		recover()
 	}()
 
 	var b Builder
-	b.AddUint8LengthPrefixed(func(b *Builder) {
+	b.AddUint8LengthPrefixed(func b {
 		b.AddUint8(1)
 		panic(1)
 	})
@@ -54,12 +54,12 @@ func TestContinuationNonError(t *testing.T) {
 }
 
 func TestGeneratedPanic(t *testing.T) {
-	defer func() {
+	defer func {
 		recover()
 	}()
 
 	var b Builder
-	b.AddUint8LengthPrefixed(func(b *Builder) {
+	b.AddUint8LengthPrefixed(func b {
 		var p *byte
 		*p = 0
 	})
@@ -207,7 +207,7 @@ func TestUMultiple(t *testing.T) {
 
 func TestUint8LengthPrefixedSimple(t *testing.T) {
 	var b Builder
-	b.AddUint8LengthPrefixed(func(c *Builder) {
+	b.AddUint8LengthPrefixed(func c {
 		c.AddUint8(23)
 		c.AddUint8(42)
 	})
@@ -234,12 +234,12 @@ func TestUint8LengthPrefixedSimple(t *testing.T) {
 
 func TestUint8LengthPrefixedMulti(t *testing.T) {
 	var b Builder
-	b.AddUint8LengthPrefixed(func(c *Builder) {
+	b.AddUint8LengthPrefixed(func c {
 		c.AddUint8(23)
 		c.AddUint8(42)
 	})
 	b.AddUint8(5)
-	b.AddUint8LengthPrefixed(func(c *Builder) {
+	b.AddUint8LengthPrefixed(func c {
 		c.AddUint8(123)
 		c.AddUint8(234)
 	})
@@ -267,9 +267,9 @@ func TestUint8LengthPrefixedMulti(t *testing.T) {
 
 func TestUint8LengthPrefixedNested(t *testing.T) {
 	var b Builder
-	b.AddUint8LengthPrefixed(func(c *Builder) {
+	b.AddUint8LengthPrefixed(func c {
 		c.AddUint8(5)
-		c.AddUint8LengthPrefixed(func(d *Builder) {
+		c.AddUint8LengthPrefixed(func d {
 			d.AddUint8(23)
 			d.AddUint8(42)
 		})
@@ -309,7 +309,7 @@ func TestPreallocatedBuffer(t *testing.T) {
 	var buf [5]byte
 	b := NewBuilder(buf[0:0])
 	b.AddUint8(1)
-	b.AddUint8LengthPrefixed(func(c *Builder) {
+	b.AddUint8LengthPrefixed(func c {
 		c.AddUint8(3)
 		c.AddUint8(4)
 	})
@@ -325,16 +325,16 @@ func TestPreallocatedBuffer(t *testing.T) {
 
 func TestWriteWithPendingChild(t *testing.T) {
 	var b Builder
-	b.AddUint8LengthPrefixed(func(c *Builder) {
-		c.AddUint8LengthPrefixed(func(d *Builder) {
-			defer func() {
+	b.AddUint8LengthPrefixed(func c {
+		c.AddUint8LengthPrefixed(func d {
+			defer func {
 				if recover() == nil {
 					t.Errorf("recover() = nil, want error; c.AddUint8() did not panic")
 				}
 			}()
 			c.AddUint8(2) // panics
 
-			defer func() {
+			defer func {
 				if recover() == nil {
 					t.Errorf("recover() = nil, want error; b.AddUint8() did not panic")
 				}
@@ -342,7 +342,7 @@ func TestWriteWithPendingChild(t *testing.T) {
 			b.AddUint8(2) // panics
 		})
 
-		defer func() {
+		defer func {
 			if recover() == nil {
 				t.Errorf("recover() = nil, want error; b.AddUint8() did not panic")
 			}

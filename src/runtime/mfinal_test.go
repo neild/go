@@ -26,7 +26,7 @@ func TestFinalizerType(t *testing.T) {
 	}
 
 	ch := make(chan bool, 10)
-	finalize := func(x *int) {
+	finalize := func x {
 		if *x != 97531 {
 			t.Errorf("finalizer %d, want %d", *x, 97531)
 		}
@@ -37,16 +37,16 @@ func TestFinalizerType(t *testing.T) {
 		convert   func(*int) interface{}
 		finalizer interface{}
 	}{
-		{func(x *int) interface{} { return x }, func(v *int) { finalize(v) }},
-		{func(x *int) interface{} { return Tintptr(x) }, func(v Tintptr) { finalize(v) }},
-		{func(x *int) interface{} { return Tintptr(x) }, func(v *int) { finalize(v) }},
-		{func(x *int) interface{} { return (*Tint)(x) }, func(v *Tint) { finalize((*int)(v)) }},
-		{func(x *int) interface{} { return (*Tint)(x) }, func(v Tinter) { finalize((*int)(v.(*Tint))) }},
+		{func x { return x }, func v { finalize(v) }},
+		{func x { return Tintptr(x) }, func v { finalize(v) }},
+		{func x { return Tintptr(x) }, func v { finalize(v) }},
+		{func x { return (*Tint)(x) }, func v { finalize((*int)(v)) }},
+		{func x { return (*Tint)(x) }, func v { finalize((*int)(v.(*Tint))) }},
 	}
 
 	for i, tt := range finalizerTests {
 		done := make(chan bool, 1)
-		go func() {
+		go func {
 			// allocate struct with pointer to avoid hitting tinyalloc.
 			// Otherwise we can't be sure when the allocation will
 			// be freed.
@@ -82,10 +82,10 @@ func TestFinalizerInterfaceBig(t *testing.T) {
 	}
 	ch := make(chan bool)
 	done := make(chan bool, 1)
-	go func() {
+	go func {
 		v := &bigValue{0xDEADBEEFDEADBEEF, true, "It matters not how strait the gate"}
 		old := *v
-		runtime.SetFinalizer(v, func(v interface{}) {
+		runtime.SetFinalizer(v, func v {
 			i, ok := v.(*bigValue)
 			if !ok {
 				t.Errorf("finalizer called with type %T, want *bigValue", v)
@@ -114,12 +114,12 @@ func fin(v *int) {
 func TestFinalizerZeroSizedStruct(t *testing.T) {
 	type Z struct{}
 	z := new(Z)
-	runtime.SetFinalizer(z, func(*Z) {})
+	runtime.SetFinalizer(z, func {})
 }
 
 func BenchmarkFinalizer(b *testing.B) {
 	const Batch = 1000
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		var data [Batch]*int
 		for i := 0; i < Batch; i++ {
 			data[i] = new(int)
@@ -136,7 +136,7 @@ func BenchmarkFinalizer(b *testing.B) {
 }
 
 func BenchmarkFinalizerRun(b *testing.B) {
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		for pb.Next() {
 			v := new(int)
 			runtime.SetFinalizer(v, fin)
@@ -177,7 +177,7 @@ func TestEmptySlice(t *testing.T) {
 	xs := x[objsize:] // change objsize to objsize-1 and the test passes
 
 	fin := make(chan bool, 1)
-	runtime.SetFinalizer(y, func(z *objtype) { fin <- true })
+	runtime.SetFinalizer(y, func z { fin <- true })
 	runtime.GC()
 	select {
 	case <-fin:
@@ -209,7 +209,7 @@ func TestEmptyString(t *testing.T) {
 	ss := x[objsize:] // change objsize to objsize-1 and the test passes
 	fin := make(chan bool, 1)
 	// set finalizer on string contents of y
-	runtime.SetFinalizer(y, func(z *objtype) { fin <- true })
+	runtime.SetFinalizer(y, func z { fin <- true })
 	runtime.GC()
 	select {
 	case <-fin:
@@ -223,8 +223,8 @@ var ssglobal string
 
 // Test for issue 7656.
 func TestFinalizerOnGlobal(t *testing.T) {
-	runtime.SetFinalizer(Foo1, func(p *Object1) {})
-	runtime.SetFinalizer(Foo2, func(p *Object2) {})
+	runtime.SetFinalizer(Foo1, func p {})
+	runtime.SetFinalizer(Foo2, func p {})
 	runtime.SetFinalizer(Foo1, nil)
 	runtime.SetFinalizer(Foo2, nil)
 }
@@ -252,7 +252,7 @@ func TestDeferKeepAlive(t *testing.T) {
 	type T *int // needs to be a pointer base type to avoid tinyalloc and its never-finalized behavior.
 	x := new(T)
 	finRun := false
-	runtime.SetFinalizer(x, func(x *T) {
+	runtime.SetFinalizer(x, func x {
 		finRun = true
 	})
 	defer runtime.KeepAlive(x)

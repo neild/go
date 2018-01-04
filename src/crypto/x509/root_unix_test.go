@@ -79,7 +79,7 @@ func TestEnvVars(t *testing.T) {
 	// Save old settings so we can restore before the test ends.
 	origCertFiles, origCertDirectories := certFiles, certDirectories
 	origFile, origDir := os.Getenv(certFileEnv), os.Getenv(certDirEnv)
-	defer func() {
+	defer func {
 		certFiles = origCertFiles
 		certDirectories = origCertDirectories
 		os.Setenv(certFileEnv, origFile)
@@ -87,7 +87,7 @@ func TestEnvVars(t *testing.T) {
 	}()
 
 	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
+		t.Run(tc.name, func t {
 			if err := os.Setenv(certFileEnv, tc.fileEnv); err != nil {
 				t.Fatalf("setenv %q failed: %v", certFileEnv, err)
 			}

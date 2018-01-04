@@ -40,7 +40,7 @@ func newAsyncIO(fn func([]byte) (int, error), b []byte) *asyncIO {
 		res: make(chan result, 0),
 	}
 	aio.mu.Lock()
-	go func() {
+	go func {
 		// Lock the current goroutine to its process
 		// and store the pid in io so that Cancel can
 		// interrupt it. We ignore the "hangup" signal,

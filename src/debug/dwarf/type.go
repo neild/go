@@ -303,7 +303,7 @@ func (d *Data) readType(name string, r typeReader, off Offset, typeCache map[Off
 	// encounters them.
 	if typedefs == nil {
 		var typedefList []*TypedefType
-		defer func() {
+		defer func {
 			for _, t := range typedefList {
 				t.Common().ByteSize = t.Type.Size()
 			}
@@ -319,7 +319,7 @@ func (d *Data) readType(name string, r typeReader, off Offset, typeCache map[Off
 	nextDepth := 0
 
 	// Get next child; set err if error happens.
-	next := func() *Entry {
+	next := func {
 		if !e.Children {
 			return nil
 		}
@@ -357,7 +357,7 @@ func (d *Data) readType(name string, r typeReader, off Offset, typeCache map[Off
 
 	// Get Type referred to by Entry's AttrType field.
 	// Set err if error happens. Not having a type is an error.
-	typeOf := func(e *Entry) Type {
+	typeOf := func e {
 		tval := e.Val(AttrType)
 		var t Type
 		switch toff := tval.(type) {

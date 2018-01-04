@@ -39,7 +39,7 @@ func lookupProtocol(ctx context.Context, name string) (int, error) {
 		err   error
 	}
 	ch := make(chan result) // unbuffered
-	go func() {
+	go func {
 		acquireThread()
 		defer releaseThread()
 		runtime.LockOSThread()
@@ -84,7 +84,7 @@ func (r *Resolver) lookupIP(ctx context.Context, name string) ([]IPAddr, error) 
 		err   error
 	}
 	ch := make(chan ret, 1)
-	go func() {
+	go func {
 		acquireThread()
 		defer releaseThread()
 		hints := syscall.AddrinfoW{

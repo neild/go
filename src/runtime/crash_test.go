@@ -71,7 +71,7 @@ func runTestProg(t *testing.T, binary, name string, env ...string) string {
 	// assume it is hanging and kill it to get a stack trace.
 	p := cmd.Process
 	done := make(chan bool)
-	go func() {
+	go func {
 		scale := 1
 		// This GOARCH/GOOS test is copied from cmd/dist/test.go.
 		// TODO(iant): Have cmd/dist update the environment variable.
@@ -149,7 +149,7 @@ var (
 )
 
 func checkStaleRuntime(t *testing.T) {
-	staleRuntimeOnce.Do(func() {
+	staleRuntimeOnce.Do(func {
 		// 'go run' uses the installed copy of runtime.a, which may be out of date.
 		out, err := testenv.CleanCmdEnv(exec.Command(testenv.GoToolPath(t), "list", "-gcflags=all="+os.Getenv("GO_GCFLAGS"), "-f", "{{.Stale}}", "runtime")).CombinedOutput()
 		if err != nil {
@@ -261,8 +261,8 @@ func TestGoexitCrash(t *testing.T) {
 
 func TestGoexitDefer(t *testing.T) {
 	c := make(chan struct{})
-	go func() {
-		defer func() {
+	go func {
+		defer func {
 			r := recover()
 			if r != nil {
 				t.Errorf("non-nil recover during Goexit")
@@ -321,29 +321,29 @@ func TestGoexitInPanic(t *testing.T) {
 // Issue 14965: Runtime panics should be of type runtime.Error
 func TestRuntimePanicWithRuntimeError(t *testing.T) {
 	testCases := [...]func(){
-		0: func() {
+		0: func {
 			var m map[uint64]bool
 			m[1234] = true
 		},
-		1: func() {
+		1: func {
 			ch := make(chan struct{})
 			close(ch)
 			close(ch)
 		},
-		2: func() {
+		2: func {
 			var ch = make(chan struct{})
 			close(ch)
 			ch <- struct{}{}
 		},
-		3: func() {
+		3: func {
 			var s = make([]int, 2)
 			_ = s[2]
 		},
-		4: func() {
+		4: func {
 			n := -1
 			_ = make(chan bool, n)
 		},
-		5: func() {
+		5: func {
 			close((chan bool)(nil))
 		},
 	}
@@ -357,7 +357,7 @@ func TestRuntimePanicWithRuntimeError(t *testing.T) {
 }
 
 func panicValue(fn func()) (recovered interface{}) {
-	defer func() {
+	defer func {
 		recovered = recover()
 	}()
 	fn()
@@ -389,13 +389,13 @@ func TestRecoverBeforePanicAfterGoexit(t *testing.T) {
 	// should be caught by the #1 defer, and execution
 	// should resume in the caller. Like the Goexit
 	// never happened!
-	defer func() {
+	defer func {
 		r := recover()
 		if r == nil {
 			panic("bad recover")
 		}
 	}()
-	defer func() {
+	defer func {
 		panic("hello")
 	}()
 	runtime.Goexit()
@@ -545,7 +545,7 @@ func (p *point) negate() {
 
 // Test for issue #10152.
 func TestPanicInlined(t *testing.T) {
-	defer func() {
+	defer func {
 		r := recover()
 		if r == nil {
 			t.Fatalf("recover failed")

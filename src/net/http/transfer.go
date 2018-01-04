@@ -201,7 +201,7 @@ func (t *transferWriter) shouldSendChunkedRequestBody() bool {
 // are workarounds if it does.
 func (t *transferWriter) probeRequestBody() {
 	t.ByteReadCh = make(chan readResult, 1)
-	go func(body io.Reader) {
+	go func body {
 		var buf [1]byte
 		var rres readResult
 		rres.n, rres.err = body.Read(buf[:])
@@ -713,7 +713,7 @@ func fixTrailer(header Header, te []string) (Header, error) {
 	trailer := make(Header)
 	var err error
 	for _, v := range vv {
-		foreachHeaderElement(v, func(key string) {
+		foreachHeaderElement(v, func key {
 			key = CanonicalHeaderKey(key)
 			switch key {
 			case "Transfer-Encoding", "Trailer", "Content-Length":

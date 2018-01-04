@@ -543,7 +543,7 @@ func TestSendDeadlock(t *testing.T) {
 	defer client.Close()
 
 	done := make(chan bool)
-	go func() {
+	go func {
 		testSendDeadlock(client)
 		testSendDeadlock(client)
 		done <- true
@@ -557,7 +557,7 @@ func TestSendDeadlock(t *testing.T) {
 }
 
 func testSendDeadlock(client *Client) {
-	defer func() {
+	defer func {
 		recover()
 	}()
 	args := &Args{7, 8}
@@ -583,7 +583,7 @@ func countMallocs(dial func() (*Client, error), t *testing.T) float64 {
 
 	args := &Args{7, 8}
 	reply := new(Reply)
-	return testing.AllocsPerRun(100, func() {
+	return testing.AllocsPerRun(100, func {
 		err := client.Call("Arith.Add", args, reply)
 		if err != nil {
 			t.Errorf("Add: expected no error but got string %q", err.Error())
@@ -702,7 +702,7 @@ func TestShutdown(t *testing.T) {
 	var l net.Listener
 	l, _ = listenTCP()
 	ch := make(chan net.Conn, 1)
-	go func() {
+	go func {
 		defer l.Close()
 		c, err := l.Accept()
 		if err != nil {
@@ -757,7 +757,7 @@ func benchmarkEndToEnd(dial func() (*Client, error), b *testing.B) {
 	args := &Args{7, 8}
 	b.ResetTimer()
 
-	b.RunParallel(func(pb *testing.PB) {
+	b.RunParallel(func pb {
 		reply := new(Reply)
 		for pb.Next() {
 			err := client.Call("Arith.Add", args, reply)
@@ -795,14 +795,14 @@ func benchmarkEndToEndAsync(dial func() (*Client, error), b *testing.B) {
 	b.ResetTimer()
 
 	for p := 0; p < procs; p++ {
-		go func() {
+		go func {
 			for atomic.AddInt32(&send, -1) >= 0 {
 				gate <- true
 				reply := new(Reply)
 				client.Go("Arith.Add", args, reply, res)
 			}
 		}()
-		go func() {
+		go func {
 			for call := range res {
 				A := call.Args.(*Args).A
 				B := call.Args.(*Args).B

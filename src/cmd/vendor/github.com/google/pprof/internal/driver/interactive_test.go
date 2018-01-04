@@ -29,15 +29,15 @@ import (
 func TestShell(t *testing.T) {
 	p := &profile.Profile{}
 	generateReportWrapper = checkValue
-	defer func() { generateReportWrapper = generateReport }()
+	defer func { generateReportWrapper = generateReport }()
 
 	// Use test commands and variables to exercise interactive processing
 	var savedCommands commands
 	savedCommands, pprofCommands = pprofCommands, testCommands
-	defer func() { pprofCommands = savedCommands }()
+	defer func { pprofCommands = savedCommands }()
 
 	savedVariables := pprofVariables
-	defer func() { pprofVariables = savedVariables }()
+	defer func { pprofVariables = savedVariables }()
 
 	// Random interleave of independent scripts
 	pprofVariables = testVariables(savedVariables)

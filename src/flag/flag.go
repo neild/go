@@ -462,7 +462,7 @@ func UnquoteUsage(flag *Flag) (name string, usage string) {
 // default values of all defined command-line flags in the set. See the
 // documentation for the global function PrintDefaults for more information.
 func (f *FlagSet) PrintDefaults() {
-	f.VisitAll(func(flag *Flag) {
+	f.VisitAll(func flag {
 		s := fmt.Sprintf("  -%s", flag.Name) // Two spaces before -; see next two comments.
 		name, usage := UnquoteUsage(flag)
 		if len(name) > 0 {
@@ -537,7 +537,7 @@ func (f *FlagSet) defaultUsage() {
 // Custom usage functions may choose to exit the program; by default exiting
 // happens anyway as the command line's error handling strategy is set to
 // ExitOnError.
-var Usage = func() {
+var Usage = func {
 	fmt.Fprintf(CommandLine.Output(), "Usage of %s:\n", os.Args[0])
 	PrintDefaults()
 }

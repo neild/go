@@ -381,7 +381,7 @@ x,,,
 	}}
 
 	for _, tt := range tests {
-		t.Run(tt.Name, func(t *testing.T) {
+		t.Run(tt.Name, func t {
 			r := NewReader(strings.NewReader(tt.Input))
 
 			if tt.Comma != 0 {
@@ -469,11 +469,11 @@ func BenchmarkRead(b *testing.B) {
 }
 
 func BenchmarkReadWithFieldsPerRecord(b *testing.B) {
-	benchmarkRead(b, func(r *Reader) { r.FieldsPerRecord = 4 }, benchmarkCSVData)
+	benchmarkRead(b, func r { r.FieldsPerRecord = 4 }, benchmarkCSVData)
 }
 
 func BenchmarkReadWithoutFieldsPerRecord(b *testing.B) {
-	benchmarkRead(b, func(r *Reader) { r.FieldsPerRecord = -1 }, benchmarkCSVData)
+	benchmarkRead(b, func r { r.FieldsPerRecord = -1 }, benchmarkCSVData)
 }
 
 func BenchmarkReadLargeFields(b *testing.B) {
@@ -485,19 +485,19 @@ xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy,zzzzzzzzzzzzzz
 }
 
 func BenchmarkReadReuseRecord(b *testing.B) {
-	benchmarkRead(b, func(r *Reader) { r.ReuseRecord = true }, benchmarkCSVData)
+	benchmarkRead(b, func r { r.ReuseRecord = true }, benchmarkCSVData)
 }
 
 func BenchmarkReadReuseRecordWithFieldsPerRecord(b *testing.B) {
-	benchmarkRead(b, func(r *Reader) { r.ReuseRecord = true; r.FieldsPerRecord = 4 }, benchmarkCSVData)
+	benchmarkRead(b, func r { r.ReuseRecord = true; r.FieldsPerRecord = 4 }, benchmarkCSVData)
 }
 
 func BenchmarkReadReuseRecordWithoutFieldsPerRecord(b *testing.B) {
-	benchmarkRead(b, func(r *Reader) { r.ReuseRecord = true; r.FieldsPerRecord = -1 }, benchmarkCSVData)
+	benchmarkRead(b, func r { r.ReuseRecord = true; r.FieldsPerRecord = -1 }, benchmarkCSVData)
 }
 
 func BenchmarkReadReuseRecordLargeFields(b *testing.B) {
-	benchmarkRead(b, func(r *Reader) { r.ReuseRecord = true }, strings.Repeat(`xxxxxxxxxxxxxxxx,yyyyyyyyyyyyyyyy,zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww,vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+	benchmarkRead(b, func r { r.ReuseRecord = true }, strings.Repeat(`xxxxxxxxxxxxxxxx,yyyyyyyyyyyyyyyy,zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww,vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 xxxxxxxxxxxxxxxxxxxxxxxx,yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy,zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww,vvvv
 ,,zzzz,wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww,vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy,zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz,wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww,vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

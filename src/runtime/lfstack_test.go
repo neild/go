@@ -99,7 +99,7 @@ func TestLFStackStress(t *testing.T) {
 	}
 	c := make(chan bool, P)
 	for p := 0; p < P; p++ {
-		go func() {
+		go func {
 			r := rand.New(rand.NewSource(rand.Int63()))
 			// Pop a node from a random stack, then push it onto a random stack.
 			for i := 0; i < N; i++ {

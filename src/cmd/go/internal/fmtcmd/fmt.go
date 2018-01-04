@@ -49,7 +49,7 @@ func runFmt(cmd *base.Command, args []string) {
 	wg.Add(procs)
 	fileC := make(chan string, 2*procs)
 	for i := 0; i < procs; i++ {
-		go func() {
+		go func {
 			defer wg.Done()
 			for file := range fileC {
 				base.Run(str.StringList(gofmt, "-l", "-w", file))

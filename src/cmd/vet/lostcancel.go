@@ -42,7 +42,7 @@ func checkLostCancel(f *File, node ast.Node) {
 
 	// Find the set of cancel vars to analyze.
 	stack := make([]ast.Node, 0, 32)
-	ast.Inspect(node, func(n ast.Node) bool {
+	ast.Inspect(node, func n {
 		switch n.(type) {
 		case *ast.FuncLit:
 			if len(stack) > 0 {
@@ -94,7 +94,7 @@ func checkLostCancel(f *File, node ast.Node) {
 
 	// Tell the CFG builder which functions never return.
 	info := &types.Info{Uses: f.pkg.uses, Selections: f.pkg.selectors}
-	mayReturn := func(call *ast.CallExpr) bool {
+	mayReturn := func call {
 		name := callName(info, call)
 		return !noReturnFuncs[name]
 	}
@@ -171,10 +171,10 @@ func lostCancelPath(f *File, g *cfg.CFG, v *types.Var, stmt ast.Node, sig *types
 	vIsNamedResult := sig != nil && tupleContains(sig.Results(), v)
 
 	// uses reports whether stmts contain a "use" of variable v.
-	uses := func(f *File, v *types.Var, stmts []ast.Node) bool {
+	uses := func f, v, stmts {
 		found := false
 		for _, stmt := range stmts {
-			ast.Inspect(stmt, func(n ast.Node) bool {
+			ast.Inspect(stmt, func n {
 				switch n := n.(type) {
 				case *ast.Ident:
 					if f.pkg.uses[n] == v {
@@ -195,7 +195,7 @@ func lostCancelPath(f *File, g *cfg.CFG, v *types.Var, stmt ast.Node, sig *types
 
 	// blockUses computes "uses" for each block, caching the result.
 	memo := make(map[*cfg.Block]bool)
-	blockUses := func(f *File, v *types.Var, b *cfg.Block) bool {
+	blockUses := func f, v, b {
 		res, ok := memo[b]
 		if !ok {
 			res = uses(f, v, b.Nodes)
@@ -236,7 +236,7 @@ outer:
 	// return block, in which v is never "used".
 	seen := make(map[*cfg.Block]bool)
 	var search func(blocks []*cfg.Block) *ast.ReturnStmt
-	search = func(blocks []*cfg.Block) *ast.ReturnStmt {
+	search = func blocks {
 		for _, b := range blocks {
 			if !seen[b] {
 				seen[b] = true

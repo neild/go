@@ -50,7 +50,7 @@ func linknew(arch *sys.Arch) *Link {
 		log.Fatalf("invalid objabi.GOARCH %s (want %s)", objabi.GOARCH, arch.Name)
 	}
 
-	AtExit(func() {
+	AtExit(func {
 		if nerrors > 0 && ctxt.Out.f != nil {
 			ctxt.Out.f.Close()
 			mayberemoveoutfile()

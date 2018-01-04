@@ -19,12 +19,12 @@ import (
 func TestEndlessWrite(t *testing.T) {
 	t.Parallel()
 	c := make(chan bool)
-	server := func(cs *TCPConn) error {
+	server := func cs {
 		cs.CloseWrite()
 		<-c
 		return nil
 	}
-	client := func(ss *TCPConn) error {
+	client := func ss {
 		// Tell the server to return when we return.
 		defer close(c)
 
